@@ -1,0 +1,530 @@
+<title>BuildI Cliente Ciclo Completo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --plaster: #e4e8e1;
+  --paper: #fbfaf6;
+  --ink: #2b2a26;
+  --ink-2: #5e6259;
+  --line: rgba(43,42,38,.13);
+  --sage: #4f7d61;
+  --sage-2: #dfe9e2;
+  --clay: #b0561f;
+  --clay-2: #f6e3d6;
+  --brass: #c9a24a;
+  --blue: #3c6e9e;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--plaster); color: var(--ink); font: 15px/1.55 var(--sans); padding-inline: 20px; padding-block: 36px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow b { background: var(--sage); color: #fff; padding: 3px 7px; font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 74px)/.98 var(--serif); letter-spacing: -.025em; margin: 14px 0 16px; text-wrap: balance; max-width: 16ch; }
+h1 em { font-style: italic; font-weight: 400; color: var(--sage); }
+h2 { font: 700 clamp(30px, 4vw, 46px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+.lede { font-size: 18px; max-width: 58ch; margin: 0 0 14px; }
+.sub { color: var(--ink-2); max-width: 62ch; margin: 0 0 20px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.tabsx { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; }
+.tx { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tx button { border: 1px solid var(--ink); background: var(--paper); padding: 7px 10px; font: 600 13px var(--sans); text-align: left; border-radius: 10px; display: flex; gap: 8px; align-items: center; }
+.tx button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tx b { font: 700 17px/1.2 var(--serif); display: block; margin-bottom: 2px; }
+.tx p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* phone */
+.phone { width: 384px; max-width: 100%; border-radius: 50px; background: #121412; padding: 11px; box-shadow: 0 40px 80px rgba(43,42,38,.3), inset 0 0 0 2px #3a3d38; justify-self: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.screen { border-radius: 40px; overflow: hidden; overflow: clip; position: relative; background: #f6f2ea; height: 790px; }
+.island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #000; border-radius: 20px; z-index: 40; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 12px 100px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: vin .4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes vin { from { opacity: 0; transform: translateY(8px); } }
+.greet small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; }
+.greet h3 { font: 700 27px/1.05 var(--serif); letter-spacing: -.015em; margin: 4px 0 0; }
+.greet h3 em { font-style: italic; font-weight: 400; color: var(--sage); }
+.pc { background: #fffdf9; border-radius: 22px; padding: 12px; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; margin-bottom: 8px; }
+.hd b { color: var(--ink); font-weight: 500; }
+.hd button { border: 0; background: none; font: 600 11.5px var(--sans); color: var(--sage); text-transform: none; letter-spacing: 0; padding: 0; }
+.hscroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* inicio */
+.intent { flex: none; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px 12px; width: 118px; text-align: left; display: grid; gap: 4px; }
+.intent .ic { font-size: 22px; }
+.intent b { font-size: 12.5px; line-height: 1.2; }
+.intent small { font: 500 10px var(--mono); color: #7a746a; }
+.intent[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.intent[aria-pressed="true"] small { color: #c7c2b8; }
+.ideas { columns: 2; column-gap: 8px; }
+.idea { break-inside: avoid; margin-bottom: 8px; background: #fffdf9; border-radius: 18px; overflow: hidden; border: 0; padding: 0; width: 100%; text-align: left; display: block; position: relative; }
+.idea .img { display: block; width: 100%; }
+.idea .t { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.idea .t b { font: 600 13.5px/1.2 var(--serif); }
+.idea .t small { font: 500 10px var(--mono); color: #7a746a; }
+.idea .save { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,253,249,.9); display: grid; place-items: center; font-size: 13px; border: 0; }
+.idea .save.on { background: var(--clay); color: #fff; }
+.tagx { position: absolute; top: 8px; left: 8px; font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: rgba(43,42,38,.75); color: #fff; padding: 3px 6px; border-radius: 6px; }
+.ba { position: relative; height: 170px; border-radius: 14px; overflow: hidden; touch-action: none; cursor: ew-resize; user-select: none; }
+.ba canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .top { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 3px solid #fff; }
+.ba .top canvas { width: var(--w); }
+.ba .lb { position: absolute; top: 8px; font: 500 9.5px var(--mono); background: rgba(0,0,0,.6); color: #fff; padding: 2px 6px; border-radius: 4px; z-index: 2; }
+.est { display: grid; gap: 8px; }
+.est .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 12.5px; }
+.seg { display: flex; background: #ece5d8; border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 4px; border-radius: 8px; font: 600 11.5px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+input[type=range] { accent-color: var(--sage); width: 100%; }
+.est .res { background: var(--sage-2); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.est .res b { font: 700 22px var(--serif); color: var(--sage); }
+.est .res small { font-size: 11.5px; color: var(--ink-2); display: block; }
+.cta { border: 0; background: var(--ink); color: #fff; border-radius: 14px; padding: 12px; font: 700 14px var(--sans); width: 100%; }
+.cta.sage { background: var(--sage); }
+.cta.ghost { background: none; color: var(--ink); border: 1px solid var(--ink); }
+
+/* obras */
+.proj { background: #fffdf9; border-radius: 22px; padding: 0; overflow: hidden; border: 0; width: 100%; text-align: left; display: grid; }
+.proj .img { height: 92px; position: relative; }
+.proj .img span { position: absolute; left: 10px; bottom: 8px; font: 500 9.5px var(--mono); background: rgba(255,253,249,.92); padding: 3px 7px; border-radius: 6px; }
+.proj .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.proj b { font: 700 17px/1.15 var(--serif); }
+.proj small { font-size: 12px; color: #7a746a; }
+.stg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.stg i { height: 6px; border-radius: 4px; background: #ece5d8; display: block; }
+.stg i.d { background: var(--sage); } .stg i.n { background: var(--clay); }
+.stg-l { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; font: 500 8.5px var(--mono); color: #9a958b; text-transform: uppercase; }
+.stg-l span.n { color: var(--clay); }
+.next { display: flex; justify-content: space-between; align-items: center; background: var(--clay-2); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; }
+.next b { font: 600 12.5px var(--sans); }
+.next em { font-style: normal; font: 500 11px var(--mono); color: var(--clay); }
+.newp { border: 1.5px dashed #b9b2a4; background: none; border-radius: 22px; padding: 14px; display: grid; gap: 2px; text-align: left; }
+.newp b { font: 700 15px var(--serif); }
+.newp small { font-size: 12px; color: #7a746a; }
+.back { border: 0; background: none; font: 600 13px var(--sans); color: var(--sage); padding: 0; justify-self: start; }
+.kpi2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpi2 div { background: #fffdf9; border-radius: 16px; padding: 9px 10px; }
+.kpi2 b { display: block; font: 700 21px/1 var(--serif); }
+.kpi2 small { font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #7a746a; }
+.appr { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; position: relative; }
+.appr:first-of-type { border-top: 0; }
+.appr .sw { width: 44px; height: 44px; border-radius: 10px; }
+.appr b { font-size: 13px; display: block; }
+.appr small { font-size: 11.5px; color: #7a746a; }
+.appr .acts { grid-column: 2; display: flex; gap: 6px; }
+.appr .acts button { border: 1px solid var(--ink); background: none; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.appr .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.appr .done { grid-column: 2; font: 500 11px var(--mono); color: var(--sage); }
+.dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dg { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 2px; font-size: 11.5px; border: 0; text-align: left; }
+.dg i { font-style: normal; font-size: 17px; }
+.dg b { font-size: 12px; }
+.dg small { font: 500 9.5px var(--mono); color: #7a746a; }
+.feed { display: grid; gap: 8px; }
+.fi { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+.fi .ph { width: 54px; height: 44px; border-radius: 8px; }
+.fi b { font-size: 13px; display: block; }
+.fi small { font-size: 11px; color: #7a746a; }
+
+/* hogar */
+.props { display: flex; gap: 6px; }
+.prop { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 14px; padding: 8px 10px; text-align: left; display: grid; gap: 1px; }
+.prop b { font-size: 12.5px; }
+.prop small { font: 500 9.5px var(--mono); color: #7a746a; }
+.prop[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.health { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
+.ring { position: relative; width: 104px; height: 104px; }
+.ring svg { width: 104px; height: 104px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .v { stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,1.3,.5,1); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; text-align: center; }
+.ring .in b { font: 700 30px/1 var(--serif); }
+.ring .in small { font: 500 8.5px var(--mono); color: #7a746a; }
+.hl { display: grid; gap: 5px; font-size: 12.5px; }
+.hl div { display: flex; justify-content: space-between; gap: 6px; }
+.hl b { font-family: var(--mono); font-weight: 500; font-size: 12px; }
+.task { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.task:first-of-type { border-top: 0; }
+.task .d { width: 40px; height: 44px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; align-content: center; text-align: center; }
+.task .d b { font: 700 16px/1 var(--serif); }
+.task .d small { font: 500 8px var(--mono); text-transform: uppercase; color: #7a746a; }
+.task b.t { font-size: 13px; display: block; }
+.task small.s { font-size: 11.5px; color: #7a746a; }
+.task button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.task button.done { background: var(--sage-2); color: var(--sage); }
+.task.urgent .d { background: var(--clay-2); }
+.task.urgent .d b { color: var(--clay); }
+.use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.use div { background: #f6f2ea; border-radius: 14px; padding: 8px 9px; display: grid; gap: 2px; }
+.use b { font: 700 17px/1 var(--serif); }
+.use small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; letter-spacing: .05em; }
+.use svg { width: 100%; height: 26px; }
+.use em { font-style: normal; font: 500 10px var(--mono); }
+.alertx { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--clay-2); border-radius: 16px; padding: 10px 12px; font-size: 12.5px; }
+.alertx i { font-style: normal; font-size: 20px; }
+.alertx b { display: block; font-size: 13px; }
+.svc { flex: none; width: 112px; border: 0; background: #fffdf9; border-radius: 16px; padding: 10px; display: grid; gap: 3px; text-align: left; }
+.svc i { font-style: normal; font-size: 20px; }
+.svc b { font-size: 12.5px; line-height: 1.2; }
+.svc small { font: 500 10px var(--mono); color: var(--sage); }
+.war { display: grid; gap: 7px; }
+.war div { display: grid; gap: 3px; font-size: 12.5px; }
+.war .l { display: flex; justify-content: space-between; }
+.war .l em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.bar { height: 6px; border-radius: 6px; background: #ece5d8; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; background: var(--sage); }
+.keycard { border-radius: 18px; padding: 14px 16px; background: linear-gradient(150deg, #2e3a33, #1b221e 60%, #3a2f1a); color: #f3ead4; display: flex; justify-content: space-between; align-items: center; }
+.keycard b { font: 700 17px/1.1 var(--serif); display: block; }
+.keycard small { font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #c3ccc5; }
+.keycard .chip { width: 34px; height: 25px; border-radius: 4px; background: linear-gradient(135deg, #f3dc9a, #c9a24a 50%, #a88234); }
+
+/* perfil */
+.me { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.me .av { width: 62px; height: 62px; border-radius: 50%; background: var(--sage); color: #fff; display: grid; place-items: center; font: 700 22px var(--serif); }
+.me b { font: 700 21px var(--serif); display: block; }
+.me small { font-size: 12.5px; color: #7a746a; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.style-tags span { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--sage-2); color: var(--sage); }
+.mrow { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13.5px; }
+.mrow:first-of-type { border-top: 0; }
+.mrow i { font-style: normal; font-size: 17px; }
+.mrow small { font: 500 11px var(--mono); color: #7a746a; }
+.mrow b { font-weight: 600; display: block; }
+.mrow span.s { font-size: 11.5px; color: #7a746a; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 82%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh .img { height: 150px; border-radius: 16px; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.facts div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.facts b { display: block; font: 700 16px/1.1 var(--serif); }
+.facts small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; }
+.steps { display: grid; gap: 4px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 12.5px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--sage-2); color: var(--sage); display: grid; place-items: center; font: 600 11px var(--mono); }
+
+/* tab bar */
+.tabs { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; border-radius: 26px; background: rgba(255,253,249,.74); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(43,42,38,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+.tabs button { border: 0; background: none; padding: 7px 0 6px; display: grid; justify-items: center; gap: 2px; font: 600 10.5px var(--sans); color: #7a746a; position: relative; z-index: 1; transition: color .3s; }
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-selected="true"] { color: var(--ink); }
+.tabs .ind { position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 21px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .55s cubic-bezier(.3,1.4,.5,1), width .55s; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 15px; height: 15px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9px/15px var(--mono); padding: 0 3px; }
+.toast { position: absolute; left: 50%; top: 48px; transform: translate(-50%, -170%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; z-index: 50; transition: transform .45s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translate(-50%, 0); }
+
+/* journey */
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .journey { grid-template-columns: 1fr; } }
+.jst { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c); }
+.jst .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--ink-2); display: flex; justify-content: space-between; }
+.jst .n span { color: var(--c); }
+.jst b { font: 700 20px/1.1 var(--serif); }
+.jst p.q { margin: 0; font: italic 400 14px/1.35 var(--serif); color: var(--ink-2); }
+.jst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.jst li { display: grid; grid-template-columns: 12px 1fr; gap: 6px; }
+.jst li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-top: 7px; }
+.jst .where { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 6px; }
+.loop { display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); border-radius: 4px; padding: 16px 18px; margin-top: 12px; }
+.loop i { font-style: normal; font-size: 26px; }
+.loop b { font: 700 18px var(--serif); display: block; }
+.loop span { font-size: 13.5px; color: #c7c2b8; }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.biz div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.biz b { font: 700 17px/1.2 var(--serif); }
+.biz p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><b>Propuesta · App del cliente</b> BuildI · de la idea a vivirla</div>
+      <h1>Tu espacio, <em>de la duda al disfrute</em></h1>
+      <p class="lede">El cliente no llega con un proyecto; llega con una duda: "¿qué hago con este espacio?". La app lo acompaña desde ahí hasta muchos años después de vivir en él, con cuatro secciones.</p>
+      <p class="sub">El teléfono es un prototipo que funciona. Toca las secciones de la barra de abajo o los botones de aquí. Mariana tiene una casa en Providencia, un departamento en obra y una remodelación en diseño. Los datos son de ejemplo.</p>
+      <div class="tabsx" id="tabsx">
+        <div class="tx"><button type="button" data-tab="0" aria-pressed="true">✦ Inicio</button><div><b>Inspiración para tu espacio</b><p>"¿Qué quieres hacer?" con ideas de interiorismo, espacios, soluciones constructivas y muebles. Cada idea trae costo y tiempo estimado, y un botón para hacerla con BuildI. Incluye un estimador rápido y casos reales de antes y después.</p></div></div>
+        <div class="tx"><button type="button" data-tab="1" aria-pressed="false">▤ Mis obras</button><div><b>Todas tus obras en un lugar</b><p>Cada proyecto con su etapa (idea, diseño, presupuesto, obra, entrega). Adentro: avance, pagos, aprobaciones pendientes, documentos, bitácora con fotos y chat con el constructor. Es el "site access" del cliente.</p></div></div>
+        <div class="tx"><button type="button" data-tab="2" aria-pressed="false">⌂ Mi hogar</button><div><b>Mantenimiento y uso inteligente</b><p>Por propiedad: salud del hogar, mantenimiento programado, consumos de luz, agua y gas, garantías vigentes, servicios a precio fijo, el expediente de la casa y la Llave BuildI.</p></div></div>
+        <div class="tx"><button type="button" data-tab="3" aria-pressed="false">◯ Perfil</button><div><b>Tú, tu familia y tus preferencias</b><p>Tu estilo (aprendido de lo que guardas), propiedades, accesos para la familia, pagos, documentos personales y soporte.</p></div></div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="toast" id="toast"></div>
+        <div class="scroll" id="scroll"></div>
+        <div class="scrim" id="scrim"></div>
+        <div class="sheet" id="sheet"><div class="grab"></div><div class="sh" id="sh"></div></div>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="App del cliente">
+          <div class="ind" id="ind"></div>
+          <button role="tab" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9 1.3 5.8L12 16l-4.9 3 1.3-5.8L4 9.3l5.8-.7z"/></svg>Inicio</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/><path d="M2 21h20"/></svg>Mis obras<span class="badge">2</span></button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Mi hogar</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Todos los servicios, del primer "¿y si…?" a vivir la casa</h2>
+    <p class="sub">Ocho etapas. Cada una tiene la pregunta que se hace el cliente, los servicios que el constructor puede darle y en qué sección de la app vive.</p>
+    <div class="journey">
+      <div class="jst" style="--c:#b0561f"><span class="n">01 <span>INICIO</span></span><b>Inspirarse</b><p class="q">"No sé qué hacer con este espacio."</p><ul><li>Ideas de interiorismo, espacios y muebles</li><li>Soluciones constructivas (ampliar, abrir muros, terrazas)</li><li>Casos reales de antes y después</li><li>Estimador rápido de costo y tiempo</li><li>Guardar ideas y aprender tu estilo</li></ul><span class="where">Vive en: Inicio</span></div>
+      <div class="jst" style="--c:#b0561f"><span class="n">02 <span>INICIO → OBRAS</span></span><b>Diagnosticar</b><p class="q">"¿Se puede hacer en mi casa?"</p><ul><li>Visita técnica a domicilio</li><li>Levantamiento y medición (escaneo 3D)</li><li>Revisión estructural e instalaciones</li><li>Factibilidad, uso de suelo y permisos</li><li>Avalúo y plusvalía esperada</li></ul><span class="where">Vive en: Inicio · se crea la obra</span></div>
+      <div class="jst" style="--c:#c9a24a"><span class="n">03 <span>MIS OBRAS</span></span><b>Diseñar</b><p class="q">"¿Cómo se va a ver y cuánto cuesta?"</p><ul><li>Proyecto arquitectónico e interiorismo</li><li>Renders y recorrido virtual</li><li>Muebles a medida y carpintería</li><li>Selección de acabados en tu espacio</li><li>Presupuesto detallado por partida</li></ul><span class="where">Vive en: Mis obras</span></div>
+      <div class="jst" style="--c:#c9a24a"><span class="n">04 <span>MIS OBRAS</span></span><b>Decidir y financiar</b><p class="q">"¿Cómo lo pago y qué firmo?"</p><ul><li>Contrato claro con calendario y fianza</li><li>Licencia de construcción y DRO</li><li>Financiamiento, crédito o pagos por avance</li><li>Pagos protegidos (se liberan con avance)</li><li>Seguro de obra</li></ul><span class="where">Vive en: Mis obras</span></div>
+      <div class="jst" style="--c:#3c6e9e"><span class="n">05 <span>MIS OBRAS</span></span><b>Construir</b><p class="q">"¿Cómo va mi obra?"</p><ul><li>Avance en vivo, fotos y bitácora</li><li>Aprobaciones de cambios y acabados</li><li>Visitas de obra programadas</li><li>Chat directo con el residente</li><li>Pagos ligados a lo construido</li></ul><span class="where">Vive en: Mis obras</span></div>
+      <div class="jst" style="--c:#3c6e9e"><span class="n">06 <span>OBRAS → HOGAR</span></span><b>Recibir</b><p class="q">"¿Todo quedó bien?"</p><ul><li>Inspección y lista de pendientes</li><li>Ceremonia de entrega y Llave BuildI</li><li>Planos finales (cómo quedó realmente)</li><li>Manuales de equipos y garantías</li><li>Limpieza final y mudanza</li></ul><span class="where">Pasa de Mis obras a Mi hogar</span></div>
+      <div class="jst" style="--c:#4f7d61"><span class="n">07 <span>MI HOGAR</span></span><b>Vivir y cuidar</b><p class="q">"¿Qué le toca a mi casa?"</p><ul><li>Mantenimiento preventivo programado</li><li>Reparaciones por garantía y servicios a precio fijo</li><li>Consumos de luz, agua y gas, y alertas de fugas</li><li>Hogar inteligente: sensores, accesos, cámaras</li><li>Seguro del hogar</li></ul><span class="where">Vive en: Mi hogar</span></div>
+      <div class="jst" style="--c:#4f7d61"><span class="n">08 <span>MI HOGAR → INICIO</span></span><b>Mejorar y continuar</b><p class="q">"Ya cambió mi vida, ¿y mi casa?"</p><ul><li>Expediente completo del hogar</li><li>Mejoras sugeridas (familia crece, home office)</li><li>Administración de rentas</li><li>Venta con historial que da valor</li><li>Plusvalía de tu propiedad</li></ul><span class="where">Vive en: Mi hogar · regresa a Inicio</span></div>
+    </div>
+    <div class="loop"><i>↻</i><div><b>El ciclo vuelve a empezar</b><span>Cada necesidad nueva de la casa (un bebé, trabajar desde casa, una terraza) aparece en Inicio como idea, ya con las medidas y el historial de su hogar. El cliente nunca tiene que volver a explicar su casa.</span></div></div>
+  </section>
+
+  <section>
+    <h2>Por qué este orden le conviene al constructor</h2>
+    <div class="biz">
+      <div><b>Inicio trae clientes nuevos</b><p>La inspiración es la puerta de entrada: cada idea guardada es un posible proyecto, con estilo y presupuesto ya conocidos.</p></div>
+      <div><b>Mis obras da confianza</b><p>Transparencia en avance y pagos: menos llamadas, aprobaciones a tiempo y recomendaciones.</p></div>
+      <div><b>Mi hogar crea ingresos recurrentes</b><p>Mantenimiento, servicios y garantías mantienen la relación por años, no solo durante la obra.</p></div>
+      <div><b>El expediente hace que vuelvan</b><p>Quien tiene la historia de la casa es a quien llaman para la siguiente remodelación.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const setup = c => { const w = c.clientWidth, h = c.clientHeight, d = devicePixelRatio || 1; c.width = w * d; c.height = h * d; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, w, h]; };
+  let toastT; const toast = s => { const t = $('toast'); t.textContent = s; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2300); };
+  const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+
+  /* ---------- "photo" generator: rooms drawn as illustrations ---------- */
+  function room(c, kind) {
+    const [x, W, H] = setup(c);
+    const P = { cocina: ['#e9e2d4', '#c79a64', '#4f7d61'], sala: ['#efe8dc', '#b98b5a', '#9fb7a6'], terraza: ['#cfe3f3', '#a08a6c', '#6b8f5e'], bano: ['#e3e9ea', '#d9d4ca', '#3c6e9e'], home: ['#ece6dc', '#7a5a3c', '#b0561f'], recamara: ['#e3ebe0', '#b98b5a', '#c9a24a'], fachada: ['#bcd5ee', '#9aa1a4', '#4f7d61'], closet: ['#f1ece2', '#a0764f', '#2b2a26'], obra: ['#dcebf6', '#b9ad97', '#9aa1a4'] }[kind] || ['#efe8dc', '#b98b5a', '#4f7d61'];
+    x.fillStyle = P[0]; x.fillRect(0, 0, W, H); x.fillStyle = P[1]; x.fillRect(0, H * .72, W, H);
+    if (kind === 'cocina') { x.fillStyle = '#f5f2ec'; x.fillRect(W * .08, H * .45, W * .84, H * .27); x.fillStyle = P[2]; x.fillRect(W * .08, H * .5, W * .84, H * .22); x.fillStyle = '#3a3a3a'; x.fillRect(W * .06, H * .45, W * .88, 5); x.fillStyle = P[2]; x.fillRect(W * .1, H * .12, W * .45, H * .18); x.fillStyle = '#ffd9a0'; [.25, .5, .75].forEach(k => { x.beginPath(); x.arc(W * k, H * .3, 6, 0, 7); x.fill(); }); }
+    else if (kind === 'sala' || kind === 'recamara') { x.fillStyle = '#9fc4e6'; x.fillRect(W * .3, H * .1, W * .4, H * .4); x.strokeStyle = '#2b2a26'; x.lineWidth = 3; x.strokeRect(W * .3, H * .1, W * .4, H * .4); x.fillStyle = P[2]; if (kind === 'sala') { x.fillRect(W * .15, H * .55, W * .7, H * .14); x.fillRect(W * .13, H * .62, W * .74, H * .14); } else { x.fillStyle = '#fff'; x.fillRect(W * .2, H * .58, W * .6, H * .18); x.fillStyle = P[2]; x.fillRect(W * .2, H * .64, W * .6, H * .14); } x.fillStyle = '#6b8f5e'; x.beginPath(); x.arc(W * .1, H * .6, W * .06, 0, 7); x.fill(); }
+    else if (kind === 'terraza') { x.fillStyle = '#7a5a3c'; for (let i = 0; i < 6; i++) x.fillRect(W * (.1 + i * .16), H * .1, W * .03, H * .62); x.fillRect(W * .05, H * .1, W * .9, H * .05); x.fillStyle = '#f3ead4'; x.fillRect(W * .25, H * .55, W * .5, H * .12); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .85, H * .5, W * .09, 0, 7); x.fill(); }
+    else if (kind === 'bano') { x.fillStyle = '#fff'; x.fillRect(W * .55, H * .2, W * .3, H * .52); x.strokeStyle = 'rgba(0,0,0,.08)'; for (let i = 0; i < W; i += 14) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H * .72); x.stroke(); } x.fillStyle = P[2]; x.fillRect(W * .12, H * .48, W * .3, H * .24); x.fillStyle = '#e8e8e8'; x.beginPath(); x.ellipse(W * .27, H * .48, W * .12, H * .05, 0, 0, 7); x.fill(); }
+    else if (kind === 'home') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .5, W * .8, H * .06); x.fillRect(W * .15, H * .56, W * .04, H * .16); x.fillRect(W * .8, H * .56, W * .04, H * .16); x.fillStyle = '#2b2a26'; x.fillRect(W * .35, H * .3, W * .28, H * .18); x.fillStyle = '#9fc4e6'; x.fillRect(W * .37, H * .32, W * .24, H * .14); x.fillStyle = P[2]; x.fillRect(W * .7, H * .15, W * .2, H * .3); }
+    else if (kind === 'fachada') { x.fillStyle = '#f3ede2'; x.fillRect(W * .15, H * .25, W * .7, H * .47); x.fillStyle = '#2b2a26'; x.beginPath(); x.moveTo(W * .1, H * .27); x.lineTo(W * .5, H * .05); x.lineTo(W * .9, H * .27); x.fill(); x.fillStyle = '#9fc4e6'; x.fillRect(W * .25, H * .35, W * .18, H * .15); x.fillRect(W * .57, H * .35, W * .18, H * .15); x.fillStyle = '#7a5a3c'; x.fillRect(W * .44, H * .52, W * .12, H * .2); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .08, H * .66, W * .07, 0, 7); x.fill(); }
+    else if (kind === 'closet') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .08, W * .8, H * .64); x.fillStyle = '#f1ece2'; for (let i = 0; i < 3; i++) x.fillRect(W * (.13 + i * .26), H * .12, W * .22, H * .56); x.fillStyle = '#b0561f'; x.fillRect(W * .15, H * .2, W * .18, H * .1); x.fillStyle = '#4f7d61'; x.fillRect(W * .42, H * .18, W * .18, H * .3); }
+    else if (kind === 'obra') { x.fillStyle = '#9aa1a4'; for (let f = 0; f < 3; f++) { x.fillRect(W * .2, H * (.62 - f * .18), W * .6, 6); for (let k = 0; k <= 4; k++) x.fillRect(W * (.2 + k * .15) - 2, H * (.62 - f * .18) + 6, 4, H * .12); } x.strokeStyle = '#ff5f0f'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .88, H * .72); x.lineTo(W * .88, H * .05); x.lineTo(W * .4, H * .05); x.stroke(); }
+  }
+
+  /* ---------- data ---------- */
+  const INTENTS = [['🍳', 'Remodelar cocina', 'desde $180k'], ['🛋', 'Interiorismo', 'desde $45k'], ['🧱', 'Ampliar o abrir', 'desde $250k'], ['🪵', 'Muebles a medida', 'desde $28k'], ['🌿', 'Terraza y jardín', 'desde $90k'], ['🏠', 'Construir desde cero', 'desde $2.4M']];
+  const IDEAS = [
+    ['cocina', 'Cocina abierta con isla', 'Ampliar · interiorismo', 0, 150, '$220k–$340k', '5–7 sem', 'Abrir el muro hacia la sala para una cocina integrada con isla de 2.4 m. Requiere revisar si el muro es de carga.'],
+    ['closet', 'Clóset a medida de piso a techo', 'Muebles', 3, 110, '$32k–$58k', '3 sem', 'Carpintería a medida con puertas lisas y luz interior. Se fabrica en taller y se instala en 2 días.'],
+    ['terraza', 'Pérgola de madera en azotea', 'Exterior', 4, 130, '$95k–$160k', '4 sem', 'Pérgola de madera tratada con piso deck y riego por goteo. Incluye revisión de impermeabilización.'],
+    ['home', 'Home office en recámara de visitas', 'Espacios', 1, 100, '$38k–$70k', '2 sem', 'Escritorio flotante, librero, iluminación de trabajo y aislamiento acústico ligero.'],
+    ['bano', 'Baño con regadera de piso', 'Remodelación', 0, 120, '$85k–$140k', '3 sem', 'Regadera sin cancel de obra, piso continuo, nicho iluminado y llave termostática.'],
+    ['sala', 'Sala con luz cálida y muro de madera', 'Interiorismo', 1, 140, '$45k–$90k', '2 sem', 'Lambrín de madera, iluminación indirecta de 2700 K y cortinas de piso a techo.'],
+    ['fachada', 'Renovar fachada y entrada', 'Exterior', 2, 120, '$120k–$210k', '4 sem', 'Nuevo aplanado, celosía de madera, iluminación exterior y puerta principal.'],
+    ['recamara', 'Recámara para un bebé', 'Espacios', 1, 110, '$30k–$55k', '2 sem', 'Pintura sin olor, piso suave, clóset con cambiador y cortinas blackout.']
+  ];
+  const saved = new Set([0, 4]);
+  const RATES = { Cocina: [9000, 14000], Baño: [11000, 17000], Sala: [3500, 7000], Recámara: [3000, 6000], Terraza: [6000, 10000] };
+  const LVL = { Básico: .8, Medio: 1, Premium: 1.45 };
+  let est = { room: 'Cocina', m2: 14, lvl: 'Medio' };
+
+  const PROJECTS = [
+    { id: 0, name: 'Depto 6B · Torre Norte', kind: 'obra', st: 3, pct: 28, where: 'Zapopan · compra en preventa', next: ['Pago mensual 13', 'Oct 5 · $48,125'], appr: [['#b98b5a', 'Piso de sala: roble natural', 'Incluido · decide antes del 1 dic'], ['#3a3a3a', 'Cubierta de cocina: cuarzo negro', '+$12,900 · decide antes del 1 dic']] },
+    { id: 1, name: 'Cocina · casa Providencia', kind: 'cocina', st: 1, pct: 0, where: 'Guadalajara · remodelación', next: ['Revisar render v2', 'Lo envió Arq. Lucía · ayer'], appr: [['#4f7d61', 'Render v2: isla de 2.4 m', 'Diseño · 2 cambios respecto a v1']] },
+    { id: 2, name: 'Terraza · casa Providencia', kind: 'terraza', st: 0, pct: 0, where: 'Idea guardada', next: ['Pedir visita técnica', 'Sin costo · 45 min'], appr: [] }
+  ];
+  const STAGES = ['Idea', 'Diseño', 'Presup.', 'Obra', 'Entrega', 'Hogar'];
+
+  const PROPS = [
+    { id: 0, name: 'Casa Providencia', sub: 'Desde 2019 · 180 m²', health: 82 },
+    { id: 1, name: 'Depto 6B', sub: 'En obra · llaves abr 2027', health: null }
+  ];
+  const TASKS = [
+    { d: '10', m: 'oct', t: 'Impermeabilizar azotea', s: 'Antes de que termine la temporada · garantía de 5 años', p: '$14,800', urgent: true },
+    { d: '18', m: 'oct', t: 'Limpieza de cisterna y tinaco', s: 'Cada 6 meses · la última fue en abril', p: '$1,450' },
+    { d: '02', m: 'nov', t: 'Servicio al calentador', s: 'Anual · revisa piloto y sarro', p: '$890' },
+    { d: '15', m: 'nov', t: 'Revisar sellos de ventanas', s: 'Antes del frío · evita filtraciones', p: '$1,200' }
+  ];
+  const booked = new Set();
+
+  /* ---------- views ---------- */
+  function vInicio() {
+    const cur = INTENTS[intent];
+    const list = IDEAS.map((d, i) => [d, i]).filter(([d]) => intent < 0 || d[3] === intent || (intent === 2 && d[2].includes('Exterior')) || (intent === 4 && d[2] === 'Exterior'));
+    const show = list.length ? list : IDEAS.map((d, i) => [d, i]);
+    const [lo, hi] = RATES[est.room]; const f = LVL[est.lvl];
+    return `<div class="view">
+      <div class="greet"><small><span>Buenos días, Mariana</span><span>${saved.size} guardadas</span></small><h3>¿Qué quieres hacer <em>con tu espacio?</em></h3></div>
+      <div class="hscroll">${INTENTS.map((t, i) => `<button type="button" class="intent" data-int="${i}" aria-pressed="${i === intent}"><span class="ic">${t[0]}</span><b>${t[1]}</b><small>${t[2]}</small></button>`).join('')}</div>
+      <div class="hd" style="margin:4px 2px -4px"><span>${intent < 0 ? 'Ideas para ti · por tu estilo cálido y natural' : 'Ideas de ' + cur[1].toLowerCase()}</span>${intent < 0 ? '' : '<button type="button" data-int="-1">Ver todo</button>'}</div>
+      <div class="ideas">${show.map(([d, i]) => `<button type="button" class="idea" data-idea="${i}"><canvas class="img" data-room="${d[0]}" style="height:${d[4]}px"></canvas><span class="tagx">${d[2]}</span><span class="save ${saved.has(i) ? 'on' : ''}" data-save="${i}" role="button" aria-label="Guardar">♥</span><span class="t"><b>${d[1]}</b><small>${d[5]} · ${d[6]}</small></span></button>`).join('')}</div>
+      <div class="pc"><div class="hd"><span>Antes y después · caso real</span><b>Chapalita · 2025</b></div><div class="ba" id="ba"><canvas id="baA"></canvas><div class="top" id="baTop"><canvas id="baB"></canvas></div><span class="lb" style="left:8px">ANTES</span><span class="lb" style="right:8px">DESPUÉS</span></div><p style="margin:8px 0 0;font-size:12.5px;color:#5e6259">Cocina de 12 m² abierta a la sala · 6 semanas · $268,000 · ★ 4.9</p></div>
+      <div class="pc est"><div class="hd"><span>Estimador rápido</span><b>sin compromiso</b></div>
+        <div class="row"><span>Espacio</span><div class="seg" id="estRoom">${Object.keys(RATES).map(r => `<button type="button" data-r="${r}" aria-pressed="${r === est.room}">${r}</button>`).join('')}</div></div>
+        <div class="row"><span id="estLbl">${est.m2} m²</span><input type="range" id="estM2" min="4" max="40" value="${est.m2}" aria-label="Metros cuadrados"></div>
+        <div class="row"><span>Nivel</span><div class="seg" id="estLvl">${Object.keys(LVL).map(r => `<button type="button" data-l="${r}" aria-pressed="${r === est.lvl}">${r}</button>`).join('')}</div></div>
+        <div class="res" id="estRes"><div><small>Costo estimado</small><b>${money(lo * est.m2 * f)}–${money(hi * est.m2 * f)}</b></div><div style="text-align:right"><small>Tiempo</small><b style="font-size:17px">${Math.max(2, Math.round(est.m2 / 4 * f))}–${Math.max(3, Math.round(est.m2 / 3 * f))} sem</b></div></div>
+        <button class="cta sage" type="button" data-visit="1">Pedir visita técnica sin costo</button></div>
+    </div>`;
+  }
+  function vObras() {
+    if (openProj >= 0) return vObra(PROJECTS[openProj]);
+    return `<div class="view">
+      <div class="greet"><small><span>Mis obras</span><span>3 proyectos</span></small><h3>Todo lo que estás <em>construyendo</em></h3></div>
+      ${PROJECTS.map(p => `<button type="button" class="proj" data-proj="${p.id}"><span class="img" style="display:block"><canvas data-room="${p.kind}" style="width:100%;height:92px;display:block"></canvas><span>${p.where}</span></span><span class="t"><b>${p.name}</b>
+        <span class="stg">${STAGES.map((s, i) => `<i class="${i < p.st ? 'd' : i === p.st ? 'n' : ''}"></i>`).join('')}</span><span class="stg-l">${STAGES.map((s, i) => `<span class="${i === p.st ? 'n' : ''}">${s}</span>`).join('')}</span>
+        <span class="next"><span><b>${p.next[0]}</b></span><em>${p.next[1]}</em></span></span></button>`).join('')}
+      <button type="button" class="newp" data-tab-go="0"><b>+ Empezar un proyecto nuevo</b><small>Desde una idea guardada o una visita técnica</small></button>
+    </div>`;
+  }
+  function vObra(p) {
+    const isObra = p.st === 3;
+    return `<div class="view">
+      <button class="back" type="button" data-back="1">← Mis obras</button>
+      <div class="greet"><small><span>${p.where}</span><span>${STAGES[p.st]}</span></small><h3>${p.name}</h3></div>
+      <canvas data-room="${p.kind}" style="width:100%;height:130px;border-radius:18px;display:block"></canvas>
+      ${isObra ? `<div class="kpi2"><div><b>28%</b><small>Construido</small></div><div><b>25%</b><small>Pagado</small></div><div><b>209</b><small>Días a llaves</small></div></div>` : `<div class="kpi2"><div><b>v2</b><small>Render</small></div><div><b>$268k</b><small>Presupuesto</small></div><div><b>6 sem</b><small>Duración</small></div></div>`}
+      <div class="pc"><div class="hd"><span>Esperan tu decisión</span><b>${p.appr.filter((_, i) => !(apprDone[p.id] || {})[i]).length} pendientes</b></div>
+        ${p.appr.length ? p.appr.map((a, i) => `<div class="appr"><span class="sw" style="background:${a[0]}"></span><div><b>${a[1]}</b><small>${a[2]}</small></div>${(apprDone[p.id] || {})[i] ? `<span class="done">✓ Aprobado hoy</span>` : `<div class="acts"><button type="button" class="ok" data-appr="${p.id}-${i}">Aprobar</button><button type="button" data-chg="1">Pedir cambio</button></div>`}</div>`).join('') : '<p style="margin:0;font-size:12.5px;color:#7a746a">Nada pendiente.</p>'}</div>
+      <div class="pc"><div class="hd"><span>Documentos de tu obra</span><button type="button" data-docs="1">Ver todos</button></div><div class="dgrid">
+        ${[['📝', 'Contrato', 'Firmado'], ['📐', 'Planos', 'v3 vigente'], ['🏛', 'Permisos', isObra ? 'Licencia ok' : 'En trámite'], ['💳', 'Pagos', isObra ? '13 de 36' : 'Anticipo'], ['🛡', 'Garantías', isObra ? 'Al entregar' : '—'], ['📷', 'Fotos', isObra ? '312' : 'Visita']].map(d => `<button type="button" class="dg" data-docs="1"><i>${d[0]}</i><b>${d[1]}</b><small>${d[2]}</small></button>`).join('')}</div></div>
+      <div class="pc"><div class="hd"><span>${isObra ? 'Bitácora de la semana' : 'Últimos movimientos'}</span><b>${isObra ? 'Sem 38' : ''}</b></div><div class="feed">
+        ${(isObra ? [['obra', 'Colado de losa L3', 'Miércoles · 61 m³'], ['obra', 'Columnas a nivel 5', 'Lunes · residente Julio M.'], ['sala', 'Muestra de piso lista', 'Para tu revisión en sitio']] : [['cocina', 'Render v2 enviado', 'Ayer · Arq. Lucía'], ['cocina', 'Levantamiento 3D', 'Hace 1 semana · 12.4 m²']]).map(f => `<div class="fi"><canvas class="ph" data-room="${f[0]}"></canvas><div><b>${f[1]}</b><small>${f[2]}</small></div></div>`).join('')}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="cta" type="button" data-chat="1">💬 Chat con tu obra</button><button class="cta ghost" type="button" data-visit="1">Agendar visita</button></div>
+    </div>`;
+  }
+  function vHogar() {
+    const p = PROPS[prop];
+    if (p.health === null) return `<div class="view"><div class="greet"><small><span>Mi hogar</span><span>2 propiedades</span></small><h3>Tus <em>espacios</em></h3></div>${propsBar()}
+      <div class="pc" style="text-align:center;display:grid;gap:8px;justify-items:center;padding:20px"><canvas data-room="obra" style="width:100%;height:140px;border-radius:14px"></canvas><b style="font:700 19px var(--serif)">Depto 6B todavía está en obra</b><p style="margin:0;font-size:13px;color:#5e6259">El día de llaves, su expediente, garantías y mantenimiento aparecen aquí solos. Mientras, sigue su avance en Mis obras.</p><button class="cta sage" type="button" data-tab-go="1" style="max-width:240px">Ver avance de la obra</button></div></div>`;
+    const C = 2 * Math.PI * 44, h = Math.min(100, p.health + booked.size * 4);
+    return `<div class="view">
+      <div class="greet"><small><span>Mi hogar</span><span>2 propiedades</span></small><h3>Tu casa, <em>bien cuidada</em></h3></div>
+      ${propsBar()}
+      <div class="pc"><div class="hd"><span>Salud del hogar</span><b>Casa Providencia</b></div><div class="health">
+        <div class="ring"><svg viewBox="0 0 104 104"><circle cx="52" cy="52" r="44" stroke="#ece5d8"/><circle class="v" cx="52" cy="52" r="44" stroke="${h >= 90 ? '#4f7d61' : '#c9a24a'}" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - h / 100)}"/></svg><div class="in"><b>${h}</b><small>DE 100</small></div></div>
+        <div class="hl"><div><span>Estructura e instalaciones</span><b style="color:#4f7d61">Bien</b></div><div><span>Impermeabilización</span><b style="color:${booked.has(0) ? '#4f7d61' : '#b0561f'}">${booked.has(0) ? 'Agendada' : 'Vence'}</b></div><div><span>Mantenimiento al día</span><b>${2 + booked.size} de 6</b></div><div><span>Garantías vigentes</span><b>3</b></div></div></div></div>
+      <div class="alertx"><i>💧</i><div><b>Consumo de agua 38% arriba de lo normal</b>Puede ser una fuga. El sensor del medidor lo detectó anoche a las 3 am. <a href="#" data-svc="0" style="color:#b0561f;font-weight:600">Pedir plomero</a></div></div>
+      <div class="pc"><div class="hd"><span>Mantenimiento programado</span><b>Próximos 60 días</b></div>
+        ${TASKS.map((t, i) => `<div class="task ${t.urgent && !booked.has(i) ? 'urgent' : ''}"><div class="d"><b>${t.d}</b><small>${t.m}</small></div><div><b class="t">${t.t}</b><small class="s">${t.s}</small></div><button type="button" class="${booked.has(i) ? 'done' : ''}" data-book="${i}">${booked.has(i) ? '✓ Agendado' : t.p}</button></div>`).join('')}</div>
+      <div class="pc"><div class="hd"><span>Uso inteligente · este mes</span><b>vs. mes pasado</b></div><div class="use">
+        ${[['Luz', '312', 'kWh', '#c9a24a', [8, 9, 7, 10, 9, 8, 7], '−6%', '#4f7d61'], ['Agua', '21', 'm³', '#3c6e9e', [5, 5, 6, 5, 6, 7, 9], '+38%', '#b0561f'], ['Gas', '46', 'kg', '#b0561f', [7, 6, 6, 5, 6, 5, 5], '−4%', '#4f7d61']].map(u => { const mx = Math.max(...u[4]), mn = Math.min(...u[4]); const pts = u[4].map((v, i) => `${i / 6 * 100},${24 - (v - mn) / (mx - mn || 1) * 20}`).join(' ');
+          return `<div><small>${u[0]}</small><b>${u[1]} <span style="font-size:11px;font-family:var(--mono)">${u[2]}</span></b><svg viewBox="0 0 100 26" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${u[3]}" stroke-width="2.2"/></svg><em style="color:${u[6]}">${u[5]}</em></div>`; }).join('')}</div></div>
+      <div class="hd" style="margin:4px 2px -4px"><span>Servicios a precio fijo</span><b>técnicos de BuildI</b></div>
+      <div class="hscroll">${[['🔧', 'Plomero', 'desde $650'], ['⚡', 'Electricista', 'desde $600'], ['🎨', 'Pintura', '$95 / m²'], ['❄️', 'Minisplit', 'desde $850'], ['🧹', 'Limpieza profunda', '$1,900'], ['🌿', 'Jardinería', '$750 / visita']].map((s, i) => `<button type="button" class="svc" data-svc="${i}"><i>${s[0]}</i><b>${s[1]}</b><small>${s[2]}</small></button>`).join('')}</div>
+      <div class="pc"><div class="hd"><span>Garantías</span><b>de tu remodelación 2024</b></div><div class="war">
+        ${[['Impermeabilización', 'hasta may 2029', 70], ['Instalación eléctrica', 'hasta ago 2029', 82], ['Carpintería de cocina', 'hasta ago 2025 · vencida', 0]].map(w => `<div><div class="l"><span>${w[0]}</span><em>${w[1]}</em></div><div class="bar"><i style="width:${w[2]}%;${w[2] ? '' : 'background:#cfc8ba'}"></i></div></div>`).join('')}</div></div>
+      <div class="pc"><div class="hd"><span>Expediente del hogar</span><button type="button" data-docs="1">Abrir</button></div><div class="dgrid">${[['📐', 'Planos finales', 'Cómo quedó'], ['🔌', 'Instalaciones', 'Por dónde pasan'], ['📘', 'Manuales', '14 equipos'], ['🧾', 'Escrituras', 'Copia digital'], ['🏷', 'Acabados', 'Marcas y colores'], ['🗂', 'Historial', '6 obras']].map(d => `<button type="button" class="dg" data-docs="1"><i>${d[0]}</i><b>${d[1]}</b><small>${d[2]}</small></button>`).join('')}</div></div>
+      <div class="keycard"><div><small>Llave BuildI</small><b>Casa Providencia</b><span style="font-size:12px;color:#c3ccc5">Puerta principal · cochera · 2 llaves compartidas</span></div><span class="chip"></span></div>
+    </div>`;
+  }
+  const propsBar = () => `<div class="props">${PROPS.map(p => `<button type="button" class="prop" data-prop="${p.id}" aria-pressed="${p.id === prop}"><b>${p.name}</b><small>${p.sub}</small></button>`).join('')}</div>`;
+  function vPerfil() {
+    const tags = ['Cálido', 'Madera natural', 'Luz indirecta', 'Verde salvia', 'Minimalista'].slice(0, 3 + Math.min(2, saved.size - 1));
+    return `<div class="view">
+      <div class="pc me"><span class="av">MO</span><div><b>Mariana Ortiz</b><small>Cliente desde 2019 · 3 proyectos con BuildI</small></div></div>
+      <div class="pc"><div class="hd"><span>Tu estilo</span><b>aprendido de ${saved.size} ideas guardadas</b></div><div class="style-tags">${tags.map(t => `<span>${t}</span>`).join('')}</div><p style="margin:8px 0 0;font-size:12.5px;color:#5e6259">Lo usamos para sugerirte ideas y para que tu arquitecto sepa qué te gusta desde la primera reunión.</p></div>
+      <div class="pc">${[['🏠', 'Mis propiedades', '2 · Casa Providencia, Depto 6B'], ['👨‍👩‍👧', 'Familia y accesos', 'Luis (pareja) · Mamá · ver y aprobar'], ['💳', 'Métodos de pago', 'Tarjeta •• 4821 · domiciliación'], ['🪪', 'Mis documentos', 'INE · RFC · comprobante de domicilio'], ['🔔', 'Avisos', 'Obra: todo · Hogar: solo importantes'], ['🛟', 'Ayuda', 'Chat con tu asesora Andrea']].map(r => `<div class="mrow"><i>${r[0]}</i><div><b>${r[1]}</b><span class="s">${r[2]}</span></div><small>›</small></div>`).join('')}</div>
+      <div class="pc" style="display:grid;gap:4px"><div class="hd"><span>Tu historia con BuildI</span></div><div class="mrow" style="border:0"><i>🏆</i><div><b>Cliente Oro</b><span class="s">10% en mantenimiento · visita anual sin costo</span></div><small></small></div></div>
+    </div>`;
+  }
+
+  /* ---------- state + render ---------- */
+  let tab = 0, intent = -1, openProj = -1, prop = 0; const apprDone = {};
+  const scroll = $('scroll');
+  function paintCanvases() { scroll.querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room)); }
+  function bindBA() {
+    const ba = $('ba'); if (!ba) return; const [ax, w, h] = setup($('baA')); $('baTop').style.setProperty('--w', w + 'px'); $('baB').style.width = w + 'px'; $('baB').style.height = h + 'px';
+    // before: dark closed kitchen
+    ax.fillStyle = '#d8d2c4'; ax.fillRect(0, 0, w, h); ax.fillStyle = '#8f8a80'; ax.fillRect(0, h * .72, w, h); ax.fillStyle = '#a69a85'; ax.fillRect(w * .05, h * .48, w * .9, h * .24); ax.fillStyle = '#7a6f5c'; ax.fillRect(w * .05, h * .1, w * .9, h * .2); ax.fillStyle = '#b9b2a4'; ax.fillRect(w * .62, h * .05, w * .06, h * .67); ax.fillStyle = 'rgba(0,0,0,.18)'; ax.fillRect(0, 0, w, h);
+    // after: drawn on top canvas (left side shows "after"? labels: left=ANTES) → top layer shows before, base shows after
+    const [bx] = setup($('baB')); bx.drawImage($('baA'), 0, 0, w, h);
+    room($('baA'), 'cocina');
+    let d = false; const set = k => { k = Math.max(.05, Math.min(.95, k)); $('baTop').style.width = k * 100 + '%'; };
+    ba.onpointerdown = e => { d = true; ba.setPointerCapture(e.pointerId); set((e.clientX - ba.getBoundingClientRect().left) / ba.clientWidth); };
+    ba.onpointermove = e => { if (d) set((e.clientX - ba.getBoundingClientRect().left) / ba.clientWidth); };
+    ba.onpointerup = () => d = false; set(.5);
+  }
+  function show(i, keep) {
+    tab = i; const st = scroll.scrollTop;
+    scroll.innerHTML = [vInicio, vObras, vHogar, vPerfil][i]();
+    if (keep) { scroll.scrollTop = st; const v = scroll.querySelector('.view'); if (v) v.style.animation = 'none'; } else scroll.scrollTop = 0;
+    paintCanvases(); if (i === 0) bindBA();
+    const tbs = [...$('tabs').querySelectorAll('button')]; tbs.forEach((b, j) => b.setAttribute('aria-selected', j === i));
+    const b = tbs[i]; $('ind').style.width = b.offsetWidth + 'px'; $('ind').style.transform = `translateX(${b.offsetLeft - 5}px)`;
+    document.querySelectorAll('#tabsx button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.tab === i));
+  }
+  $('tabs').querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => { if (i === 1) openProj = -1; show(i); }));
+  document.querySelectorAll('#tabsx button').forEach(b => b.addEventListener('click', () => { openProj = -1; show(+b.dataset.tab); }));
+
+  /* ---------- sheet ---------- */
+  const openSheet = html => { $('sh').innerHTML = html; $('sheet').classList.add('on'); $('scrim').classList.add('on'); $('sh').scrollTop = 0; $('sh').querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room)); };
+  const closeSheet = () => { $('sheet').classList.remove('on'); $('scrim').classList.remove('on'); };
+  $('scrim').onclick = closeSheet;
+  function ideaSheet(i) {
+    const d = IDEAS[i];
+    openSheet(`<canvas class="img" data-room="${d[0]}"></canvas><span style="font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#7a746a">${d[2]}</span><h4>${d[1]}</h4><p>${d[7]}</p>
+      <div class="facts"><div><b>${d[5].split('–')[0]}+</b><small>Desde</small></div><div><b>${d[6]}</b><small>Duración</small></div><div><b>★ 4.8</b><small>23 proyectos</small></div></div>
+      <div class="pc"><div class="hd"><span>Cómo lo haríamos</span></div><div class="steps"><div>Visita técnica sin costo y medición de tu espacio</div><div>Diseño con 2 propuestas y render en tu casa real</div><div>Presupuesto cerrado y calendario</div><div>Obra con avance en la app y pagos por avance</div></div></div>
+      <button class="cta sage" type="button" data-start="${i}">Quiero esto en mi casa</button><button class="cta ghost" type="button" data-save="${i}">${saved.has(i) ? '♥ Guardada' : '♡ Guardar idea'}</button>`);
+  }
+
+  /* ---------- events ---------- */
+  scroll.addEventListener('click', e => {
+    const sv = e.target.closest('[data-save]'); if (sv) { e.stopPropagation(); const i = +sv.dataset.save; saved.has(i) ? saved.delete(i) : saved.add(i); show(tab, true); toast(saved.has(i) ? 'Guardada · ajustamos tus sugerencias' : 'Quitada de guardadas'); return; }
+    const it = e.target.closest('[data-int]'); if (it) { const v = +it.dataset.int; intent = intent === v ? -1 : v; show(0, true); return; }
+    const id = e.target.closest('[data-idea]'); if (id) { ideaSheet(+id.dataset.idea); return; }
+    const r = e.target.closest('[data-r]'); if (r) { est.room = r.dataset.r; show(0, true); return; }
+    const l = e.target.closest('[data-l]'); if (l) { est.lvl = l.dataset.l; show(0, true); return; }
+    if (e.target.closest('[data-visit]')) { toast('Visita técnica solicitada · te llamamos hoy'); return; }
+    const pj = e.target.closest('[data-proj]'); if (pj) { openProj = +pj.dataset.proj; show(1); return; }
+    if (e.target.closest('[data-back]')) { openProj = -1; show(1); return; }
+    const ap = e.target.closest('[data-appr]'); if (ap) { const [p, i] = ap.dataset.appr.split('-').map(Number); apprDone[p] = apprDone[p] || {}; apprDone[p][i] = true; show(1, true); toast('Aprobado · el constructor ya lo pidió'); return; }
+    if (e.target.closest('[data-chg]')) { toast('Abriendo chat para describir el cambio'); return; }
+    if (e.target.closest('[data-docs]')) { toast('Documentos por categoría (como el rediseño de obra)'); return; }
+    if (e.target.closest('[data-chat]')) { toast('Chat con el residente Julio M.'); return; }
+    const tg = e.target.closest('[data-tab-go]'); if (tg) { openProj = -1; show(+tg.dataset.tabGo); return; }
+    const pr = e.target.closest('[data-prop]'); if (pr) { prop = +pr.dataset.prop; show(2, true); return; }
+    const bk = e.target.closest('[data-book]'); if (bk) { const i = +bk.dataset.book; if (!booked.has(i)) { booked.add(i); show(2, true); toast(`${TASKS[i].t} · agendado ${TASKS[i].d} ${TASKS[i].m}`); } return; }
+    const svc = e.target.closest('[data-svc]'); if (svc) { e.preventDefault(); toast('Plomero agendado hoy 4–6 pm · precio fijo $650'); return; }
+  });
+  scroll.addEventListener('input', e => { if (e.target.id === 'estM2') { est.m2 = +e.target.value; const [lo, hi] = RATES[est.room], f = LVL[est.lvl]; $('estLbl').textContent = est.m2 + ' m²'; $('estRes').innerHTML = `<div><small>Costo estimado</small><b>${money(lo * est.m2 * f)}–${money(hi * est.m2 * f)}</b></div><div style="text-align:right"><small>Tiempo</small><b style="font-size:17px">${Math.max(2, Math.round(est.m2 / 4 * f))}–${Math.max(3, Math.round(est.m2 / 3 * f))} sem</b></div>`; } });
+  $('sh').addEventListener('click', e => {
+    const s = e.target.closest('[data-start]'); if (s) { closeSheet(); PROJECTS[2] = { ...PROJECTS[2], name: IDEAS[+s.dataset.start][1], kind: IDEAS[+s.dataset.start][0], where: 'Nuevo · visita técnica solicitada' }; toast('Proyecto creado en Mis obras'); openProj = -1; setTimeout(() => show(1), 350); return; }
+    const sv = e.target.closest('[data-save]'); if (sv) { const i = +sv.dataset.save; saved.has(i) ? saved.delete(i) : saved.add(i); sv.textContent = saved.has(i) ? '♥ Guardada' : '♡ Guardar idea'; show(tab, true); }
+  });
+
+  show(0);
+  addEventListener('resize', () => show(tab, true));
+})();
+</script>

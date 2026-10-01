@@ -1,0 +1,761 @@
+<title>BuildI Diseñadores y Acabados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --plaster: #e4e8e1;
+  --paper: #fbfaf6;
+  --ink: #2b2a26;
+  --ink-2: #5e6259;
+  --line: rgba(43,42,38,.13);
+  --sage: #4f7d61;
+  --sage-2: #dfe9e2;
+  --clay: #b0561f;
+  --clay-2: #f6e3d6;
+  --brass: #c9a24a;
+  --blue: #3c6e9e;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--plaster); color: var(--ink); font: 15px/1.55 var(--sans); padding-inline: 20px; padding-block: 36px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow b { background: var(--sage); color: #fff; padding: 3px 7px; font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 74px)/.98 var(--serif); letter-spacing: -.025em; margin: 14px 0 16px; text-wrap: balance; max-width: 16ch; }
+h1 em { font-style: italic; font-weight: 400; color: var(--sage); }
+h2 { font: 700 clamp(30px, 4vw, 46px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+.lede { font-size: 18px; max-width: 58ch; margin: 0 0 14px; }
+.sub { color: var(--ink-2); max-width: 62ch; margin: 0 0 20px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+.tabsx { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; }
+.tx { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tx button { border: 1px solid var(--ink); background: var(--paper); padding: 7px 10px; font: 600 13px var(--sans); text-align: left; border-radius: 10px; display: flex; gap: 8px; align-items: center; }
+.tx button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tx b { font: 700 17px/1.2 var(--serif); display: block; margin-bottom: 2px; }
+.tx p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* phone */
+.phone { width: 384px; max-width: 100%; border-radius: 50px; background: #121412; padding: 11px; box-shadow: 0 40px 80px rgba(43,42,38,.3), inset 0 0 0 2px #3a3d38; justify-self: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.screen { border-radius: 40px; overflow: hidden; overflow: clip; position: relative; background: #f6f2ea; height: 790px; }
+.island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #000; border-radius: 20px; z-index: 40; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 12px 100px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: vin .4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes vin { from { opacity: 0; transform: translateY(8px); } }
+.greet small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; }
+.greet h3 { font: 700 27px/1.05 var(--serif); letter-spacing: -.015em; margin: 4px 0 0; }
+.greet h3 em { font-style: italic; font-weight: 400; color: var(--sage); }
+.pc { background: #fffdf9; border-radius: 22px; padding: 12px; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; margin-bottom: 8px; }
+.hd b { color: var(--ink); font-weight: 500; }
+.hd button { border: 0; background: none; font: 600 11.5px var(--sans); color: var(--sage); text-transform: none; letter-spacing: 0; padding: 0; }
+.hscroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* inicio */
+.intent { flex: none; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px 12px; width: 118px; text-align: left; display: grid; gap: 4px; }
+.intent .ic { font-size: 22px; }
+.intent b { font-size: 12.5px; line-height: 1.2; }
+.intent small { font: 500 10px var(--mono); color: #7a746a; }
+.intent[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.intent[aria-pressed="true"] small { color: #c7c2b8; }
+.ideas { columns: 2; column-gap: 8px; }
+.idea { break-inside: avoid; margin-bottom: 8px; background: #fffdf9; border-radius: 18px; overflow: hidden; border: 0; padding: 0; width: 100%; text-align: left; display: block; position: relative; }
+.idea .img { display: block; width: 100%; }
+.idea .t { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.idea .t b { font: 600 13.5px/1.2 var(--serif); }
+.idea .t small { font: 500 10px var(--mono); color: #7a746a; }
+.idea .save { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,253,249,.9); display: grid; place-items: center; font-size: 13px; border: 0; }
+.idea .save.on { background: var(--clay); color: #fff; }
+.tagx { position: absolute; top: 8px; left: 8px; font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: rgba(43,42,38,.75); color: #fff; padding: 3px 6px; border-radius: 6px; }
+.ba { position: relative; height: 170px; border-radius: 14px; overflow: hidden; touch-action: none; cursor: ew-resize; user-select: none; }
+.ba canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .top { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 3px solid #fff; }
+.ba .top canvas { width: var(--w); }
+.ba .lb { position: absolute; top: 8px; font: 500 9.5px var(--mono); background: rgba(0,0,0,.6); color: #fff; padding: 2px 6px; border-radius: 4px; z-index: 2; }
+.est { display: grid; gap: 8px; }
+.est .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 12.5px; }
+.seg { display: flex; background: #ece5d8; border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 4px; border-radius: 8px; font: 600 11.5px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+input[type=range] { accent-color: var(--sage); width: 100%; }
+.est .res { background: var(--sage-2); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.est .res b { font: 700 22px var(--serif); color: var(--sage); }
+.est .res small { font-size: 11.5px; color: var(--ink-2); display: block; }
+.cta { border: 0; background: var(--ink); color: #fff; border-radius: 14px; padding: 12px; font: 700 14px var(--sans); width: 100%; }
+.cta.sage { background: var(--sage); }
+.cta.ghost { background: none; color: var(--ink); border: 1px solid var(--ink); }
+
+/* obras */
+.proj { background: #fffdf9; border-radius: 22px; padding: 0; overflow: hidden; border: 0; width: 100%; text-align: left; display: grid; }
+.proj .img { height: 92px; position: relative; }
+.proj .img span { position: absolute; left: 10px; bottom: 8px; font: 500 9.5px var(--mono); background: rgba(255,253,249,.92); padding: 3px 7px; border-radius: 6px; }
+.proj .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.proj b { font: 700 17px/1.15 var(--serif); }
+.proj small { font-size: 12px; color: #7a746a; }
+.stg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.stg i { height: 6px; border-radius: 4px; background: #ece5d8; display: block; }
+.stg i.d { background: var(--sage); } .stg i.n { background: var(--clay); }
+.stg-l { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; font: 500 8.5px var(--mono); color: #9a958b; text-transform: uppercase; }
+.stg-l span.n { color: var(--clay); }
+.next { display: flex; justify-content: space-between; align-items: center; background: var(--clay-2); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; }
+.next b { font: 600 12.5px var(--sans); }
+.next em { font-style: normal; font: 500 11px var(--mono); color: var(--clay); }
+.newp { border: 1.5px dashed #b9b2a4; background: none; border-radius: 22px; padding: 14px; display: grid; gap: 2px; text-align: left; }
+.newp b { font: 700 15px var(--serif); }
+.newp small { font-size: 12px; color: #7a746a; }
+.back { border: 0; background: none; font: 600 13px var(--sans); color: var(--sage); padding: 0; justify-self: start; }
+.kpi2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpi2 div { background: #fffdf9; border-radius: 16px; padding: 9px 10px; }
+.kpi2 b { display: block; font: 700 21px/1 var(--serif); }
+.kpi2 small { font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #7a746a; }
+.appr { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; position: relative; }
+.appr:first-of-type { border-top: 0; }
+.appr .sw { width: 44px; height: 44px; border-radius: 10px; }
+.appr b { font-size: 13px; display: block; }
+.appr small { font-size: 11.5px; color: #7a746a; }
+.appr .acts { grid-column: 2; display: flex; gap: 6px; }
+.appr .acts button { border: 1px solid var(--ink); background: none; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.appr .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.appr .done { grid-column: 2; font: 500 11px var(--mono); color: var(--sage); }
+.dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dg { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 2px; font-size: 11.5px; border: 0; text-align: left; }
+.dg i { font-style: normal; font-size: 17px; }
+.dg b { font-size: 12px; }
+.dg small { font: 500 9.5px var(--mono); color: #7a746a; }
+.feed { display: grid; gap: 8px; }
+.fi { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+.fi .ph { width: 54px; height: 44px; border-radius: 8px; }
+.fi b { font-size: 13px; display: block; }
+.fi small { font-size: 11px; color: #7a746a; }
+
+/* hogar */
+.props { display: flex; gap: 6px; }
+.prop { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 14px; padding: 8px 10px; text-align: left; display: grid; gap: 1px; }
+.prop b { font-size: 12.5px; }
+.prop small { font: 500 9.5px var(--mono); color: #7a746a; }
+.prop[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.health { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
+.ring { position: relative; width: 104px; height: 104px; }
+.ring svg { width: 104px; height: 104px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .v { stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,1.3,.5,1); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; text-align: center; }
+.ring .in b { font: 700 30px/1 var(--serif); }
+.ring .in small { font: 500 8.5px var(--mono); color: #7a746a; }
+.hl { display: grid; gap: 5px; font-size: 12.5px; }
+.hl div { display: flex; justify-content: space-between; gap: 6px; }
+.hl b { font-family: var(--mono); font-weight: 500; font-size: 12px; }
+.task { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.task:first-of-type { border-top: 0; }
+.task .d { width: 40px; height: 44px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; align-content: center; text-align: center; }
+.task .d b { font: 700 16px/1 var(--serif); }
+.task .d small { font: 500 8px var(--mono); text-transform: uppercase; color: #7a746a; }
+.task b.t { font-size: 13px; display: block; }
+.task small.s { font-size: 11.5px; color: #7a746a; }
+.task button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.task button.done { background: var(--sage-2); color: var(--sage); }
+.task.urgent .d { background: var(--clay-2); }
+.task.urgent .d b { color: var(--clay); }
+.use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.use div { background: #f6f2ea; border-radius: 14px; padding: 8px 9px; display: grid; gap: 2px; }
+.use b { font: 700 17px/1 var(--serif); }
+.use small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; letter-spacing: .05em; }
+.use svg { width: 100%; height: 26px; }
+.use em { font-style: normal; font: 500 10px var(--mono); }
+.alertx { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--clay-2); border-radius: 16px; padding: 10px 12px; font-size: 12.5px; }
+.alertx i { font-style: normal; font-size: 20px; }
+.alertx b { display: block; font-size: 13px; }
+.svc { flex: none; width: 112px; border: 0; background: #fffdf9; border-radius: 16px; padding: 10px; display: grid; gap: 3px; text-align: left; }
+.svc i { font-style: normal; font-size: 20px; }
+.svc b { font-size: 12.5px; line-height: 1.2; }
+.svc small { font: 500 10px var(--mono); color: var(--sage); }
+.war { display: grid; gap: 7px; }
+.war div { display: grid; gap: 3px; font-size: 12.5px; }
+.war .l { display: flex; justify-content: space-between; }
+.war .l em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.bar { height: 6px; border-radius: 6px; background: #ece5d8; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; background: var(--sage); }
+.keycard { border-radius: 18px; padding: 14px 16px; background: linear-gradient(150deg, #2e3a33, #1b221e 60%, #3a2f1a); color: #f3ead4; display: flex; justify-content: space-between; align-items: center; }
+.keycard b { font: 700 17px/1.1 var(--serif); display: block; }
+.keycard small { font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #c3ccc5; }
+.keycard .chip { width: 34px; height: 25px; border-radius: 4px; background: linear-gradient(135deg, #f3dc9a, #c9a24a 50%, #a88234); }
+
+/* perfil */
+.me { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.me .av { width: 62px; height: 62px; border-radius: 50%; background: var(--sage); color: #fff; display: grid; place-items: center; font: 700 22px var(--serif); }
+.me b { font: 700 21px var(--serif); display: block; }
+.me small { font-size: 12.5px; color: #7a746a; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.style-tags span { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--sage-2); color: var(--sage); }
+.mrow { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13.5px; }
+.mrow:first-of-type { border-top: 0; }
+.mrow i { font-style: normal; font-size: 17px; }
+.mrow small { font: 500 11px var(--mono); color: #7a746a; }
+.mrow b { font-weight: 600; display: block; }
+.mrow span.s { font-size: 11.5px; color: #7a746a; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 82%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh .img { height: 150px; border-radius: 16px; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.facts div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.facts b { display: block; font: 700 16px/1.1 var(--serif); }
+.facts small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; }
+.steps { display: grid; gap: 4px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 12.5px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--sage-2); color: var(--sage); display: grid; place-items: center; font: 600 11px var(--mono); }
+
+/* tab bar */
+.tabs { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; border-radius: 26px; background: rgba(255,253,249,.74); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(43,42,38,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+.tabs button { border: 0; background: none; padding: 7px 0 6px; display: grid; justify-items: center; gap: 2px; font: 600 10.5px var(--sans); color: #7a746a; position: relative; z-index: 1; transition: color .3s; }
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-selected="true"] { color: var(--ink); }
+.tabs .ind { position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 21px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .55s cubic-bezier(.3,1.4,.5,1), width .55s; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 15px; height: 15px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9px/15px var(--mono); padding: 0 3px; }
+.toast { position: absolute; left: 50%; top: 48px; transform: translate(-50%, -260%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; z-index: 50; transition: transform .45s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translate(-50%, 0); }
+
+/* journey */
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .journey { grid-template-columns: 1fr; } }
+.jst { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c); }
+.jst .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--ink-2); display: flex; justify-content: space-between; }
+.jst .n span { color: var(--c); }
+.jst b { font: 700 20px/1.1 var(--serif); }
+.jst p.q { margin: 0; font: italic 400 14px/1.35 var(--serif); color: var(--ink-2); }
+.jst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.jst li { display: grid; grid-template-columns: 12px 1fr; gap: 6px; }
+.jst li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-top: 7px; }
+.jst .where { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 6px; }
+.loop { display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); border-radius: 4px; padding: 16px 18px; margin-top: 12px; }
+.loop i { font-style: normal; font-size: 26px; }
+.loop b { font: 700 18px var(--serif); display: block; }
+.loop span { font-size: 13.5px; color: #c7c2b8; }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.biz div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.biz b { font: 700 17px/1.2 var(--serif); }
+.biz p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+<style>
+.subtabs { display: flex; gap: 4px; }
+.subtabs button { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 7px 10px; font: 600 12.5px var(--sans); }
+.subtabs button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.modes { display: grid; grid-template-columns: repeat(4, 1fr); background: #ece5d8; border-radius: 14px; padding: 3px; }
+.modes button { border: 0; background: none; border-radius: 11px; padding: 7px 2px; font: 600 12px var(--sans); color: #5e6259; }
+.modes button[aria-pressed="true"] { background: #fffdf9; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.hrow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 2px 12px 4px; }
+.hrow::-webkit-scrollbar { display: none; }
+.hrow > * { flex: none; }
+.fchip { border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 6px 11px; font: 600 12px var(--sans); }
+.fchip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.feed { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.sec { display: grid; gap: 10px; }
+.sec > h6 { margin: 0 2px; display: flex; justify-content: space-between; align-items: baseline; font: 700 17px var(--serif); }
+.sec > h6 small { font: 500 10.5px var(--mono); color: #7a746a; letter-spacing: .04em; }
+/* furniture grid */
+.fgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.fitem { border: 0; background: #fffdf9; border-radius: 16px; padding: 10px 6px 9px; display: grid; justify-items: center; gap: 3px; text-align: center; }
+.fitem svg { width: 46px; height: 38px; color: var(--ink); }
+.fitem b { font-size: 11.5px; line-height: 1.2; }
+.fitem small { font: 500 9.5px var(--mono); color: #7a746a; }
+/* finishes */
+.flist { display: grid; gap: 6px; }
+.fin { border: 0; background: #fffdf9; border-radius: 16px; padding: 8px; display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center; text-align: left; }
+.fin canvas { width: 56px; height: 56px; border-radius: 12px; display: block; }
+.fin b { font-size: 13.5px; display: block; }
+.fin small { font-size: 11px; color: #7a746a; display: block; }
+.fin em { font-style: normal; font: 600 11px var(--mono); text-align: right; }
+.dots { display: inline-flex; gap: 2px; vertical-align: middle; } .dots i { width: 6px; height: 6px; border-radius: 50%; background: #e2dacb; display: block; } .dots i.on { background: var(--sage); }
+.dots.c i.on { background: var(--clay); }
+/* designers */
+.dcard { background: #fffdf9; border-radius: 20px; padding: 12px; display: grid; gap: 9px; border: 0; text-align: left; width: 100%; }
+.dcard .top { display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; }
+.av { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 15px var(--sans); }
+.dcard b { font: 700 15px var(--serif); display: block; }
+.dcard small { font-size: 11.5px; color: #7a746a; }
+.dcard .tr { font: 600 9.5px var(--mono); text-transform: uppercase; letter-spacing: .05em; background: var(--sage-2); color: var(--sage); border-radius: 999px; padding: 3px 7px; white-space: nowrap; }
+.dcard .pf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.dcard .pf canvas { width: 100%; height: 60px; border-radius: 10px; display: block; }
+.dcard .meta { display: flex; gap: 10px; font: 500 10.5px var(--mono); color: #7a746a; flex-wrap: wrap; }
+.tcard { width: 128px; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px; display: grid; gap: 5px; text-align: left; }
+.tcard .av { width: 40px; height: 40px; font-size: 13px; }
+.tcard b { font-size: 12.5px; line-height: 1.2; }
+.tcard small { font-size: 10.5px; color: #7a746a; line-height: 1.3; }
+.learn { background: var(--ink); color: #fff; border-radius: 22px; padding: 14px; display: grid; gap: 10px; }
+.learn b.t { font: 700 19px/1.15 var(--serif); }
+.learn .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.learn .vs div { background: rgba(255,255,255,.08); border-radius: 14px; padding: 8px; display: grid; gap: 4px; font-size: 11.5px; }
+.learn .vs canvas { width: 100%; height: 54px; border-radius: 8px; display: block; }
+.learn .vs b { font-size: 13px; }
+.learn button { justify-self: start; border: 0; background: var(--brass); color: var(--ink); border-radius: 999px; padding: 7px 13px; font: 700 12.5px var(--sans); }
+.box { background: var(--clay-2); border-radius: 20px; padding: 14px; display: grid; grid-template-columns: 1fr 86px; gap: 10px; align-items: center; }
+.box b { font: 700 17px/1.15 var(--serif); display: block; }
+.box small { font-size: 12px; color: #6d3412; }
+.box .sw { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; transform: rotate(-6deg); }
+.box .sw canvas { width: 40px; height: 40px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,.15); }
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 90%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+.sheet.on { transform: none; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 0; }
+.sh { overflow-y: auto; padding: 8px 14px 24px; display: grid; gap: 12px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13px; color: #5e6259; }
+.eyeb { font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; }
+.blk { background: #fffdf9; border-radius: 18px; padding: 12px; display: grid; gap: 8px; }
+.blk h6 { margin: 0; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; gap: 10px; }
+.opt { display: flex; flex-wrap: wrap; gap: 5px; }
+.opt button { border: 1.5px solid var(--line); background: #fffdf9; border-radius: 10px; padding: 6px 9px; font: 600 12px var(--sans); }
+.opt button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
+.matinfo { font-size: 12.5px; color: #5e6259; display: grid; gap: 4px; }
+.matinfo span b { color: var(--ink); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.way { border: 1.5px solid var(--line); background: #fffdf9; border-radius: 16px; padding: 10px; text-align: left; display: grid; gap: 3px; }
+.way[aria-pressed="true"] { border-color: var(--sage); box-shadow: inset 0 0 0 1px var(--sage); }
+.way b { font-size: 13.5px; } .way small { font-size: 11px; color: #7a746a; } .way em { font-style: normal; font: 600 12px var(--mono); color: var(--sage); }
+.kv { display: grid; grid-template-columns: 1fr auto; font-size: 12.5px; padding: 7px 0; border-top: 1px solid #efe8dc; }
+.kv:first-of-type { border-top: 0; } .kv b { font: 600 12px var(--mono); }
+.yesno { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px; }
+.yesno div { border-radius: 12px; padding: 8px; } .yesno .y { background: var(--sage-2); color: #2e5a3f; } .yesno .n { background: var(--clay-2); color: #6d3412; }
+.yesno b { display: block; font: 600 10px var(--mono); text-transform: uppercase; margin-bottom: 2px; }
+.bigsw { height: 120px; border-radius: 16px; overflow: hidden; } .bigsw canvas { width: 100%; height: 100%; display: block; }
+.proc { display: grid; gap: 0; }
+.proc div { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; padding: 7px 0; font-size: 12.5px; border-top: 1px solid #efe8dc; }
+.proc div:first-child { border-top: 0; }
+.proc i { width: 22px; height: 22px; border-radius: 50%; background: #ece5d8; display: grid; place-items: center; font: 600 10px var(--mono); font-style: normal; color: #7a746a; }
+.proc div.done i { background: var(--sage); color: #fff; } .proc div.now i { background: var(--clay); color: #fff; animation: pulse 1.4s infinite; }
+.proc em { font-style: normal; font: 500 10.5px var(--mono); color: #7a746a; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(176,86,31,.2); } }
+.range { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; font-size: 12.5px; align-items: center; }
+.range input { grid-column: 1 / -1; width: 100%; accent-color: var(--sage); }
+.range output { font: 600 13px var(--mono); }
+.review { font-size: 12.5px; color: #5e6259; font-style: italic; border-left: 3px solid var(--brass); padding-left: 9px; }
+/* page */
+.princ { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; margin-top: 18px; }
+.princ div { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.princ i { font: 700 18px/1 var(--serif); color: var(--sage); font-style: normal; }
+.princ b { display: block; font: 700 16px/1.2 var(--serif); }
+.princ p { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.try { margin-top: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; font-size: 13.5px; max-width: 580px; }
+.try b.h { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); display: block; margin-bottom: 4px; }
+.cat3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; }
+.grp { grid-column: 1 / -1; margin: 14px 0 0; font: 700 22px var(--serif); display: flex; gap: 10px; align-items: baseline; }
+.grp:first-child { margin-top: 0; }
+.grp span { font: 500 12px var(--mono); color: var(--ink-2); }
+.cc { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+.cc h5 { margin: 0; font: 700 17px/1.2 var(--serif); display: flex; justify-content: space-between; gap: 8px; }
+.cc h5 span { font: 500 11px var(--mono); color: var(--ink-2); font-weight: 500; }
+.cc p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.cc .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.cc .tags span { font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+.cc .who { font: 500 11px var(--mono); color: var(--clay); }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.bz { border-top: 3px solid var(--ink); padding-top: 10px; }
+.bz b { display: block; font: 700 17px var(--serif); }
+.bz p { margin: 4px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.tabsP { display: flex; gap: 6px; margin: 12px 0 14px; flex-wrap: wrap; }
+.tabsP button { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 7px 14px; font: 600 13px var(--sans); }
+.tabsP button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><b>Inicio · diseñadores, muebles y acabados</b> BuildI · app del cliente</div>
+      <h1>Conoce a <em>quién hace cada cosa</em> de tu casa</h1>
+      <p class="lede">La mayoría de los clientes no sabe que existe un tapicero que hace sillones a medida, que el espejo del baño puede llevar luz y antiempañante, o qué diferencia hay entre cuarzo y granito. Inicio puede enseñarle todo eso sin que se sienta una clase.</p>
+      <p class="sub">El teléfono muestra Inicio con Explorar en 4 modos: Espacios, Muebles, Acabados y Diseñadores. Abajo está el catálogo completo: 53 oficios en 6 grupos, 10 espacios con sus muebles y 10 familias de acabados.</p>
+      <div class="princ">
+        <div><i>1</i><div><b>Explorar con cuatro lentes</b><p>Por espacio (como antes), por mueble, por acabado o por quién lo hace. Todo se cruza: el sofá te lleva al tapicero, y el tapicero a sus telas.</p></div></div>
+        <div><i>2</i><div><b>Cada mueble: comprarlo hecho o hacerlo a medida</b><p>Al abrir un mueble ves sus tipos, materiales con pros y contras, la medida que cabe en tu casa y dos caminos con precio: comprarlo hecho con un proveedor, o encargarlo a un taller.</p></div></div>
+        <div><i>3</i><div><b>Cada acabado explicado en simple</b><p>Textura, precio por m², qué tan resistente es, cuánto mantenimiento necesita, dónde sí y dónde no ponerlo, y una caja de muestras gratis a casa.</p></div></div>
+        <div><i>4</i><div><b>Diseñadores y talleres con cara y proceso</b><p>Perfil con portafolio, tiempo de entrega y distancia a su taller. Un encargo a medida que se sigue paso a paso: idea, boceto, render, fabricación e instalación.</p></div></div>
+      </div>
+      <div class="try"><b class="h">Prueba esto</b>En <b>Explorar › Muebles</b> abre <b>Sofá</b>, cambia la tela y elige "A medida". En <b>Acabados</b> abre <b>Microcemento</b>. En <b>Diseñadores</b> filtra por <b>Espejos y vidrio</b>, abre el perfil y haz un encargo hasta la instalación.</div>
+    </div>
+
+    <div class="phone">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="toast" id="toast"></div>
+        <div class="scroll" id="scroll"></div>
+        <div class="scrim" id="scrim"></div>
+        <div class="sheet" id="sheet"><div class="grab"></div><div class="sh" id="sh"></div></div>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="App del cliente">
+          <div class="ind" id="ind"></div>
+          <button role="tab" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9 1.3 5.8L12 16l-4.9 3 1.3-5.8L4 9.3l5.8-.7z"/></svg>Inicio</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/><path d="M2 21h20"/></svg>Mis obras</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Mi hogar</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>El catálogo completo</h2>
+    <p class="sub">Todo lo que Inicio puede ofrecer. Cada oficio sabe qué muebles y acabados hace, y cada mueble o acabado sabe quién lo hace.</p>
+    <div class="tabsP" id="ptabs"><button type="button" data-p="0" aria-pressed="true">Diseñadores y oficios · 53</button><button type="button" data-p="1" aria-pressed="false">Muebles por espacio · 10</button><button type="button" data-p="2" aria-pressed="false">Acabados · 10 familias</button></div>
+    <div class="cat3" id="pcat"></div>
+  </section>
+
+  <section>
+    <h2>Por qué le conviene a BuildI</h2>
+    <div class="biz">
+      <div class="bz"><b>Cada mueble es una venta</b><p>Comisión por cada mueble y acabado vendido de proveedores, aunque el cliente nunca haga obra.</p></div>
+      <div class="bz"><b>Clientes para los talleres</b><p>Tapiceros, herreros y vidrieros reciben encargos ya con medidas, fotos y presupuesto. BuildI cobra por encargo cerrado o con una suscripción del taller.</p></div>
+      <div class="bz"><b>De mueble a obra</b><p>El que encarga un clóset suele terminar remodelando la recámara. Inicio aprende eso y propone la obra en el momento justo.</p></div>
+      <div class="bz"><b>Caja de muestras</b><p>Muestras físicas a casa. Son baratas y quien toca el material compra mucho más.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const setup = c => { const w = c.clientWidth, h = c.clientHeight, d = devicePixelRatio || 1; c.width = w * d; c.height = h * d; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, w, h]; };
+  let toastT; const toast = s => { const t = $('toast'); t.textContent = s; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); };
+  const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+  const dots = (n, c) => `<span class="dots ${c || ''}">${[1, 2, 3, 4, 5].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
+function room(c, kind) {
+    const [x, W, H] = setup(c);
+    const P = { cocina: ['#e9e2d4', '#c79a64', '#4f7d61'], sala: ['#efe8dc', '#b98b5a', '#9fb7a6'], terraza: ['#cfe3f3', '#a08a6c', '#6b8f5e'], bano: ['#e3e9ea', '#d9d4ca', '#3c6e9e'], home: ['#ece6dc', '#7a5a3c', '#b0561f'], recamara: ['#e3ebe0', '#b98b5a', '#c9a24a'], fachada: ['#bcd5ee', '#9aa1a4', '#4f7d61'], closet: ['#f1ece2', '#a0764f', '#2b2a26'], obra: ['#dcebf6', '#b9ad97', '#9aa1a4'] }[kind] || ['#efe8dc', '#b98b5a', '#4f7d61'];
+    x.fillStyle = P[0]; x.fillRect(0, 0, W, H); x.fillStyle = P[1]; x.fillRect(0, H * .72, W, H);
+    if (kind === 'cocina') { x.fillStyle = '#f5f2ec'; x.fillRect(W * .08, H * .45, W * .84, H * .27); x.fillStyle = P[2]; x.fillRect(W * .08, H * .5, W * .84, H * .22); x.fillStyle = '#3a3a3a'; x.fillRect(W * .06, H * .45, W * .88, 5); x.fillStyle = P[2]; x.fillRect(W * .1, H * .12, W * .45, H * .18); x.fillStyle = '#ffd9a0'; [.25, .5, .75].forEach(k => { x.beginPath(); x.arc(W * k, H * .3, 6, 0, 7); x.fill(); }); }
+    else if (kind === 'sala' || kind === 'recamara') { x.fillStyle = '#9fc4e6'; x.fillRect(W * .3, H * .1, W * .4, H * .4); x.strokeStyle = '#2b2a26'; x.lineWidth = 3; x.strokeRect(W * .3, H * .1, W * .4, H * .4); x.fillStyle = P[2]; if (kind === 'sala') { x.fillRect(W * .15, H * .55, W * .7, H * .14); x.fillRect(W * .13, H * .62, W * .74, H * .14); } else { x.fillStyle = '#fff'; x.fillRect(W * .2, H * .58, W * .6, H * .18); x.fillStyle = P[2]; x.fillRect(W * .2, H * .64, W * .6, H * .14); } x.fillStyle = '#6b8f5e'; x.beginPath(); x.arc(W * .1, H * .6, W * .06, 0, 7); x.fill(); }
+    else if (kind === 'terraza') { x.fillStyle = '#7a5a3c'; for (let i = 0; i < 6; i++) x.fillRect(W * (.1 + i * .16), H * .1, W * .03, H * .62); x.fillRect(W * .05, H * .1, W * .9, H * .05); x.fillStyle = '#f3ead4'; x.fillRect(W * .25, H * .55, W * .5, H * .12); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .85, H * .5, W * .09, 0, 7); x.fill(); }
+    else if (kind === 'bano') { x.fillStyle = '#fff'; x.fillRect(W * .55, H * .2, W * .3, H * .52); x.strokeStyle = 'rgba(0,0,0,.08)'; for (let i = 0; i < W; i += 14) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H * .72); x.stroke(); } x.fillStyle = P[2]; x.fillRect(W * .12, H * .48, W * .3, H * .24); x.fillStyle = '#e8e8e8'; x.beginPath(); x.ellipse(W * .27, H * .48, W * .12, H * .05, 0, 0, 7); x.fill(); }
+    else if (kind === 'home') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .5, W * .8, H * .06); x.fillRect(W * .15, H * .56, W * .04, H * .16); x.fillRect(W * .8, H * .56, W * .04, H * .16); x.fillStyle = '#2b2a26'; x.fillRect(W * .35, H * .3, W * .28, H * .18); x.fillStyle = '#9fc4e6'; x.fillRect(W * .37, H * .32, W * .24, H * .14); x.fillStyle = P[2]; x.fillRect(W * .7, H * .15, W * .2, H * .3); }
+    else if (kind === 'fachada') { x.fillStyle = '#f3ede2'; x.fillRect(W * .15, H * .25, W * .7, H * .47); x.fillStyle = '#2b2a26'; x.beginPath(); x.moveTo(W * .1, H * .27); x.lineTo(W * .5, H * .05); x.lineTo(W * .9, H * .27); x.fill(); x.fillStyle = '#9fc4e6'; x.fillRect(W * .25, H * .35, W * .18, H * .15); x.fillRect(W * .57, H * .35, W * .18, H * .15); x.fillStyle = '#7a5a3c'; x.fillRect(W * .44, H * .52, W * .12, H * .2); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .08, H * .66, W * .07, 0, 7); x.fill(); }
+    else if (kind === 'closet') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .08, W * .8, H * .64); x.fillStyle = '#f1ece2'; for (let i = 0; i < 3; i++) x.fillRect(W * (.13 + i * .26), H * .12, W * .22, H * .56); x.fillStyle = '#b0561f'; x.fillRect(W * .15, H * .2, W * .18, H * .1); x.fillStyle = '#4f7d61'; x.fillRect(W * .42, H * .18, W * .18, H * .3); }
+    else if (kind === 'obra') { x.fillStyle = '#9aa1a4'; for (let f = 0; f < 3; f++) { x.fillRect(W * .2, H * (.62 - f * .18), W * .6, 6); for (let k = 0; k <= 4; k++) x.fillRect(W * (.2 + k * .15) - 2, H * (.62 - f * .18) + 6, 4, H * .12); } x.strokeStyle = '#ff5f0f'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .88, H * .72); x.lineTo(W * .88, H * .05); x.lineTo(W * .4, H * .05); x.stroke(); }
+  }
+
+  
+
+  /* ---------- procedural textures ---------- */
+  function rnd(seed) { let s = seed; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
+  function tex(c, kind, col, seed = 7) {
+    const [x, w, h] = setup(c), r = rnd(seed); x.fillStyle = col; x.fillRect(0, 0, w, h);
+    if (kind === 'madera') { for (let i = 0; i < h; i += 2) { x.strokeStyle = `rgba(60,30,10,${.04 + r() * .12})`; x.beginPath(); x.moveTo(0, i); for (let k = 0; k <= w; k += 8) x.lineTo(k, i + Math.sin(k / 15 + i / 7) * 1.5); x.stroke(); } x.strokeStyle = 'rgba(0,0,0,.18)'; for (let i = h / 3; i < h; i += h / 3) { x.beginPath(); x.moveTo(0, i); x.lineTo(w, i); x.stroke(); } }
+    if (kind === 'marmol') { for (let v = 0; v < 5; v++) { x.strokeStyle = `rgba(90,90,100,${.15 + r() * .3})`; x.lineWidth = .6 + r() * 1.4; x.beginPath(); let px = r() * w, py = 0; x.moveTo(px, py); while (py < h) { px += (r() - .5) * 14; py += 6; x.lineTo(px, py); } x.stroke(); } }
+    if (kind === 'terrazo') { for (let i = 0; i < w * h / 40; i++) { x.fillStyle = ['#b0561f', '#4f7d61', '#2b2a26', '#c9a24a', '#fff'][Math.floor(r() * 5)]; x.globalAlpha = .7; x.beginPath(); x.ellipse(r() * w, r() * h, 1 + r() * 3, 1 + r() * 2, r() * 3, 0, 7); x.fill(); } x.globalAlpha = 1; }
+    if (kind === 'concreto' || kind === 'micro') { const img = x.getImageData(0, 0, c.width, c.height), d = img.data; for (let i = 0; i < d.length; i += 4) { const n = (r() - .5) * (kind === 'micro' ? 14 : 30); d[i] += n; d[i + 1] += n; d[i + 2] += n; } x.putImageData(img, 0, 0); if (kind === 'micro') { x.strokeStyle = 'rgba(255,255,255,.12)'; for (let i = 0; i < 6; i++) { x.beginPath(); x.arc(r() * w, r() * h, 10 + r() * 30, 0, 2); x.stroke(); } } }
+    if (kind === 'azulejo' || kind === 'barro') { const s = kind === 'barro' ? w / 3 : w / 5; for (let i = 0; i < w; i += s) for (let j = 0; j < h; j += s) { x.fillStyle = `rgba(0,0,0,${r() * .08})`; x.fillRect(i, j, s, s); } x.strokeStyle = kind === 'barro' ? 'rgba(255,240,220,.6)' : 'rgba(255,255,255,.8)'; x.lineWidth = 1.5; for (let i = 0; i <= w; i += s) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, h); x.stroke(); } for (let j = 0; j <= h; j += s) { x.beginPath(); x.moveTo(0, j); x.lineTo(w, j); x.stroke(); } }
+    if (kind === 'ladrillo') { const bh = h / 6; for (let j = 0; j < 6; j++) for (let i = -1; i < 4; i++) { x.fillStyle = `rgba(0,0,0,${r() * .15})`; x.fillRect(i * w / 3 + (j % 2) * w / 6 + 1, j * bh + 1, w / 3 - 2, bh - 2); } x.strokeStyle = '#d8cfc0'; x.lineWidth = 2; for (let j = 0; j <= 6; j++) { x.beginPath(); x.moveTo(0, j * bh); x.lineTo(w, j * bh); x.stroke(); } }
+    if (kind === 'tela') { for (let i = 0; i < w; i += 2) { x.fillStyle = `rgba(0,0,0,${.03 + r() * .05})`; x.fillRect(i, 0, 1, h); } for (let j = 0; j < h; j += 2) { x.fillStyle = `rgba(255,255,255,${.03 + r() * .05})`; x.fillRect(0, j, w, 1); } }
+    if (kind === 'metal') { const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'rgba(255,255,255,.35)'); g.addColorStop(.5, 'rgba(0,0,0,.1)'); g.addColorStop(1, 'rgba(255,255,255,.25)'); x.fillStyle = g; x.fillRect(0, 0, w, h); for (let j = 0; j < h; j += 1.5) { x.fillStyle = `rgba(255,255,255,${r() * .06})`; x.fillRect(0, j, w, .7); } }
+    if (kind === 'piedra') { for (let i = 0; i < 120; i++) { x.fillStyle = `rgba(${r() > .5 ? '255,255,255' : '0,0,0'},${r() * .12})`; x.beginPath(); x.arc(r() * w, r() * h, r() * 4, 0, 7); x.fill(); } }
+    if (kind === 'vidrio') { const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'rgba(255,255,255,.6)'); g.addColorStop(.45, 'rgba(255,255,255,.05)'); g.addColorStop(.55, 'rgba(255,255,255,.4)'); g.addColorStop(1, 'rgba(255,255,255,.05)'); x.fillStyle = g; x.fillRect(0, 0, w, h); }
+    if (kind === 'pintura') { x.fillStyle = 'rgba(255,255,255,.08)'; for (let i = 0; i < 8; i++) x.fillRect(0, r() * h, w, 1); }
+    if (kind === 'papel') { x.strokeStyle = 'rgba(255,255,255,.45)'; x.lineWidth = 1.2; for (let i = -h; i < w; i += 12) { x.beginPath(); x.moveTo(i, 0); x.quadraticCurveTo(i + 10, h / 2, i, h); x.stroke(); } }
+    if (kind === 'lambrin') { for (let i = 0; i < w; i += 9) { x.fillStyle = `rgba(0,0,0,${.05 + r() * .1})`; x.fillRect(i, 0, 8, h); x.fillStyle = 'rgba(0,0,0,.3)'; x.fillRect(i + 8, 0, 1, h); } }
+  }
+
+  /* ---------- icons ---------- */
+  const IC = {
+    sofa: '<path d="M6 22v-7a3 3 0 0 1 3-3h28a3 3 0 0 1 3 3v7"/><path d="M3 30v-8a3 3 0 0 1 6 0v3h28v-3a3 3 0 0 1 6 0v8z"/><path d="M8 30v3M38 30v3"/>',
+    sillon: '<path d="M12 22v-8a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v8"/><path d="M9 31v-8a3 3 0 0 1 6 0v2h16v-2a3 3 0 0 1 6 0v8z"/><path d="M13 31v3M33 31v3"/>',
+    mesa: '<path d="M4 16h38"/><path d="M8 16v16M38 16v16"/>',
+    centro: '<rect x="6" y="18" width="34" height="5" rx="1"/><path d="M10 23v8M36 23v8"/>',
+    silla: '<path d="M14 4v28M14 18h16v14M14 18h16"/><path d="M30 18v-2"/>',
+    cama: '<path d="M4 32V8M42 32V20"/><path d="M4 22h38M4 26h38"/><rect x="7" y="15" width="10" height="7" rx="2"/>',
+    buro: '<rect x="11" y="10" width="24" height="20" rx="1"/><path d="M11 20h24M21 15h4M21 25h4M13 30v3M33 30v3"/>',
+    comoda: '<rect x="6" y="8" width="34" height="24" rx="1"/><path d="M6 16h34M6 24h34M20 12h6M20 20h6M20 28h6"/>',
+    espejo: '<ellipse cx="23" cy="17" rx="10" ry="14"/><path d="M18 10l5-3M17 16l9-6"/>',
+    espejoR: '<rect x="12" y="3" width="22" height="30" rx="11"/><path d="M17 10l6-4M16 16l10-7"/>',
+    lampara: '<path d="M15 4h16l4 10H11z"/><path d="M23 14v18M16 32h14"/>',
+    colgante: '<path d="M23 2v10"/><path d="M11 24a12 12 0 0 1 24 0z"/><path d="M20 27h6"/>',
+    librero: '<rect x="9" y="3" width="28" height="30"/><path d="M9 13h28M9 23h28M13 6v7M16 7v6M27 16v7M30 17v6"/>',
+    tapete: '<rect x="5" y="12" width="36" height="16" rx="1"/><path d="M5 15h36M5 25h36M2 12v16M44 12v16"/>',
+    cortina: '<path d="M4 4h38"/><path d="M8 4c2 10-2 20 2 30M16 4c-2 10 2 20 0 30M30 4c2 10-2 20 0 30M38 4c-2 10 2 20-2 30"/>',
+    closet: '<rect x="6" y="3" width="34" height="30"/><path d="M17 3v30M29 3v30M15 16v4M19 16v4M27 16v4M31 16v4"/>',
+    escritorio: '<path d="M4 14h38M7 14v18M39 14v18M28 14v10h11"/><rect x="14" y="5" width="12" height="8" rx="1"/>',
+    cuna: '<path d="M6 32V10M40 32V10M6 14h34M6 28h34M12 14v14M18 14v14M24 14v14M30 14v14M36 14v14"/>',
+    banco: '<path d="M12 10h22M14 10l-3 23M32 10l3 23M13 22h20"/>',
+    credenza: '<rect x="4" y="12" width="38" height="16" rx="1"/><path d="M17 12v16M30 12v16M8 28l-1 5M38 28l1 5"/>',
+    camastro: '<path d="M3 28l12-6h28M15 22l-6-12M8 28v4M40 22v10"/>',
+    maceta: '<path d="M14 20h18l-3 13H17z"/><path d="M23 20c0-8-6-12-10-14M23 20c0-6 4-12 10-13M23 20V8"/>',
+    gabinete: '<rect x="4" y="8" width="38" height="25"/><path d="M4 14h38M17 14v19M30 14v19M14 22v4M20 22v4M27 22v4"/>',
+    lavabo: '<rect x="6" y="18" width="34" height="14"/><path d="M14 18c0-4 4-6 9-6s9 2 9 6M23 6v6M20 6h6M23 25v3"/>',
+    regadera: '<path d="M8 33V8a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/><path d="M15 12h14"/><path d="M18 17v2M22 17v3M26 17v2M20 23v2M24 23v2"/>',
+    wc: '<path d="M10 5h12v12H10z"/><path d="M8 17h28c0 8-6 10-12 10l1 6H17l1-6"/>',
+    puerta: '<rect x="12" y="3" width="22" height="30"/><circle cx="29" cy="19" r="1.4"/>',
+    perchero: '<path d="M23 4v28M17 33h12M23 8l-7 4M23 8l7 4M23 14l-5 3M23 14l5 3"/>',
+    bar: '<path d="M10 14h26M12 14l3 14h16l3-14M15 28v5M31 28v5"/><circle cx="17" cy="33" r="1.5"/><circle cx="29" cy="33" r="1.5"/>',
+    asador: '<path d="M8 14h30a15 9 0 0 1-30 0z"/><path d="M15 23l-4 10M31 23l4 10M23 23v10"/>',
+    hamaca: '<path d="M4 8l8 4c6 14 16 14 22 0l8-4"/><path d="M12 12h22"/>',
+    pouf: '<ellipse cx="23" cy="14" rx="14" ry="4"/><path d="M9 14v14c0 2 6 4 14 4s14-2 14-4V14"/>',
+    cabecera: '<path d="M6 32V10a4 4 0 0 1 4-4h26a4 4 0 0 1 4 4v22"/><path d="M6 24h34M12 12v8M18 12v8M24 12v8M30 12v8M34 12v8"/>',
+    tocador: '<rect x="8" y="18" width="30" height="8"/><path d="M11 26v7M35 26v7"/><ellipse cx="23" cy="9" rx="7" ry="7"/>',
+    cancel: '<rect x="8" y="3" width="30" height="30"/><path d="M23 3v30M12 8l6-3M27 8l6-3"/>',
+    electro: '<rect x="10" y="3" width="26" height="30" rx="2"/><path d="M10 14h26M14 8h3M14 18v6"/>',
+    lavadora: '<rect x="9" y="3" width="28" height="30" rx="2"/><circle cx="23" cy="20" r="8"/><path d="M13 8h4"/>',
+    persiana: '<path d="M6 4h34"/><path d="M8 8h30M8 12h30M8 16h30M8 20h30M8 24h30"/><path d="M36 4v26"/>'
+  };
+  const icon = k => `<svg viewBox="0 0 46 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k] || IC.mesa}</svg>`;
+
+  /* ---------- trades (oficios) ---------- */
+  // [id, name, color, what, makes, lead]
+  const TRADES = [
+    ['arq', 'Arquitectura', '#2b2a26', 'Diseña el espacio completo: distribución, luz, permisos.', 'Remodelaciones, ampliaciones, planos', '3–6 sem de diseño', 'Diseño y acabados'],
+    ['int', 'Interiorismo', '#4f7d61', 'Elige y combina colores, muebles, luz y textiles para que todo se vea como un conjunto.', 'Proyecto de interiores, paletas, compras', '2–4 sem', 'Diseño y acabados'],
+    ['coc', 'Diseño de cocinas', '#8a5a3c', 'Diseña cómo funciona la cocina: dónde va cada cosa, el guardado, la isla, los electrodomésticos.', 'Cocinas integrales, islas, alacenas', '4–8 sem', 'Diseño y acabados'],
+    ['ban', 'Diseño de baños', '#3c6e9e', 'Baños cómodos y fáciles de limpiar; también accesibles para adultos mayores.', 'Baños, vanities, regaderas', '3–5 sem', 'Diseño y acabados'],
+    ['ilu', 'Iluminación', '#c9a24a', 'Planea la luz por capas: general, para trabajar y decorativa. Escenas y luz inteligente.', 'Plan de luz, lámparas a medida', '1–3 sem', 'Diseño y acabados'],
+    ['mob', 'Diseño de mobiliario', '#6b4e3d', 'Diseña muebles únicos a la medida exacta de tu espacio.', 'Mesas, credenzas, libreros, camas', '4–10 sem', 'Diseño y acabados'],
+    ['eba', 'Ebanistería y carpintería', '#9a6a3f', 'Fabrica en madera sólida y chapa: puertas, clósets, lambrines.', 'Clósets, puertas, lambrines, cocinas', '3–8 sem', 'Diseño y acabados'],
+    ['tap', 'Tapicería', '#9fb7a6', 'Hace sillones, cabeceras y bancos, y retapiza los muebles que ya tienes.', 'Sofás, sillones, cabeceras, retapizado', '2–5 sem', 'Diseño y acabados'],
+    ['her', 'Herrería artística', '#3a3a3a', 'Trabaja metal: barandales, celosías, puertas, bases de mesa.', 'Barandales, celosías, estructuras', '2–6 sem', 'Diseño y acabados'],
+    ['vid', 'Espejos y vidrio', '#7fa6b8', 'Espejos a medida con luz o antiempañante, canceles y repisas de vidrio.', 'Espejos, canceles, vitrinas', '1–3 sem', 'Diseño y acabados'],
+    ['mar', 'Marmolería y piedra', '#b9b2a4', 'Corta e instala piedra natural y cuarzo: cubiertas, lavabos, pisos.', 'Cubiertas, lavabos, chimeneas', '2–4 sem', 'Diseño y acabados'],
+    ['cer', 'Cerámica y azulejo artesanal', '#b0561f', 'Azulejo hecho a mano, talavera, mosaicos y piezas únicas.', 'Azulejo, lavabos, murales', '3–8 sem', 'Diseño y acabados'],
+    ['tex', 'Textiles', '#c98fa3', 'Cortinas, persianas, tapetes y cojines a la medida de tus ventanas.', 'Cortinas, tapetes, blancos', '1–3 sem', 'Diseño y acabados'],
+    ['clo', 'Clósets y vestidores', '#5e6259', 'Diseña el guardado según lo que tienes: cuántos zapatos, qué cuelga, qué se dobla.', 'Clósets, vestidores, alacenas', '2–5 sem', 'Diseño y acabados'],
+    ['pis', 'Pisos especiales', '#a67c52', 'Instala madera, microcemento, terrazo y vinílicos.', 'Duelas, microcemento, terrazo', '1–3 sem', 'Diseño y acabados'],
+    ['pin', 'Pintura decorativa', '#d4a64a', 'Acabados que no son pintura lisa: estuco, veneciano, chukum, murales.', 'Estucos, murales, texturas', '1–2 sem', 'Diseño y acabados'],
+    ['pai', 'Paisajismo', '#2f6b45', 'Jardines, terrazas y azoteas verdes con plantas que aguantan tu clima.', 'Jardines, riego, macetas', '2–6 sem', 'Diseño y acabados'],
+    ['dom', 'Domótica', '#1f3a56', 'Casa inteligente: luces, persianas, cerraduras y sensores desde el celular.', 'Escenas, cerraduras, sensores', '1–2 sem', 'Diseño y acabados'],
+    ['acu', 'Acústica', '#4a4f66', 'Menos ruido de fuera y mejor sonido dentro: paneles, muros y puertas.', 'Paneles, home theater, muros', '1–3 sem', 'Diseño y acabados'],
+    ['inf', 'Espacios infantiles', '#e8b04a', 'Recámaras que crecen con el niño: cunas que se vuelven camas, guardado de juguetes.', 'Cunas, literas, ludotecas', '2–4 sem', 'Diseño y acabados'],
+    ['art', 'Arte y curaduría', '#7b3f61', 'Te ayuda a elegir y colgar arte; también arte por encargo.', 'Cuadros, esculturas, montaje', '1–6 sem', 'Diseño y acabados'],
+    ['sta', 'Home staging', '#6d8a96', 'Prepara tu casa para venderla o rentarla: la hace verse mejor en fotos.', 'Puesta en escena, fotos', '1 sem', 'Diseño y acabados'],
+    ['rat', 'Ratán, bejuco y palma', '#c4a574', 'Tejen muebles y lámparas con fibras naturales, a mano.', 'Sillas, lámparas, cabeceras, canastos', '3–6 sem', 'Artesanos mexicanos'],
+    ['vit', 'Vitrales y vidrio soplado', '#5f8fa8', 'Vitrales para puertas y ventanas, y lámparas de vidrio soplado.', 'Vitrales, lámparas, piezas únicas', '3–8 sem', 'Artesanos mexicanos'],
+    ['fun', 'Fundición y latón', '#a8842f', 'Funden herrajes, jaladeras y lámparas en latón o bronce.', 'Jaladeras, apliques, bases de lámpara', '3–6 sem', 'Artesanos mexicanos'],
+    ['tal', 'Talabartería', '#7a4a2a', 'Trabajan la piel para sillas, asientos, asas y detalles.', 'Sillas de piel, asas, tapizados', '2–5 sem', 'Artesanos mexicanos'],
+    ['can', 'Cantería', '#b8a888', 'Tallan piedra: fuentes, marcos de puertas, columnas, chimeneas.', 'Fuentes, marcos, columnas', '4–10 sem', 'Artesanos mexicanos'],
+    ['res', 'Restauración de muebles', '#8a6a4a', 'Recuperan muebles antiguos o heredados: barniz, ensambles y tapiz.', 'Restauración, laqueado, barniz', '2–4 sem', 'Artesanos mexicanos'],
+    ['ele', 'Electricidad', '#e0b020', 'Contactos donde los necesitas, tableros seguros, cargador para auto eléctrico.', 'Contactos, tableros, cargadores', '1–5 días', 'Instalaciones y técnicos'],
+    ['plo', 'Plomería e hidráulica', '#3c6e9e', 'Presión de agua, calentadores, bombas, fugas y tuberías.', 'Calentadores, bombas, tuberías', '1–5 días', 'Instalaciones y técnicos'],
+    ['cli', 'Climatización', '#6aa6c8', 'Minisplits, ventilación y calefacción bien calculados para cada cuarto.', 'Minisplits, extractores, calefacción', '1–3 días', 'Instalaciones y técnicos'],
+    ['sol', 'Energía solar', '#e8a33a', 'Paneles, calentador solar y baterías. Calculan cuánto ahorras.', 'Paneles, calentadores, baterías', '1–2 sem', 'Instalaciones y técnicos'],
+    ['imp', 'Impermeabilización', '#4a5a6a', 'Azoteas, muros y cisternas sin filtraciones.', 'Azoteas, cisternas, muros', '2–5 días', 'Instalaciones y técnicos'],
+    ['yes', 'Yesería y tablaroca', '#d8d2c4', 'Plafones con luz escondida, molduras y muros ligeros.', 'Plafones, molduras, muros', '1–2 sem', 'Instalaciones y técnicos'],
+    ['av', 'Audio, video y redes', '#2d3b55', 'Home theater, bocinas en techo y WiFi que llega a toda la casa.', 'Home theater, WiFi, bocinas', '2–5 días', 'Instalaciones y técnicos'],
+    ['seg', 'Seguridad', '#3a3a3a', 'Cámaras, alarmas, cerraduras inteligentes y cercas.', 'Cámaras, alarmas, cerraduras', '1–3 días', 'Instalaciones y técnicos'],
+    ['chi', 'Chimeneas', '#b0561f', 'Chimeneas de gas, leña o etanol, con salida de humo segura.', 'Chimeneas, braseros', '1–3 sem', 'Instalaciones y técnicos'],
+    ['bio', 'Bioconstrucción', '#8a7a52', 'Adobe, tierra compactada, bambú y cal: frescos y de bajo impacto.', 'Muros de tierra, bambú, cal', '3–8 sem', 'Instalaciones y técnicos'],
+    ['acc', 'Accesibilidad', '#4f7d61', 'Casas seguras para adultos mayores y sillas de ruedas.', 'Rampas, baños accesibles, salvaescaleras', '1–4 sem', 'Instalaciones y técnicos'],
+    ['alb', 'Albercas y spas', '#3c8fb0', 'Construyen y dan mantenimiento a albercas, jacuzzis y fuentes.', 'Albercas, jacuzzis, fuentes', '4–10 sem', 'Exterior'],
+    ['tol', 'Toldos y pérgolas', '#9a8a6a', 'Sombra para terrazas: toldos retráctiles, pérgolas y velarias.', 'Toldos, pérgolas, velarias', '1–3 sem', 'Exterior'],
+    ['rie', 'Riego y huertos', '#5a8a3a', 'Riego automático, huertos en casa y captación de lluvia.', 'Riego, huertos, captación pluvial', '3–10 días', 'Exterior'],
+    ['est', 'Ingeniería estructural', '#5e6259', 'Dice si un muro se puede quitar y cómo reforzar. Firma cálculos.', 'Revisiones, refuerzos, cálculos', '3–10 días', 'Profesionales y trámites'],
+    ['dro', 'Permisos y DRO', '#7a746a', 'Tramita licencias y firma como director responsable de obra.', 'Licencias, avisos de obra', '2–6 sem', 'Profesionales y trámites'],
+    ['val', 'Valuación', '#6b5e4a', 'Avalúo de tu casa para vender, pedir crédito o asegurar.', 'Avalúos', '3–7 días', 'Profesionales y trámites'],
+    ['top', 'Topografía', '#8a8478', 'Mide el terreno y la casa existente para hacer planos exactos.', 'Levantamientos, planos', '2–5 días', 'Profesionales y trámites'],
+    ['fot', 'Fotografía de interiores', '#2b2a26', 'Fotos y recorridos 360° para vender, rentar o presumir tu obra.', 'Fotos, recorridos 360°', '2–4 días', 'Profesionales y trámites'],
+    ['org', 'Organización profesional', '#9fb7a6', 'Ordena clósets, cocina y bodega, y prepara mudanzas.', 'Clósets, cocina, mudanzas', '1–3 días', 'Servicios para tu hogar'],
+    ['lim', 'Limpieza post-obra', '#a9c4cf', 'Limpieza profunda al terminar una obra o antes de mudarte.', 'Limpieza profunda', '1–2 días', 'Servicios para tu hogar'],
+    ['pla', 'Control de plagas', '#6a5a3a', 'Termitas, comején, cucarachas y roedores, con garantía.', 'Fumigación, tratamiento de madera', '1 día', 'Servicios para tu hogar'],
+    ['mud', 'Mudanza y montaje', '#7d8284', 'Mudan, arman muebles, cuelgan cuadros y televisores.', 'Mudanzas, armado, colgado', '1–2 días', 'Servicios para tu hogar'],
+    ['lav', 'Lavado de salas y tapetes', '#8aa0b0', 'Lavan sofás, colchones y tapetes en tu casa.', 'Lavado de salas, colchones, tapetes', '1 día', 'Servicios para tu hogar'],
+    ['jar', 'Mantenimiento de jardín', '#3f7a4a', 'Poda, pasto, plantas y riego, cada semana o cada mes.', 'Poda, pasto, plantas', 'semanal', 'Servicios para tu hogar']
+  ];
+  const T = Object.fromEntries(TRADES.map(t => [t[0], t]));
+
+  /* ---------- furniture by space: [icon, name, price range, trades, materials key] ---------- */
+  const FURN = [
+    ['Sala', [['sofa', 'Sofá', '$12k–$85k', ['tap', 'mob'], 'tela'], ['sofa', 'Seccional / modular', '$28k–$140k', ['tap'], 'tela'], ['sillon', 'Sillón', '$5k–$38k', ['tap', 'mob'], 'tela'], ['pouf', 'Puf / otomana', '$1.5k–$9k', ['tap'], 'tela'], ['centro', 'Mesa de centro', '$3k–$32k', ['mob', 'eba', 'mar'], 'cub'], ['mesa', 'Mesa lateral', '$1.2k–$12k', ['mob', 'her'], 'cub'], ['credenza', 'Mueble de TV', '$6k–$45k', ['eba', 'mob'], 'mad'], ['librero', 'Librero', '$4k–$40k', ['eba'], 'mad'], ['tapete', 'Tapete', '$2k–$60k', ['tex'], 'tex'], ['cortina', 'Cortinas', '$2.5k–$18k', ['tex'], 'tex'], ['lampara', 'Lámpara de pie', '$1.5k–$22k', ['ilu'], 'met'], ['bar', 'Carrito bar', '$3k–$15k', ['her'], 'met']]],
+    ['Comedor', [['mesa', 'Mesa de comedor', '$8k–$90k', ['mob', 'eba', 'mar'], 'cub'], ['silla', 'Sillas', '$1.2k–$14k c/u', ['mob', 'tap'], 'mad'], ['banco', 'Banca', '$3k–$18k', ['eba'], 'mad'], ['credenza', 'Bufetero / trinchador', '$9k–$55k', ['eba', 'mob'], 'mad'], ['librero', 'Vitrina', '$8k–$40k', ['eba', 'vid'], 'vid'], ['colgante', 'Lámpara colgante', '$2k–$35k', ['ilu'], 'met'], ['espejo', 'Espejo de comedor', '$3k–$20k', ['vid'], 'vid']]],
+    ['Recámara', [['cama', 'Cama / base', '$6k–$70k', ['mob', 'eba'], 'mad'], ['cabecera', 'Cabecera', '$3k–$28k', ['tap', 'eba'], 'tela'], ['cama', 'Colchón', '$5k–$60k', [], 'tex'], ['buro', 'Burós', '$1.8k–$15k c/u', ['eba', 'mob'], 'mad'], ['comoda', 'Cómoda', '$6k–$38k', ['eba'], 'mad'], ['tocador', 'Tocador', '$5k–$30k', ['eba', 'vid'], 'mad'], ['banco', 'Banca pie de cama', '$2.5k–$16k', ['tap'], 'tela'], ['espejoR', 'Espejo de cuerpo completo', '$2k–$18k', ['vid'], 'vid'], ['closet', 'Clóset / vestidor', '$18k–$160k', ['clo', 'eba'], 'mad'], ['sillon', 'Sillón de lectura', '$5k–$30k', ['tap'], 'tela'], ['persiana', 'Persianas / blackout', '$2k–$14k', ['tex', 'dom'], 'tex']]],
+    ['Infantil', [['cuna', 'Cuna convertible', '$6k–$28k', ['inf', 'eba'], 'mad'], ['cama', 'Litera / cama alta', '$9k–$45k', ['inf', 'eba'], 'mad'], ['comoda', 'Cambiador', '$4k–$18k', ['inf'], 'mad'], ['escritorio', 'Escritorio infantil', '$3k–$14k', ['inf'], 'mad'], ['librero', 'Guardado de juguetes', '$2.5k–$16k', ['inf', 'clo'], 'mad'], ['tapete', 'Tapete de juego', '$1.5k–$8k', ['tex'], 'tex']]],
+    ['Cocina', [['gabinete', 'Gabinetes / cocina integral', '$45k–$400k', ['coc', 'eba'], 'mad'], ['centro', 'Isla', '$25k–$160k', ['coc', 'mar'], 'cub'], ['closet', 'Alacena', '$12k–$70k', ['coc', 'eba'], 'mad'], ['banco', 'Bancos de barra', '$1.5k–$9k c/u', ['mob', 'her'], 'met'], ['electro', 'Campana y electrodomésticos', '$8k–$250k', [], 'met'], ['mesa', 'Cubierta', '$6k–$18k/ml', ['mar'], 'cub'], ['colgante', 'Lámparas sobre isla', '$2k–$20k', ['ilu'], 'met']]],
+    ['Baño', [['lavabo', 'Mueble de lavabo', '$6k–$55k', ['ban', 'eba', 'mar'], 'cub'], ['espejo', 'Espejo con luz / antiempañante', '$3.5k–$22k', ['vid', 'ilu'], 'vid'], ['cancel', 'Cancel', '$6k–$30k', ['vid'], 'vid'], ['regadera', 'Regadera y grifería', '$3k–$40k', ['ban'], 'met'], ['wc', 'WC suspendido', '$6k–$28k', ['ban'], 'cer'], ['librero', 'Repisas y nichos', '$1.5k–$9k', ['ban', 'mar'], 'cub']]],
+    ['Home office', [['escritorio', 'Escritorio', '$4k–$45k', ['mob', 'eba'], 'mad'], ['silla', 'Silla ergonómica', '$4k–$35k', [], 'tela'], ['librero', 'Libreros a medida', '$8k–$60k', ['eba'], 'mad'], ['lampara', 'Lámpara de trabajo', '$1k–$9k', ['ilu'], 'met'], ['persiana', 'Paneles acústicos', '$4k–$25k', ['acu'], 'tex']]],
+    ['Terraza y jardín', [['mesa', 'Comedor exterior', '$9k–$70k', ['her', 'mob'], 'met'], ['camastro', 'Camastros', '$4k–$28k c/u', ['her'], 'met'], ['sofa', 'Sala exterior', '$15k–$95k', ['tap', 'her'], 'tela'], ['maceta', 'Macetas y jardineras', '$800–$18k', ['pai', 'cer'], 'cer'], ['asador', 'Asador / cocina exterior', '$6k–$120k', ['coc', 'mar'], 'met'], ['hamaca', 'Hamaca / columpio', '$2k–$15k', ['tex'], 'tex'], ['lampara', 'Luces exteriores', '$500–$12k', ['ilu'], 'met']]],
+    ['Entrada', [['credenza', 'Consola', '$4k–$30k', ['mob', 'her'], 'mad'], ['espejo', 'Espejo de entrada', '$2.5k–$20k', ['vid'], 'vid'], ['banco', 'Banca zapatera', '$3k–$15k', ['eba'], 'mad'], ['perchero', 'Perchero', '$800–$6k', ['her'], 'met'], ['puerta', 'Puerta principal', '$15k–$90k', ['eba', 'her', 'dom'], 'mad']]],
+    ['Lavandería', [['lavadora', 'Lavadora y secadora', '$12k–$60k', [], 'met'], ['gabinete', 'Muebles de lavandería', '$9k–$40k', ['eba', 'clo'], 'mad'], ['perchero', 'Tendedero plegable', '$800–$5k', ['her'], 'met']]]
+  ];
+  const MATS = {
+    tela: [['Lino', '#d8cdb8', 'Fresco y natural. Se arruga y se mancha más.', 2, 3], ['Bouclé', '#efe8dc', 'Suave y de moda. Atrapa pelo de mascotas.', 3, 2], ['Terciopelo', '#4f7d61', 'Elegante y suave. Marca cuando lo aplastas.', 2, 3], ['Piel', '#8a5a3c', 'Dura muchos años y mejora con el uso.', 3, 5], ['Antimanchas', '#9aa1a4', 'Para niños y mascotas: se limpia con agua.', 1, 5]],
+    mad: [['Roble', '#b98b5a', 'Clara, con veta marcada.', 2, 5], ['Nogal', '#6b4e3d', 'Oscura y cálida.', 2, 5], ['Parota', '#a0673b', 'Madera mexicana, piezas grandes.', 2, 4], ['Laca mate', '#9fb7a6', 'Del color que quieras, superficie lisa.', 2, 3], ['MDF con chapa', '#c9a57a', 'Se ve como madera y cuesta menos.', 2, 3]],
+    cub: [['Cuarzo', '#efeeea', 'No se mancha. Le afecta el calor directo.', 1, 5], ['Granito', '#7d7a74', 'Aguanta el calor. Se sella cada año.', 2, 4], ['Mármol', '#f2efe9', 'El más bonito. Se mancha con limón y vino.', 4, 3], ['Madera sólida', '#a0673b', 'Cálida. Necesita aceite cada 6 meses.', 3, 3], ['Sinterizado', '#3a3a3a', 'Aguanta todo: calor, rayones y manchas.', 1, 5]],
+    vid: [['Espejo plata', '#c9d3d8', 'El clásico, refleja fiel.', 1, 5], ['Bronce', '#b49a7a', 'Tono cálido, más decorativo.', 1, 5], ['Con luz LED', '#e8eef0', 'Ilumina la cara sin sombras.', 1, 4], ['Antiempañante', '#d8e2e6', 'No se empaña al bañarte.', 1, 4]],
+    met: [['Negro mate', '#2b2a26', 'Moderno; se notan las marcas de agua.', 2, 4], ['Latón', '#c9a24a', 'Cálido; se oscurece con los años.', 3, 4], ['Acero inox', '#b9bec2', 'Resistente y fácil de limpiar.', 1, 5], ['Aluminio', '#d6d8da', 'Ligero; no se oxida en exteriores.', 1, 4]],
+    tex: [['Algodón', '#efe8dc', 'Lavable y económico.', 2, 3], ['Lana', '#d8cdb8', 'Cálida y dura mucho.', 3, 5], ['Yute / sisal', '#c4a574', 'Natural; áspero al pisar descalzo.', 2, 4], ['Blackout', '#3f4e66', 'Oscurece el cuarto por completo.', 1, 4]],
+    cer: [['Barro', '#b8673f', 'Artesanal y fresco.', 3, 3], ['Porcelana', '#f4f4f2', 'Lisa, no absorbe agua.', 1, 5], ['Concreto', '#a9a59c', 'Pesado e industrial.', 2, 4]]
+  };
+
+  /* ---------- finishes: [name, tex, color, $/m², durab, mant(1 bajo..5 alto), sí, no, trade] ---------- */
+  const FIN = [
+    ['Pisos', [['Porcelanato', 'azulejo', '#d8cbb3', 650, 5, 1, 'Toda la casa, también exteriores', 'Nada: es lo más versátil', 'pis'], ['Madera sólida', 'madera', '#b98b5a', 1800, 3, 4, 'Recámaras y sala', 'Baños, cocina, planta baja con humedad', 'pis'], ['Madera de ingeniería', 'madera', '#c9a57a', 1100, 4, 3, 'Recámaras, sala, sobre loseta existente', 'Baños', 'pis'], ['Vinílico SPC', 'madera', '#a99070', 480, 4, 1, 'Rentas, niños, mascotas', 'Terrazas con sol directo', 'pis'], ['Mármol', 'marmol', '#efebe4', 2600, 3, 4, 'Recibidor, baños', 'Cocina (se mancha con ácidos)', 'mar'], ['Terrazo', 'terrazo', '#e8e2d4', 1500, 5, 2, 'Áreas comunes, cocina', 'Si buscas algo económico', 'pis'], ['Microcemento', 'micro', '#b9b2a4', 1200, 3, 3, 'Sala, baños sin juntas', 'Donde arrastres muebles pesados', 'pis'], ['Concreto pulido', 'concreto', '#a9a59c', 700, 5, 2, 'Lofts, estudios, cocheras', 'Recámaras (se siente frío)', 'pis'], ['Barro / pasta', 'barro', '#b8673f', 550, 3, 3, 'Casas de estilo mexicano, terrazas', 'Cocina (absorbe grasa)', 'cer'], ['Cantera', 'piedra', '#c8b79a', 1300, 4, 3, 'Patios, escaleras, fachadas', 'Interiores muy húmedos', 'mar']]],
+    ['Muros', [['Pintura mate', 'pintura', '#9fb7a6', 90, 2, 2, 'Recámaras, sala', 'Cocina y baño (usa satinada)', 'pin'], ['Papel tapiz', 'papel', '#c9a57a', 450, 2, 2, 'Muro principal, recámaras', 'Baños sin ventilación', 'int'], ['Lambrín de madera', 'lambrin', '#a0673b', 1400, 4, 2, 'Cabeceras, estudio, comedor', 'Muros húmedos', 'eba'], ['Piedra laminada', 'piedra', '#9a9284', 1600, 5, 1, 'Fachada, chimenea', 'Cuartos pequeños', 'mar'], ['Ladrillo aparente', 'ladrillo', '#b06a48', 900, 5, 1, 'Estilo industrial, terrazas', 'Cuando quieres lavar el muro', 'pin'], ['Estuco / veneciano', 'micro', '#e6dccb', 650, 4, 2, 'Sala, recibidor, baños', 'Si buscas algo económico', 'pin'], ['Chukum', 'micro', '#d8c4a8', 800, 4, 2, 'Baños, regaderas, albercas', 'Lugares con golpes', 'pin'], ['Azulejo', 'azulejo', '#7fa6b8', 700, 5, 1, 'Baños, cocina', 'Recámaras', 'cer'], ['Paneles acústicos', 'tela', '#4a4f66', 1100, 3, 2, 'Home office, home theater', 'Exteriores', 'acu']]],
+    ['Cubiertas', [['Cuarzo', 'marmol', '#efeeea', 6500, 5, 1, 'Cocina, baño', 'Junto a la estufa sin base', 'mar'], ['Granito', 'piedra', '#7d7a74', 4800, 5, 2, 'Cocina con mucho uso', 'Si quieres un color parejo', 'mar'], ['Mármol', 'marmol', '#f2efe9', 7500, 3, 5, 'Baños, mesas', 'Cocina con mucho uso', 'mar'], ['Sinterizado', 'concreto', '#3a3a3a', 8200, 5, 1, 'Cocina, exteriores', 'Si tienes poco presupuesto', 'mar'], ['Madera', 'madera', '#a0673b', 3800, 3, 4, 'Barras, escritorios', 'Junto a la tarja', 'eba'], ['Acero inox', 'metal', '#b9bec2', 5200, 5, 2, 'Cocinas para cocinar mucho', 'Si te molestan los rayones', 'her']]],
+    ['Techos', [['Plafón liso', 'pintura', '#f4f2ee', 380, 4, 1, 'Toda la casa, luz escondida', '—', 'arq'], ['Vigas aparentes', 'madera', '#8a5a3c', 1900, 4, 2, 'Sala, terraza', 'Techos bajos', 'eba'], ['Bóveda catalana', 'ladrillo', '#b8673f', 2200, 5, 1, 'Casas de estilo mexicano', 'Departamentos', 'arq'], ['Madera / duela', 'lambrin', '#c9a57a', 1500, 4, 2, 'Terrazas, recámaras', 'Baños', 'eba']]],
+    ['Cancelería', [['Aluminio', 'metal', '#d6d8da', 2800, 4, 1, 'Toda la casa', '—', 'vid'], ['PVC', 'pintura', '#f4f4f2', 3400, 4, 1, 'Ruido y frío: aísla mejor', 'Ventanas muy grandes', 'vid'], ['Madera', 'madera', '#8a5a3c', 4600, 3, 4, 'Casas cálidas, de estilo', 'Fachadas con mucho sol', 'eba'], ['Herrería', 'metal', '#2b2a26', 3000, 4, 3, 'Estilo industrial, ventanas altas', 'Junto al mar (se oxida)', 'her'], ['Doble vidrio', 'vidrio', '#cfe0e6', 4200, 5, 1, 'Calles ruidosas', '—', 'vid']]],
+    ['Iluminación', [['Empotrados', 'pintura', '#f4f2ee', 600, 5, 1, 'Luz general', 'Para ambientar (es plana)', 'ilu'], ['Tira LED escondida', 'pintura', '#ffe3b0', 450, 4, 1, 'Plafones, muebles, escaleras', '—', 'ilu'], ['Colgantes', 'metal', '#c9a24a', 3500, 4, 2, 'Sobre isla y comedor', 'Techos bajos', 'ilu'], ['Apliques de muro', 'metal', '#2b2a26', 1800, 4, 1, 'Pasillos, cabeceras', '—', 'ilu'], ['Inteligente', 'pintura', '#d8e2f0', 900, 4, 1, 'Escenas desde el celular', '—', 'dom']]],
+    ['Grifería', [['Cromo', 'metal', '#c9d3d8', 2500, 5, 2, 'Clásico, fácil de combinar', '—', 'ban'], ['Negro mate', 'metal', '#2b2a26', 3200, 4, 3, 'Moderno', 'Agua dura (se ve el sarro)', 'ban'], ['Latón cepillado', 'metal', '#c9a24a', 4800, 4, 3, 'Cálido, elegante', '—', 'ban'], ['Acero cepillado', 'metal', '#b9bec2', 2800, 5, 1, 'Cocina', '—', 'coc']]],
+    ['Herrajes', [['Jaladeras latón', 'metal', '#c9a24a', 180, 5, 2, 'Cocina, clósets', '—', 'eba'], ['Push sin jaladera', 'pintura', '#efe8dc', 120, 3, 1, 'Minimalista', 'Cajones pesados', 'eba'], ['Cierre suave', 'metal', '#b9bec2', 220, 5, 1, 'Todos los cajones', '—', 'eba'], ['Apagadores de diseño', 'metal', '#2b2a26', 650, 5, 1, 'Toda la casa', '—', 'ilu']]],
+    ['Textiles', [['Cortina de lino', 'tela', '#e6dccb', 900, 3, 2, 'Sala, recámaras', 'Cocina', 'tex'], ['Enrollable screen', 'tela', '#9aa1a4', 700, 4, 1, 'Oficina, sol directo', '—', 'tex'], ['Blackout', 'tela', '#3f4e66', 850, 4, 1, 'Recámaras', '—', 'tex'], ['Tapete de lana', 'tela', '#d8cdb8', 2200, 5, 3, 'Sala, recámaras', 'Comedor con niños', 'tex']]],
+    ['Exterior', [['Deck de madera', 'lambrin', '#8a5a3c', 2100, 3, 4, 'Terrazas, albercas', 'Sombra con humedad', 'pai'], ['Deck sintético', 'lambrin', '#7d6a58', 1600, 5, 1, 'Terrazas, azoteas', '—', 'pai'], ['Adoquín', 'ladrillo', '#9a9284', 650, 5, 1, 'Cocheras, andadores', '—', 'arq'], ['Pasto sintético', 'tela', '#4f7d61', 420, 4, 1, 'Azoteas, zonas sin sol', 'Si tienes perros (se calienta)', 'pai'], ['Azulejo de alberca', 'azulejo', '#3c8fb0', 1400, 5, 1, 'Albercas, fuentes', '—', 'cer']]]
+  ];
+
+  /* ---------- designers ---------- */
+  // [ini, name, trade, specialty, rating, km, lead, priceFrom, portfolio rooms, pieces]
+  const DES = [
+    ['RV', 'Taller Reyes Vidrio', 'vid', 'Espejos con luz, canceles sin marco', '4.9', 3.2, '8 días', 3500, ['bano', 'sala', 'bano'], ['Espejo redondo con luz', 'Espejo de cuerpo con marco', 'Cancel de piso a techo']],
+    ['TM', 'Tapicería Medina', 'tap', 'Sofás a medida y retapizado', '4.8', 4.1, '3 semanas', 9000, ['sala', 'recamara', 'sala'], ['Sofá 3 plazas', 'Cabecera capitonada', 'Retapizar sillón']],
+    ['CO', 'Carpintería Ochoa', 'eba', 'Clósets y lambrines en parota', '5.0', 6.8, '4 semanas', 18000, ['closet', 'recamara', 'home'], ['Clóset de 3.1 m', 'Lambrín para cabecera', 'Librero a medida']],
+    ['LR', 'Lucía Ramos', 'int', 'Interiorismo cálido', '4.9', 2.5, '2 semanas', 12000, ['sala', 'cocina', 'recamara'], ['Proyecto de sala', 'Paleta y compras', 'Recámara completa']],
+    ['HF', 'Herrería Fuentes', 'her', 'Celosías y bases de mesa', '4.7', 9.0, '3 semanas', 6000, ['fachada', 'terraza', 'sala'], ['Celosía de fachada', 'Barandal', 'Base para mesa']],
+    ['MP', 'Mármoles del Pacífico', 'mar', 'Cubiertas y lavabos tallados', '4.8', 11.2, '2 semanas', 6500, ['cocina', 'bano', 'cocina'], ['Cubierta de cuarzo', 'Lavabo tallado', 'Isla en granito']],
+    ['AT', 'Azulejos Tlaquepaque', 'cer', 'Azulejo y talavera hechos a mano', '4.9', 14.5, '5 semanas', 900, ['bano', 'cocina', 'terraza'], ['Muro de talavera', 'Lavabo de cerámica', 'Piso de barro']],
+    ['ES', 'Estudio Sombra', 'ilu', 'Planes de luz y lámparas a medida', '4.8', 5.0, '10 días', 4500, ['sala', 'cocina', 'home'], ['Plan de luz por cuarto', 'Lámpara sobre isla', 'Escenas inteligentes']],
+    ['NA', 'Nido Infantil', 'inf', 'Recámaras que crecen con el niño', '5.0', 7.3, '3 semanas', 8000, ['recamara', 'home', 'closet'], ['Cuna convertible', 'Litera con escritorio', 'Guardado de juguetes']],
+    ['VE', 'Vestidores Elia', 'clo', 'Vestidores y alacenas', '4.7', 8.1, '3 semanas', 22000, ['closet', 'cocina', 'recamara'], ['Vestidor en L', 'Clóset con cajonera', 'Alacena']],
+    ['PT', 'Pisos Terra', 'pis', 'Microcemento y duela', '4.6', 6.0, '10 días', 1100, ['sala', 'bano', 'recamara'], ['Microcemento en baño', 'Duela de roble', 'Terrazo en cocina']],
+    ['TL', 'Textiles Lumbre', 'tex', 'Cortinas y tapetes a medida', '4.9', 3.9, '12 días', 2500, ['recamara', 'sala', 'terraza'], ['Cortinas de lino', 'Blackout motorizado', 'Tapete de lana']]
+  ];
+
+  /* ---------- state ---------- */
+  const S = { sub: 1, mode: 1, room: 0, fcat: 0, trade: 'all' };
+  const scroll = $('scroll');
+  const avatar = (d, sz) => `<span class="av" style="background:${T[d[2]][2]}${sz ? ';width:' + sz + 'px;height:' + sz + 'px' : ''}">${d[0]}</span>`;
+
+  function paraTi() {
+    return `<div class="feed">
+      <div class="sec"><h6>Hecho a mano cerca de ti <small>TALLERES</small></h6><div class="hrow">${DES.slice(0, 7).map((d, i) => `<button type="button" class="tcard" data-des="${i}">${avatar(d)}<b>${d[1]}</b><small>${T[d[2]][1]} · ${d[5]} km</small></button>`).join('')}</div></div>
+      <div class="learn"><span style="font:500 10px var(--mono);letter-spacing:.1em;opacity:.7">APRENDE EN 30 SEGUNDOS</span><b class="t">Cuarzo o granito: ¿cuál va en tu cocina?</b>
+        <div class="vs"><div><canvas data-tex="marmol" data-col="#efeeea"></canvas><b>Cuarzo</b>No se mancha · le afecta el calor · $6,500/m²</div><div><canvas data-tex="piedra" data-col="#7d7a74"></canvas><b>Granito</b>Aguanta el calor · se sella cada año · $4,800/m²</div></div>
+        <button type="button" data-goacab="2">Ver todas las cubiertas</button></div>
+      <div class="sec"><h6>Oficios que quizá no conocías <small>${TRADES.length} OFICIOS</small></h6><div class="hrow">${['tap', 'vid', 'rat', 'fun', 'res', 'pin', 'acu', 'sta'].map(k => `<button type="button" class="tcard" data-trade="${k}"><span class="av" style="background:${T[k][2]}">${T[k][1].slice(0, 2).toUpperCase()}</span><b>${T[k][1]}</b><small>${T[k][3].split(':')[0].slice(0, 62)}</small></button>`).join('')}</div></div>
+      <div class="box"><span><b>Caja de muestras gratis</b><small>Elige hasta 8 acabados y llegan a tu casa en 3 días. Tócalos con tu luz.</small></span><span class="sw">${[['madera', '#b98b5a'], ['marmol', '#efeeea'], ['terrazo', '#e8e2d4'], ['tela', '#9fb7a6']].map(t => `<canvas data-tex="${t[0]}" data-col="${t[1]}"></canvas>`).join('')}</span></div>
+    </div>`;
+  }
+  function explorar() {
+    const modes = `<div class="modes">${['Espacios', 'Muebles', 'Acabados', 'Diseñadores'].map((m, i) => `<button type="button" data-mode="${i}" aria-pressed="${i === S.mode}">${m}</button>`).join('')}</div>`;
+    let b = '';
+    if (S.mode === 0) b = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${[['cocina', 'Cocina'], ['sala', 'Sala'], ['recamara', 'Recámara'], ['bano', 'Baño'], ['terraza', 'Terraza'], ['home', 'Home office']].map(s => `<button type="button" style="border:0;padding:0;border-radius:16px;overflow:hidden;background:#fffdf9;text-align:left" data-t="Ideas de ${s[1].toLowerCase()}"><canvas data-room="${s[0]}" style="width:100%;height:84px;display:block"></canvas><span style="display:block;padding:7px 10px;font:600 12.5px var(--sans)">${s[1]}</span></button>`).join('')}</div>`;
+    if (S.mode === 1) { const r = FURN[S.room]; b = `<div class="hrow">${FURN.map((f, i) => `<button type="button" class="fchip" data-room="${i}" aria-pressed="${i === S.room}">${f[0]}</button>`).join('')}</div>
+      <p style="margin:0 2px;font-size:12.5px;color:#5e6259">${r[1].length} tipos de muebles para ${r[0].toLowerCase()}. Toca uno para ver materiales, medidas y quién lo hace.</p>
+      <div class="fgrid">${r[1].map((it, i) => `<button type="button" class="fitem" data-furn="${i}">${icon(it[0])}<b>${it[1]}</b><small>${it[2]}</small></button>`).join('')}</div>`; }
+    if (S.mode === 2) { const c = FIN[S.fcat]; b = `<div class="hrow">${FIN.map((f, i) => `<button type="button" class="fchip" data-fcat="${i}" aria-pressed="${i === S.fcat}">${f[0]}</button>`).join('')}</div>
+      <div class="flist">${c[1].map((m, i) => `<button type="button" class="fin" data-fin="${i}"><canvas data-tex="${m[1]}" data-col="${m[2]}" data-seed="${i + 3}"></canvas><span><b>${m[0]}</b><small>Resiste ${dots(m[4])} · Cuidado ${dots(m[5], 'c')}</small></span><em>${money(m[3])}<br><small style="font-size:9.5px">/m²</small></em></button>`).join('')}</div>`; }
+    if (S.mode === 3) { const list = DES.filter(d => S.trade === 'all' || d[2] === S.trade), used = [...new Set(DES.map(d => d[2]))];
+      b = `<div class="hrow"><button type="button" class="fchip" data-tr="all" aria-pressed="${S.trade === 'all'}">Todos · ${TRADES.length} oficios</button>${TRADES.map(t => `<button type="button" class="fchip" data-tr="${t[0]}" aria-pressed="${S.trade === t[0]}">${t[1]}</button>`).join('')}</div>
+      ${S.trade !== 'all' ? `<div class="blk"><h6><span>${T[S.trade][1]}</span><span>${T[S.trade][5]}</span></h6><p style="margin:0;font-size:12.5px;color:#5e6259">${T[S.trade][3]}</p><p style="margin:0;font-size:12px"><b>Hace:</b> ${T[S.trade][4]}</p></div>` : ''}
+      ${list.length ? list.map(d => { const i = DES.indexOf(d); return `<button type="button" class="dcard" data-des="${i}"><span class="top">${avatar(d)}<span><b>${d[1]}</b><small>${d[3]}</small></span><span class="tr">${T[d[2]][1].split(' ')[0]}</span></span><span class="pf">${d[8].map(r => `<canvas data-room="${r}"></canvas>`).join('')}</span><span class="meta"><span>★ ${d[4]}</span><span>${d[5]} km</span><span>entrega ${d[6]}</span><span>desde ${money(d[7])}</span></span></button>`; }).join('') : `<div class="blk"><p style="margin:0;font-size:12.5px;color:#5e6259">Aún no hay talleres de este oficio en tu zona. Avísame cuando haya.</p><button class="cta ghost" type="button" data-t="Te avisamos cuando haya uno">Avisarme</button></div>`}`; }
+    return modes + b;
+  }
+  function render(keep) {
+    const st = scroll.scrollTop;
+    scroll.innerHTML = `<div class="view"><div class="greet"><small><span>Inicio</span><span>Casa Providencia</span></small><h3>¿Qué quieres hacer <em>con tu espacio?</em></h3></div>
+      <div class="subtabs">${['Para ti', 'Explorar', 'Guardado'].map((s, i) => `<button type="button" data-sub="${i}" aria-pressed="${i === S.sub}">${s}</button>`).join('')}</div>
+      ${S.sub === 0 ? paraTi() : S.sub === 1 ? explorar() : '<div class="blk"><p style="margin:0;font-size:13px;color:#5e6259">Tus tableros, muebles guardados y encargos aparecen aquí.</p></div>'}</div>`;
+    if (keep) { scroll.scrollTop = st; scroll.querySelector('.view').style.animation = 'none'; } else scroll.scrollTop = 0;
+    paint(scroll);
+  }
+  function paint(root) { root.querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room)); root.querySelectorAll('canvas[data-tex]').forEach(c => tex(c, c.dataset.tex, c.dataset.col, +(c.dataset.seed || 7))); }
+
+  /* ---------- sheets ---------- */
+  const sh = $('sh');
+  const open = () => { $('sheet').classList.add('on'); $('scrim').classList.add('on'); sh.scrollTop = 0; paint(sh); };
+  const close = () => { $('sheet').classList.remove('on'); $('scrim').classList.remove('on'); };
+  $('scrim').onclick = close;
+  let F = { it: null, var: 0, mat: 0, way: 1 };
+  function furnSheet() {
+    const it = F.it, mats = MATS[it[4]], m = mats[F.mat], trades = it[3];
+    const mm = it[2].match(/\$([\d.]+)(k?)/), lo = parseFloat(mm[1]) * (mm[2] ? 1000 : 1);
+    const made = trades.length ? DES.filter(d => trades.includes(d[2])) : [];
+    sh.innerHTML = `<span class="eyeb">${FURN[S.room][0]} · mueble</span><h4>${it[1]}</h4>
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:center"><div style="background:#fffdf9;border-radius:16px;padding:10px;color:${m[1] === '#efe8dc' || m[1] === '#f4f4f2' ? '#2b2a26' : m[1]}">${icon(it[0]).replace('<svg', '<svg style="width:70px;height:56px"')}</div><p>Rango en BuildI: <b style="color:var(--ink)">${it[2]}</b>. El precio depende del tamaño, el material y si es hecho o a medida.</p></div>
+      <div class="blk"><h6><span>Material</span><span>${mats.length} opciones</span></h6><div class="opt">${mats.map((x, i) => `<button type="button" data-mat="${i}" aria-pressed="${i === F.mat}"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${x[1]};margin-right:5px;vertical-align:-1px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)"></span>${x[0]}</button>`).join('')}</div>
+        <div class="matinfo"><span>${m[2]}</span><span>Cuidado ${dots(m[3], 'c')} · Dura ${dots(m[4])}</span></div></div>
+      <div class="blk"><h6><span>Medida para tu casa</span><span>de tu plano</span></h6><p style="margin:0;font-size:12.5px;color:#5e6259">${/Sofá|Seccional|Sala exterior/.test(it[1]) ? 'Tu muro de sala mide 3.4 m: cabe un sofá de hasta <b style="color:var(--ink)">2.6 m</b> dejando paso a los lados.' : /Cama|Cabecera/.test(it[1]) ? 'Tu recámara principal mide 3.6 × 3.9 m: cabe una <b style="color:var(--ink)">king size</b> con burós de 50 cm.' : /Clóset/.test(it[1]) ? 'Tu pared de clóset mide <b style="color:var(--ink)">3.1 m</b> por 2.5 m de alto.' : /Espejo/.test(it[1]) ? 'El muro del lavabo mide <b style="color:var(--ink)">1.2 m</b>: un espejo de 80–100 cm queda bien.' : 'Revisamos que quepa con las medidas de tu plano antes de comprar.'}</p></div>
+      <div class="two"><button type="button" class="way" data-way="0" aria-pressed="${F.way === 0}"><b>Comprarlo hecho</b><small>Proveedores BuildI · 3 a 10 días</small><em>desde ${money(lo)}</em></button><button type="button" class="way" data-way="1" aria-pressed="${F.way === 1}" ${trades.length ? '' : 'disabled style="opacity:.45"'}><b>A medida</b><small>${trades.length ? trades.map(t => T[t][1]).join(', ') : 'No aplica'}</small><em>${trades.length ? 'desde ' + money(lo * 1.35) : '—'}</em></button></div>
+      ${F.way === 1 && made.length ? `<div class="blk"><h6><span>Quién lo hace cerca de ti</span><span>${made.length}</span></h6>${made.map(d => `<button type="button" class="dcard" data-des="${DES.indexOf(d)}" style="padding:4px 0;background:none"><span class="top">${avatar(d)}<span><b>${d[1]}</b><small>${d[3]} · ★ ${d[4]} · ${d[5]} km</small></span><span class="tr">${d[6]}</span></span></button>`).join('')}</div>` : F.way === 0 ? `<div class="blk"><h6><span>Proveedores</span><span>entrega e instalación</span></h6>${['Muebles Roble · ★4.7', 'Casa Alma · ★4.8', 'Hábitat GDL · ★4.6'].map((p, i) => `<div class="kv"><span>${p}</span><b>${money(lo * (1 + i * .25))}</b></div>`).join('')}</div>` : ''}
+      <button class="cta sage" type="button" data-t="${F.way ? 'Solicitud enviada a los talleres con tus medidas' : 'Agregado al carrito'}">${F.way ? 'Pedir propuestas a medida' : 'Ver en mi sala y comprar'}</button>`;
+    paint(sh);
+  }
+  function finSheet(cat, m) {
+    const t = T[m[8]], ds = DES.filter(d => d[2] === m[8]);
+    sh.innerHTML = `<span class="eyeb">Acabados · ${cat}</span><h4>${m[0]}</h4>
+      <div class="bigsw"><canvas data-tex="${m[1]}" data-col="${m[2]}" data-seed="11"></canvas></div>
+      <div class="blk"><div class="kv"><span>Precio instalado</span><b>${money(m[3])}/m²</b></div><div class="kv"><span>Qué tan resistente</span><span>${dots(m[4])}</span></div><div class="kv"><span>Mantenimiento</span><span>${dots(m[5], 'c')}</span></div><div class="kv"><span>En tu sala (22 m²)</span><b>${money(m[3] * 22)}</b></div></div>
+      <div class="yesno"><div class="y"><b>Dónde sí</b>${m[6]}</div><div class="n"><b>Dónde no</b>${m[7]}</div></div>
+      <div class="blk"><h6><span>Quién lo instala</span><span>${t[1]}</span></h6>${ds.length ? ds.map(d => `<button type="button" class="dcard" data-des="${DES.indexOf(d)}" style="padding:4px 0;background:none"><span class="top">${avatar(d)}<span><b>${d[1]}</b><small>★ ${d[4]} · ${d[5]} km · ${d[6]}</small></span><span></span></span></button>`).join('') : `<p style="margin:0;font-size:12.5px;color:#5e6259">Equipo de obra de BuildI con especialista en ${t[1].toLowerCase()}.</p>`}</div>
+      <div class="two"><button class="cta ghost" type="button" data-t="Muestra de ${m[0].toLowerCase()} agregada a tu caja">Agregar a mi caja</button><button class="cta sage" type="button" data-t="Abriría Luz y color con este acabado">Verlo en mi casa</button></div>`;
+    paint(sh);
+  }
+  let D = { i: 0, step: 0, piece: 0, budget: 0, stage: 0 };
+  const STAGES = [['Solicitud', 'hoy'], ['Visita y medidas', '2 días'], ['Boceto', '4 días'], ['Render 3D', '7 días'], ['Fabricación en taller', '2–4 sem'], ['Instalación', '1 día']];
+  function desSheet() {
+    const d = DES[D.i], t = T[d[2]];
+    let flow = '';
+    if (D.step === 0) flow = `<div class="blk"><h6><span>Encargo a medida</span><span>1 de 3</span></h6><p style="margin:0;font-size:12.5px;color:#5e6259">¿Qué quieres encargar?</p><div class="opt">${d[9].map((p, i) => `<button type="button" data-piece="${i}" aria-pressed="${i === D.piece}">${p}</button>`).join('')}</div><button class="cta" type="button" data-next="1">Siguiente</button></div>`;
+    if (D.step === 1) flow = `<div class="blk"><h6><span>Medidas y fotos</span><span>2 de 3</span></h6><div class="kv"><span>Medidas</span><b>de tu plano ✓</b></div><div class="kv"><span>Fotos del lugar</span><b>3 de tu galería ✓</b></div><div class="kv"><span>Tu estilo</span><b>Cálido natural ✓</b></div><div class="range"><span>Presupuesto</span><output id="bO">${money(d[7] * (1 + D.budget))}</output><input type="range" id="bud" min="0" max="3" step=".25" value="${D.budget}" aria-label="Presupuesto"></div><button class="cta" type="button" data-next="2">Siguiente</button></div>`;
+    if (D.step === 2) flow = `<div class="blk"><h6><span>Tu encargo · ${d[9][D.piece]}</span><span>${D.stage === 5 ? 'listo' : 'en curso'}</span></h6><div class="proc">${STAGES.map((s, i) => `<div class="${i < D.stage ? 'done' : i === D.stage ? 'now' : ''}"><i>${i < D.stage ? '✓' : i + 1}</i><span>${s[0]}${i === 4 && D.stage === 4 ? ' · <b style="color:var(--clay)">ver el taller en vivo</b>' : ''}</span><em>${s[1]}</em></div>`).join('')}</div>
+      ${D.stage < 5 ? '<button class="cta ghost" type="button" data-adv="1">Simular siguiente paso</button>' : '<button class="cta sage" type="button" data-t="Garantía de 1 año guardada en Mi hogar › Expediente">Guardar garantía en Mi hogar</button>'}
+      <p style="margin:0;font-size:11.5px;color:#7a746a">Pagas 40% al aprobar el render y 60% al instalar. El dinero se queda en BuildI hasta que confirmas que te gustó.</p></div>`;
+    sh.innerHTML = `<div class="top" style="display:grid;grid-template-columns:60px 1fr;gap:12px;align-items:center">${avatar(d, 60)}<div><span class="eyeb">${t[1]}</span><h4>${d[1]}</h4></div></div>
+      <p>${d[3]}. ${t[3]}</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">${d[8].map(r => `<canvas data-room="${r}" style="width:100%;height:80px;border-radius:10px;display:block"></canvas>`).join('')}</div>
+      <div class="blk"><div class="kv"><span>Calificación</span><b>★ ${d[4]} · 38 trabajos</b></div><div class="kv"><span>Taller a</span><b>${d[5]} km de tu casa</b></div><div class="kv"><span>Entrega típica</span><b>${d[6]}</b></div><div class="kv"><span>Desde</span><b>${money(d[7])}</b></div></div>
+      <div class="review">"Nos midieron, nos mandaron render y quedó idéntico. Llegaron el día que dijeron." — Mariana, Chapalita</div>
+      ${flow}`;
+    paint(sh);
+  }
+  $('sheet').addEventListener('click', e => { let b;
+    if (b = e.target.closest('[data-mat]')) { F.mat = +b.dataset.mat; furnSheet(); return; }
+    if (b = e.target.closest('[data-way]')) { if (b.disabled) return; F.way = +b.dataset.way; furnSheet(); return; }
+    if (b = e.target.closest('[data-des]')) { D = { i: +b.dataset.des, step: 0, piece: 0, budget: 0, stage: 0 }; desSheet(); sh.scrollTop = 0; return; }
+    if (b = e.target.closest('[data-piece]')) { D.piece = +b.dataset.piece; desSheet(); return; }
+    if (b = e.target.closest('[data-next]')) { D.step = +b.dataset.next; desSheet(); if (D.step === 2) toast('Encargo enviado · respuesta en 24 h'); sh.scrollTop = sh.scrollHeight; return; }
+    if (e.target.closest('[data-adv]')) { D.stage = Math.min(5, D.stage + 1); desSheet(); sh.scrollTop = sh.scrollHeight; if (D.stage === 3) toast('Llegó el render · apruébalo para fabricar'); if (D.stage === 5) toast('Instalado · ¿cómo quedó?'); return; }
+    if (b = e.target.closest('[data-t]')) { toast(b.dataset.t); }
+  });
+  $('sheet').addEventListener('input', e => { if (e.target.id === 'bud') { D.budget = +e.target.value; $('bO').textContent = money(DES[D.i][7] * (1 + D.budget)); } });
+
+  scroll.addEventListener('click', e => { let b;
+    if (b = e.target.closest('[data-sub]')) { S.sub = +b.dataset.sub; render(); return; }
+    if (b = e.target.closest('[data-mode]')) { S.mode = +b.dataset.mode; render(true); return; }
+    if (b = e.target.closest('[data-room]:not(canvas)')) { S.room = +b.dataset.room; render(true); return; }
+    if (b = e.target.closest('[data-fcat]')) { S.fcat = +b.dataset.fcat; render(true); return; }
+    if (b = e.target.closest('[data-tr]')) { S.trade = b.dataset.tr; render(true); return; }
+    if (b = e.target.closest('[data-trade]')) { S.sub = 1; S.mode = 3; S.trade = b.dataset.trade; render(); return; }
+    if (b = e.target.closest('[data-goacab]')) { S.sub = 1; S.mode = 2; S.fcat = +b.dataset.goacab; render(); return; }
+    if (b = e.target.closest('[data-furn]')) { F = { it: FURN[S.room][1][+b.dataset.furn], mat: 0, way: FURN[S.room][1][+b.dataset.furn][3].length ? 1 : 0 }; furnSheet(); open(); return; }
+    if (b = e.target.closest('[data-fin]')) { const c = FIN[S.fcat]; finSheet(c[0], c[1][+b.dataset.fin]); open(); return; }
+    if (b = e.target.closest('[data-des]')) { D = { i: +b.dataset.des, step: 0, piece: 0, budget: 0, stage: 0 }; desSheet(); open(); return; }
+    if (b = e.target.closest('[data-t]')) { toast(b.dataset.t); }
+  });
+  const tb = [...$('tabs').querySelectorAll('button')]; requestAnimationFrame(() => { const b = tb[0]; $('ind').style.width = b.offsetWidth + 'px'; $('ind').style.transform = `translateX(${b.offsetLeft - 5}px)`; });
+  tb.forEach((t, i) => { if (i) t.onclick = () => toast('Esa sección tiene su propio prototipo'); });
+  render();
+
+  /* ---------- page catalog ---------- */
+  function pcat(k) {
+    let h = '';
+    if (k === 0) h = [...new Set(TRADES.map(t => t[6]))].map(g => { const ts = TRADES.filter(t => t[6] === g); return `<h3 class="grp">${g} <span>${ts.length}${g === 'Servicios para tu hogar' ? ' · se ofrecen desde Mi hogar' : ''}</span></h3>` + ts.map(t => `<div class="cc"><h5>${t[1]} <span>${t[5]}</span></h5><p>${t[3]}</p><div class="tags">${t[4].split(', ').map(x => `<span>${x}</span>`).join('')}</div></div>`).join(''); }).join('');
+    if (k === 1) h = FURN.map(f => `<div class="cc"><h5>${f[0]} <span>${f[1].length}</span></h5><div class="tags">${f[1].map(x => `<span>${x[1]}</span>`).join('')}</div><span class="who">Hacen a medida: ${[...new Set(f[1].flatMap(x => x[3]))].map(t => T[t][1]).join(', ')}</span></div>`).join('');
+    if (k === 2) h = FIN.map(f => `<div class="cc"><h5>${f[0]} <span>${f[1].length}</span></h5><div class="tags">${f[1].map(x => `<span>${x[0]} · ${money(x[3])}</span>`).join('')}</div><span class="who">Lo instalan: ${[...new Set(f[1].map(x => x[8]))].map(t => T[t][1]).join(', ')}</span></div>`).join('');
+    $('pcat').innerHTML = h;
+  }
+  $('ptabs').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; $('ptabs').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); pcat(+b.dataset.p); });
+  pcat(0);
+  addEventListener('resize', () => render(true));
+})();
+</script>

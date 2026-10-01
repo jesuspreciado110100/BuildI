@@ -1,0 +1,599 @@
+<title>BuildI Mis Obras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --plaster: #e4e8e1;
+  --paper: #fbfaf6;
+  --ink: #2b2a26;
+  --ink-2: #5e6259;
+  --line: rgba(43,42,38,.13);
+  --sage: #4f7d61;
+  --sage-2: #dfe9e2;
+  --clay: #b0561f;
+  --clay-2: #f6e3d6;
+  --brass: #c9a24a;
+  --blue: #3c6e9e;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--plaster); color: var(--ink); font: 15px/1.55 var(--sans); padding-inline: 20px; padding-block: 36px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow b { background: var(--sage); color: #fff; padding: 3px 7px; font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 74px)/.98 var(--serif); letter-spacing: -.025em; margin: 14px 0 16px; text-wrap: balance; max-width: 16ch; }
+h1 em { font-style: italic; font-weight: 400; color: var(--sage); }
+h2 { font: 700 clamp(30px, 4vw, 46px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+.lede { font-size: 18px; max-width: 58ch; margin: 0 0 14px; }
+.sub { color: var(--ink-2); max-width: 62ch; margin: 0 0 20px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.tabsx { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; }
+.tx { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tx button { border: 1px solid var(--ink); background: var(--paper); padding: 7px 10px; font: 600 13px var(--sans); text-align: left; border-radius: 10px; display: flex; gap: 8px; align-items: center; }
+.tx button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tx b { font: 700 17px/1.2 var(--serif); display: block; margin-bottom: 2px; }
+.tx p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* phone */
+.phone { width: 384px; max-width: 100%; border-radius: 50px; background: #121412; padding: 11px; box-shadow: 0 40px 80px rgba(43,42,38,.3), inset 0 0 0 2px #3a3d38; justify-self: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.screen { border-radius: 40px; overflow: hidden; overflow: clip; position: relative; background: #f6f2ea; height: 790px; }
+.island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #000; border-radius: 20px; z-index: 40; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 12px 100px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: vin .4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes vin { from { opacity: 0; transform: translateY(8px); } }
+.greet small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; }
+.greet h3 { font: 700 27px/1.05 var(--serif); letter-spacing: -.015em; margin: 4px 0 0; }
+.greet h3 em { font-style: italic; font-weight: 400; color: var(--sage); }
+.pc { background: #fffdf9; border-radius: 22px; padding: 12px; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; margin-bottom: 8px; }
+.hd b { color: var(--ink); font-weight: 500; }
+.hd button { border: 0; background: none; font: 600 11.5px var(--sans); color: var(--sage); text-transform: none; letter-spacing: 0; padding: 0; }
+.hscroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* inicio */
+.intent { flex: none; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px 12px; width: 118px; text-align: left; display: grid; gap: 4px; }
+.intent .ic { font-size: 22px; }
+.intent b { font-size: 12.5px; line-height: 1.2; }
+.intent small { font: 500 10px var(--mono); color: #7a746a; }
+.intent[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.intent[aria-pressed="true"] small { color: #c7c2b8; }
+.ideas { columns: 2; column-gap: 8px; }
+.idea { break-inside: avoid; margin-bottom: 8px; background: #fffdf9; border-radius: 18px; overflow: hidden; border: 0; padding: 0; width: 100%; text-align: left; display: block; position: relative; }
+.idea .img { display: block; width: 100%; }
+.idea .t { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.idea .t b { font: 600 13.5px/1.2 var(--serif); }
+.idea .t small { font: 500 10px var(--mono); color: #7a746a; }
+.idea .save { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,253,249,.9); display: grid; place-items: center; font-size: 13px; border: 0; }
+.idea .save.on { background: var(--clay); color: #fff; }
+.tagx { position: absolute; top: 8px; left: 8px; font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: rgba(43,42,38,.75); color: #fff; padding: 3px 6px; border-radius: 6px; }
+.ba { position: relative; height: 170px; border-radius: 14px; overflow: hidden; touch-action: none; cursor: ew-resize; user-select: none; }
+.ba canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .top { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 3px solid #fff; }
+.ba .top canvas { width: var(--w); }
+.ba .lb { position: absolute; top: 8px; font: 500 9.5px var(--mono); background: rgba(0,0,0,.6); color: #fff; padding: 2px 6px; border-radius: 4px; z-index: 2; }
+.est { display: grid; gap: 8px; }
+.est .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 12.5px; }
+.seg { display: flex; background: #ece5d8; border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 4px; border-radius: 8px; font: 600 11.5px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+input[type=range] { accent-color: var(--sage); width: 100%; }
+.est .res { background: var(--sage-2); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.est .res b { font: 700 22px var(--serif); color: var(--sage); }
+.est .res small { font-size: 11.5px; color: var(--ink-2); display: block; }
+.cta { border: 0; background: var(--ink); color: #fff; border-radius: 14px; padding: 12px; font: 700 14px var(--sans); width: 100%; }
+.cta.sage { background: var(--sage); }
+.cta.ghost { background: none; color: var(--ink); border: 1px solid var(--ink); }
+
+/* obras */
+.proj { background: #fffdf9; border-radius: 22px; padding: 0; overflow: hidden; border: 0; width: 100%; text-align: left; display: grid; }
+.proj .img { height: 92px; position: relative; }
+.proj .img span { position: absolute; left: 10px; bottom: 8px; font: 500 9.5px var(--mono); background: rgba(255,253,249,.92); padding: 3px 7px; border-radius: 6px; }
+.proj .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.proj b { font: 700 17px/1.15 var(--serif); }
+.proj small { font-size: 12px; color: #7a746a; }
+.stg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.stg i { height: 6px; border-radius: 4px; background: #ece5d8; display: block; }
+.stg i.d { background: var(--sage); } .stg i.n { background: var(--clay); }
+.stg-l { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; font: 500 8.5px var(--mono); color: #9a958b; text-transform: uppercase; }
+.stg-l span.n { color: var(--clay); }
+.next { display: flex; justify-content: space-between; align-items: center; background: var(--clay-2); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; }
+.next b { font: 600 12.5px var(--sans); }
+.next em { font-style: normal; font: 500 11px var(--mono); color: var(--clay); }
+.newp { border: 1.5px dashed #b9b2a4; background: none; border-radius: 22px; padding: 14px; display: grid; gap: 2px; text-align: left; }
+.newp b { font: 700 15px var(--serif); }
+.newp small { font-size: 12px; color: #7a746a; }
+.back { border: 0; background: none; font: 600 13px var(--sans); color: var(--sage); padding: 0; justify-self: start; }
+.kpi2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpi2 div { background: #fffdf9; border-radius: 16px; padding: 9px 10px; }
+.kpi2 b { display: block; font: 700 21px/1 var(--serif); }
+.kpi2 small { font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #7a746a; }
+.appr { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; position: relative; }
+.appr:first-of-type { border-top: 0; }
+.appr .sw { width: 44px; height: 44px; border-radius: 10px; }
+.appr b { font-size: 13px; display: block; }
+.appr small { font-size: 11.5px; color: #7a746a; }
+.appr .acts { grid-column: 2; display: flex; gap: 6px; }
+.appr .acts button { border: 1px solid var(--ink); background: none; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.appr .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.appr .done { grid-column: 2; font: 500 11px var(--mono); color: var(--sage); }
+.dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dg { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 2px; font-size: 11.5px; border: 0; text-align: left; }
+.dg i { font-style: normal; font-size: 17px; }
+.dg b { font-size: 12px; }
+.dg small { font: 500 9.5px var(--mono); color: #7a746a; }
+.feed { display: grid; gap: 8px; }
+.fi { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+.fi .ph { width: 54px; height: 44px; border-radius: 8px; }
+.fi b { font-size: 13px; display: block; }
+.fi small { font-size: 11px; color: #7a746a; }
+
+/* hogar */
+.props { display: flex; gap: 6px; }
+.prop { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 14px; padding: 8px 10px; text-align: left; display: grid; gap: 1px; }
+.prop b { font-size: 12.5px; }
+.prop small { font: 500 9.5px var(--mono); color: #7a746a; }
+.prop[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.health { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
+.ring { position: relative; width: 104px; height: 104px; }
+.ring svg { width: 104px; height: 104px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .v { stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,1.3,.5,1); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; text-align: center; }
+.ring .in b { font: 700 30px/1 var(--serif); }
+.ring .in small { font: 500 8.5px var(--mono); color: #7a746a; }
+.hl { display: grid; gap: 5px; font-size: 12.5px; }
+.hl div { display: flex; justify-content: space-between; gap: 6px; }
+.hl b { font-family: var(--mono); font-weight: 500; font-size: 12px; }
+.task { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.task:first-of-type { border-top: 0; }
+.task .d { width: 40px; height: 44px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; align-content: center; text-align: center; }
+.task .d b { font: 700 16px/1 var(--serif); }
+.task .d small { font: 500 8px var(--mono); text-transform: uppercase; color: #7a746a; }
+.task b.t { font-size: 13px; display: block; }
+.task small.s { font-size: 11.5px; color: #7a746a; }
+.task button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.task button.done { background: var(--sage-2); color: var(--sage); }
+.task.urgent .d { background: var(--clay-2); }
+.task.urgent .d b { color: var(--clay); }
+.use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.use div { background: #f6f2ea; border-radius: 14px; padding: 8px 9px; display: grid; gap: 2px; }
+.use b { font: 700 17px/1 var(--serif); }
+.use small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; letter-spacing: .05em; }
+.use svg { width: 100%; height: 26px; }
+.use em { font-style: normal; font: 500 10px var(--mono); }
+.alertx { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--clay-2); border-radius: 16px; padding: 10px 12px; font-size: 12.5px; }
+.alertx i { font-style: normal; font-size: 20px; }
+.alertx b { display: block; font-size: 13px; }
+.svc { flex: none; width: 112px; border: 0; background: #fffdf9; border-radius: 16px; padding: 10px; display: grid; gap: 3px; text-align: left; }
+.svc i { font-style: normal; font-size: 20px; }
+.svc b { font-size: 12.5px; line-height: 1.2; }
+.svc small { font: 500 10px var(--mono); color: var(--sage); }
+.war { display: grid; gap: 7px; }
+.war div { display: grid; gap: 3px; font-size: 12.5px; }
+.war .l { display: flex; justify-content: space-between; }
+.war .l em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.bar { height: 6px; border-radius: 6px; background: #ece5d8; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; background: var(--sage); }
+.keycard { border-radius: 18px; padding: 14px 16px; background: linear-gradient(150deg, #2e3a33, #1b221e 60%, #3a2f1a); color: #f3ead4; display: flex; justify-content: space-between; align-items: center; }
+.keycard b { font: 700 17px/1.1 var(--serif); display: block; }
+.keycard small { font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #c3ccc5; }
+.keycard .chip { width: 34px; height: 25px; border-radius: 4px; background: linear-gradient(135deg, #f3dc9a, #c9a24a 50%, #a88234); }
+
+/* perfil */
+.me { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.me .av { width: 62px; height: 62px; border-radius: 50%; background: var(--sage); color: #fff; display: grid; place-items: center; font: 700 22px var(--serif); }
+.me b { font: 700 21px var(--serif); display: block; }
+.me small { font-size: 12.5px; color: #7a746a; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.style-tags span { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--sage-2); color: var(--sage); }
+.mrow { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13.5px; }
+.mrow:first-of-type { border-top: 0; }
+.mrow i { font-style: normal; font-size: 17px; }
+.mrow small { font: 500 11px var(--mono); color: #7a746a; }
+.mrow b { font-weight: 600; display: block; }
+.mrow span.s { font-size: 11.5px; color: #7a746a; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 82%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh .img { height: 150px; border-radius: 16px; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.facts div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.facts b { display: block; font: 700 16px/1.1 var(--serif); }
+.facts small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; }
+.steps { display: grid; gap: 4px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 12.5px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--sage-2); color: var(--sage); display: grid; place-items: center; font: 600 11px var(--mono); }
+
+/* tab bar */
+.tabs { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; border-radius: 26px; background: rgba(255,253,249,.74); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(43,42,38,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+.tabs button { border: 0; background: none; padding: 7px 0 6px; display: grid; justify-items: center; gap: 2px; font: 600 10.5px var(--sans); color: #7a746a; position: relative; z-index: 1; transition: color .3s; }
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-selected="true"] { color: var(--ink); }
+.tabs .ind { position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 21px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .55s cubic-bezier(.3,1.4,.5,1), width .55s; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 15px; height: 15px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9px/15px var(--mono); padding: 0 3px; }
+.toast { position: absolute; left: 50%; top: 48px; transform: translate(-50%, -170%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; z-index: 50; transition: transform .45s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translate(-50%, 0); }
+
+/* journey */
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .journey { grid-template-columns: 1fr; } }
+.jst { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c); }
+.jst .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--ink-2); display: flex; justify-content: space-between; }
+.jst .n span { color: var(--c); }
+.jst b { font: 700 20px/1.1 var(--serif); }
+.jst p.q { margin: 0; font: italic 400 14px/1.35 var(--serif); color: var(--ink-2); }
+.jst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.jst li { display: grid; grid-template-columns: 12px 1fr; gap: 6px; }
+.jst li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-top: 7px; }
+.jst .where { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 6px; }
+.loop { display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); border-radius: 4px; padding: 16px 18px; margin-top: 12px; }
+.loop i { font-style: normal; font-size: 26px; }
+.loop b { font: 700 18px var(--serif); display: block; }
+.loop span { font-size: 13.5px; color: #c7c2b8; }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.biz div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.biz b { font: 700 17px/1.2 var(--serif); }
+.biz p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+<style>
+.subtabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.subtabs::-webkit-scrollbar { display: none; }
+.subtabs button { flex: none; border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 6px 12px; font: 600 12.5px var(--sans); position: relative; }
+.subtabs button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.subtabs button .b { position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9.5px/16px var(--mono); padding: 0 4px; }
+.today { border-radius: 22px; overflow: hidden; position: relative; }
+.today canvas { width: 100%; height: 150px; display: block; }
+.today .ov { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(transparent, rgba(20,22,18,.75)); color: #fff; display: flex; justify-content: space-between; align-items: end; }
+.today .ov b { font: 700 17px var(--serif); display: block; }
+.today .ov small { font-size: 11.5px; opacity: .9; }
+.live { display: inline-flex; gap: 5px; align-items: center; font: 500 10px var(--mono); letter-spacing: .08em; background: rgba(0,0,0,.45); padding: 3px 7px; border-radius: 999px; position: absolute; top: 10px; left: 10px; color: #fff; }
+.live i { width: 7px; height: 7px; border-radius: 50%; background: #ff3b30; animation: bl 1.4s infinite; }
+@keyframes bl { 50% { opacity: .3; } }
+.todo { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; font-size: 13px; }
+.todo:first-of-type { border-top: 0; }
+.todo i { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-style: normal; font-size: 16px; background: var(--clay-2); }
+.todo b { display: block; font-size: 13px; }
+.todo small { color: #7a746a; font-size: 11.5px; }
+.todo button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.phases { display: grid; gap: 8px; }
+.ph { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; font-size: 12.5px; }
+.ph b { font-weight: 600; }
+.ph em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.ph .bar { grid-column: 1 / -1; height: 8px; }
+.ph.now b::after { content: " · ahora"; color: var(--clay); font-weight: 500; }
+.ph.now .bar i { background: var(--clay); }
+.wk { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.wk button { flex: none; border: 1px solid var(--line); background: #fffdf9; border-radius: 10px; padding: 4px 9px; font: 500 11px var(--mono); }
+.wk button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.wphoto { position: relative; border-radius: 16px; overflow: hidden; }
+.wphoto canvas { width: 100%; height: 170px; display: block; }
+.wphoto .cap2 { position: absolute; left: 10px; bottom: 10px; right: 10px; background: rgba(255,253,249,.92); border-radius: 10px; padding: 6px 9px; font-size: 12px; }
+.wphoto .cap2 b { display: block; font-size: 12.5px; }
+.money { display: grid; gap: 8px; }
+.money .tot { display: flex; justify-content: space-between; align-items: baseline; }
+.money .tot b { font: 700 26px var(--serif); font-variant-numeric: tabular-nums; transition: color .4s; }
+.money .tot small { font-size: 12px; color: #7a746a; }
+.duo .lab { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 3px; }
+.duo .lab b { font: 700 15px var(--serif); }
+.duo .bar { height: 10px; margin-bottom: 8px; }
+.duo .bar.c i { background: var(--clay); }
+.pay { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; font-size: 12.5px; }
+.pay:first-of-type { border-top: 0; }
+.pay i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font: 700 10px var(--sans); font-style: normal; color: #fff; }
+.pay b { display: block; font-size: 12.5px; }
+.pay small { color: #7a746a; font-size: 11px; }
+.pay .amt { font: 500 11.5px var(--mono); text-align: right; }
+.slide { position: relative; height: 54px; border-radius: 27px; background: var(--ink); overflow: hidden; touch-action: none; user-select: none; }
+.slide span.l { position: absolute; inset: 0; display: grid; place-items: center; color: #c7c2b8; font: 600 13px var(--sans); padding-left: 40px; }
+.slide .k { position: absolute; left: 5px; top: 5px; width: 44px; height: 44px; border-radius: 50%; background: var(--brass); display: grid; place-items: center; font-size: 18px; cursor: grab; }
+.slide.done { background: var(--sage); }
+.slide.done span.l { color: #fff; padding-left: 0; }
+.co { background: #fffdf9; border-radius: 20px; padding: 12px; display: grid; gap: 8px; position: relative; overflow: hidden; }
+.co .top { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.co b.t { font: 700 16px/1.2 var(--serif); }
+.co small { font-size: 12px; color: #7a746a; }
+.co .imp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.co .imp div { background: #f6f2ea; border-radius: 10px; padding: 6px 8px; }
+.co .imp b { display: block; font: 700 15px var(--serif); }
+.co .imp small { font: 500 9px var(--mono); text-transform: uppercase; }
+.co .acts { display: flex; gap: 6px; }
+.co .acts button { flex: 1; border: 1px solid var(--ink); background: none; border-radius: 12px; padding: 9px; font: 600 12.5px var(--sans); }
+.co .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.co .swatches { display: flex; gap: 6px; }
+.co .swatches button { width: 54px; height: 54px; border-radius: 12px; border: 3px solid transparent; padding: 0; position: relative; }
+.co .swatches button[aria-pressed="true"] { border-color: var(--ink); }
+.co .swatches button span { position: absolute; bottom: -16px; left: 0; right: 0; font: 500 9px var(--mono); color: #7a746a; text-align: center; white-space: nowrap; }
+.stampx { position: absolute; right: 18px; top: 70px; font: 800 15px/1 var(--sans); letter-spacing: .06em; color: var(--sage); border: 3px solid var(--sage); padding: 5px 8px; transform: rotate(-10deg); background: #fffdf9; animation: stin .35s cubic-bezier(.5,0,.8,.4) both; }
+.stampx small { display: block; font: 500 8.5px var(--mono); color: var(--sage); letter-spacing: .04em; }
+@keyframes stin { from { transform: rotate(-10deg) scale(2.2); opacity: 0; } 70% { transform: rotate(-10deg) scale(.92); opacity: 1; } }
+.pill { font: 500 9.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--sage-2); color: var(--sage); } .pill.warn { background: #f8ecd0; color: #8a6400; } .pill.new { background: var(--clay-2); color: var(--clay); }
+.dcat { display: grid; grid-template-columns: 38px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; }
+.dcat:first-of-type { border-top: 0; }
+.dcat i { width: 38px; height: 38px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; font-style: normal; font-size: 17px; }
+.dcat b { font-size: 13.5px; display: block; }
+.dcat small { font-size: 11.5px; color: #7a746a; }
+.person { display: grid; grid-template-columns: 46px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.person:first-of-type { border-top: 0; }
+.person .av { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font: 700 14px var(--sans); color: #fff; position: relative; }
+.person .av.on::after { content: ""; position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: 50%; background: #3cc46b; border: 2px solid #fffdf9; }
+.person b { font-size: 13.5px; display: block; }
+.person small { font-size: 11.5px; color: #7a746a; }
+.person .acts { display: flex; gap: 4px; }
+.person .acts button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: #fff; font-size: 14px; }
+.chat { display: grid; gap: 6px; }
+.msg { width: fit-content; max-width: 82%; padding: 8px 11px; border-radius: 16px; font-size: 13px; line-height: 1.35; }
+.msg.theirs { background: #f1ece2; border-bottom-left-radius: 4px; }
+.msg.mine { background: var(--sage); color: #fff; justify-self: end; border-bottom-right-radius: 4px; }
+.msg small { display: block; position: static; font: 500 9.5px var(--mono); opacity: .7; margin-top: 3px; text-align: right; color: inherit; }
+.msg canvas { width: 100%; height: 100px; border-radius: 10px; display: block; margin-top: 4px; }
+.compose { display: flex; gap: 6px; }
+.compose input { flex: 1; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 9px 14px; font-size: 13px; outline: none; }
+.compose button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 0 14px; font: 600 13px var(--sans); }
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.slots button { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 7px 4px; font-size: 12px; display: grid; }
+.slots button b { font: 700 14px var(--serif); }
+.slots button[aria-pressed="true"] { border-color: var(--sage); background: var(--sage-2); }
+.dstep { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 8px 0; align-items: start; font-size: 13px; }
+.dstep i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--mono); font-style: normal; background: #ece5d8; }
+.dstep.d i { background: var(--sage); color: #fff; }
+.dstep.n i { background: var(--clay); color: #fff; }
+.dstep b { display: block; }
+.dstep small { color: #7a746a; font-size: 11.5px; }
+.stagemap { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--paper); }
+.stagemap th, .stagemap td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.stagemap th { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: #f2efe7; }
+.stagemap td:first-child { font: 700 16px var(--serif); white-space: nowrap; }
+.tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; }
+.princ { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; margin-top: 18px; }
+.princ div { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.princ i { font: 700 18px/1 var(--serif); color: var(--sage); font-style: normal; }
+.princ b { display: block; font: 700 16px/1.2 var(--serif); }
+.princ p { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.try { margin-top: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; font-size: 13.5px; max-width: 580px; }
+.try b.h { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); display: block; margin-bottom: 4px; }
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><b>Sección a fondo · Mis obras</b> BuildI · app del cliente</div>
+      <h1>Mis obras: <em>tu obra, sin tener que preguntar</em></h1>
+      <p class="lede">Todo lo que un cliente le pregunta por WhatsApp al constructor ("¿cómo va?", "¿cuánto llevo pagado?", "¿qué tengo que decidir?") ya está respondido aquí, siempre al día.</p>
+      <p class="sub">Adentro de cada obra hay seis secciones. Lo que aparece primero cambia según la etapa del proyecto. Cambia de obra arriba en el teléfono para ver la diferencia entre una obra en construcción, una en diseño y una que apenas es idea. Los datos son de ejemplo.</p>
+      <div class="princ">
+        <div><i>1</i><div><b>Resumen: lo que pasa hoy y lo que te toca</b><p>Foto en vivo de la obra, clima, cuántas personas trabajan y la lista de cosas que esperan al cliente. Si no hay nada pendiente, lo dice.</p></div></div>
+        <div><i>2</i><div><b>Avance: por fases y semana a semana</b><p>Cimentación, estructura, instalaciones y acabados con su %, planeado contra real, y un diario de fotos por semana con antes y después.</p></div></div>
+        <div><i>3</i><div><b>Dinero: pagado contra construido</b><p>Total del contrato, calendario de pagos, cambios aprobados y facturas. Se paga deslizando la llave, como en la Llave BuildI.</p></div></div>
+        <div><i>4</i><div><b>Decisiones: todo lo que necesita tu sí</b><p>Acabados para elegir, cambios con su impacto en costo y días, y renders para revisar. Al aprobar cae el sello y el constructor recibe la orden.</p></div></div>
+        <div><i>5</i><div><b>Documentos: contrato, planos, permisos, facturas</b><p>Las mismas categorías del rediseño de documentos de obra, pero solo lo que le corresponde al cliente.</p></div></div>
+        <div><i>6</i><div><b>Equipo: con nombre y cara</b><p>Arquitecta, residente y asesora, quién está hoy en obra, chat con fotos y visitas a la obra con fecha.</p></div></div>
+      </div>
+      <div class="try"><b class="h">Prueba esto</b>En <b>Decisiones</b> aprueba el cambio "Ventana de piso a techo" y mira cómo suben el total en <b>Dinero</b> y la fecha de entrega. Después paga la mensualidad deslizando la llave. Luego cambia a la obra "Cocina Providencia", que está en diseño.</div>
+    </div>
+
+    <div class="phone">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="toast" id="toast"></div>
+        <div class="scroll" id="scroll"></div>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="App del cliente">
+          <div class="ind" id="ind"></div>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9 1.3 5.8L12 16l-4.9 3 1.3-5.8L4 9.3l5.8-.7z"/></svg>Inicio</button>
+          <button role="tab" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/><path d="M2 21h20"/></svg>Mis obras<span class="badge" id="tbBadge">3</span></button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Mi hogar</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cómo cambia Mis obras según la etapa</h2>
+    <p class="sub">Las seis secciones existen siempre, pero el Resumen pone primero lo que importa en ese momento.</p>
+    <div class="tblwrap"><table class="stagemap">
+      <thead><tr><th>Etapa</th><th>Lo primero que ve el cliente</th><th>Lo que le toca hacer</th><th>Lo que pasa del lado del constructor</th></tr></thead>
+      <tbody>
+        <tr><td>Idea</td><td>Los pasos para empezar y cuánto puede costar</td><td>Pedir visita técnica, subir fotos y medidas</td><td>Recibe el prospecto con estilo y presupuesto ya conocidos</td></tr>
+        <tr><td>Diagnóstico</td><td>Fecha de visita y quién va</td><td>Estar en casa; aprobar el levantamiento</td><td>Escaneo 3D, revisión estructural, factibilidad</td></tr>
+        <tr><td>Diseño</td><td>Render más reciente y sus cambios</td><td>Revisar, comentar sobre la imagen, aprobar</td><td>Versiones de diseño y presupuesto por partida</td></tr>
+        <tr><td>Presupuesto</td><td>Total, calendario y comparativa de opciones</td><td>Elegir opción, firmar contrato, anticipo</td><td>Contrato, fianza, licencia, programa de obra</td></tr>
+        <tr><td>Obra</td><td>Lo que pasa hoy, avance y decisiones pendientes</td><td>Aprobar acabados y cambios, pagar, visitar</td><td>Bitácora, fotos, compras, pagos por avance</td></tr>
+        <tr><td>Entrega</td><td>Lista de pendientes y fecha de llaves</td><td>Inspeccionar, firmar acta, recibir la Llave BuildI</td><td>Corrige pendientes, entrega manuales y garantías</td></tr>
+        <tr><td>Hogar</td><td>La obra pasa a Mi hogar con todo su expediente</td><td>Nada: ya vive ahí</td><td>Mantenimiento y garantías, la relación sigue</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const setup = c => { const w = c.clientWidth, h = c.clientHeight, d = devicePixelRatio || 1; c.width = w * d; c.height = h * d; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, w, h]; };
+  let toastT; const toast = s => { const t = $('toast'); t.textContent = s; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); };
+  const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+function room(c, kind) {
+    const [x, W, H] = setup(c);
+    const P = { cocina: ['#e9e2d4', '#c79a64', '#4f7d61'], sala: ['#efe8dc', '#b98b5a', '#9fb7a6'], terraza: ['#cfe3f3', '#a08a6c', '#6b8f5e'], bano: ['#e3e9ea', '#d9d4ca', '#3c6e9e'], home: ['#ece6dc', '#7a5a3c', '#b0561f'], recamara: ['#e3ebe0', '#b98b5a', '#c9a24a'], fachada: ['#bcd5ee', '#9aa1a4', '#4f7d61'], closet: ['#f1ece2', '#a0764f', '#2b2a26'], obra: ['#dcebf6', '#b9ad97', '#9aa1a4'] }[kind] || ['#efe8dc', '#b98b5a', '#4f7d61'];
+    x.fillStyle = P[0]; x.fillRect(0, 0, W, H); x.fillStyle = P[1]; x.fillRect(0, H * .72, W, H);
+    if (kind === 'cocina') { x.fillStyle = '#f5f2ec'; x.fillRect(W * .08, H * .45, W * .84, H * .27); x.fillStyle = P[2]; x.fillRect(W * .08, H * .5, W * .84, H * .22); x.fillStyle = '#3a3a3a'; x.fillRect(W * .06, H * .45, W * .88, 5); x.fillStyle = P[2]; x.fillRect(W * .1, H * .12, W * .45, H * .18); x.fillStyle = '#ffd9a0'; [.25, .5, .75].forEach(k => { x.beginPath(); x.arc(W * k, H * .3, 6, 0, 7); x.fill(); }); }
+    else if (kind === 'sala' || kind === 'recamara') { x.fillStyle = '#9fc4e6'; x.fillRect(W * .3, H * .1, W * .4, H * .4); x.strokeStyle = '#2b2a26'; x.lineWidth = 3; x.strokeRect(W * .3, H * .1, W * .4, H * .4); x.fillStyle = P[2]; if (kind === 'sala') { x.fillRect(W * .15, H * .55, W * .7, H * .14); x.fillRect(W * .13, H * .62, W * .74, H * .14); } else { x.fillStyle = '#fff'; x.fillRect(W * .2, H * .58, W * .6, H * .18); x.fillStyle = P[2]; x.fillRect(W * .2, H * .64, W * .6, H * .14); } x.fillStyle = '#6b8f5e'; x.beginPath(); x.arc(W * .1, H * .6, W * .06, 0, 7); x.fill(); }
+    else if (kind === 'terraza') { x.fillStyle = '#7a5a3c'; for (let i = 0; i < 6; i++) x.fillRect(W * (.1 + i * .16), H * .1, W * .03, H * .62); x.fillRect(W * .05, H * .1, W * .9, H * .05); x.fillStyle = '#f3ead4'; x.fillRect(W * .25, H * .55, W * .5, H * .12); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .85, H * .5, W * .09, 0, 7); x.fill(); }
+    else if (kind === 'bano') { x.fillStyle = '#fff'; x.fillRect(W * .55, H * .2, W * .3, H * .52); x.strokeStyle = 'rgba(0,0,0,.08)'; for (let i = 0; i < W; i += 14) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H * .72); x.stroke(); } x.fillStyle = P[2]; x.fillRect(W * .12, H * .48, W * .3, H * .24); x.fillStyle = '#e8e8e8'; x.beginPath(); x.ellipse(W * .27, H * .48, W * .12, H * .05, 0, 0, 7); x.fill(); }
+    else if (kind === 'home') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .5, W * .8, H * .06); x.fillRect(W * .15, H * .56, W * .04, H * .16); x.fillRect(W * .8, H * .56, W * .04, H * .16); x.fillStyle = '#2b2a26'; x.fillRect(W * .35, H * .3, W * .28, H * .18); x.fillStyle = '#9fc4e6'; x.fillRect(W * .37, H * .32, W * .24, H * .14); x.fillStyle = P[2]; x.fillRect(W * .7, H * .15, W * .2, H * .3); }
+    else if (kind === 'fachada') { x.fillStyle = '#f3ede2'; x.fillRect(W * .15, H * .25, W * .7, H * .47); x.fillStyle = '#2b2a26'; x.beginPath(); x.moveTo(W * .1, H * .27); x.lineTo(W * .5, H * .05); x.lineTo(W * .9, H * .27); x.fill(); x.fillStyle = '#9fc4e6'; x.fillRect(W * .25, H * .35, W * .18, H * .15); x.fillRect(W * .57, H * .35, W * .18, H * .15); x.fillStyle = '#7a5a3c'; x.fillRect(W * .44, H * .52, W * .12, H * .2); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .08, H * .66, W * .07, 0, 7); x.fill(); }
+    else if (kind === 'closet') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .08, W * .8, H * .64); x.fillStyle = '#f1ece2'; for (let i = 0; i < 3; i++) x.fillRect(W * (.13 + i * .26), H * .12, W * .22, H * .56); x.fillStyle = '#b0561f'; x.fillRect(W * .15, H * .2, W * .18, H * .1); x.fillStyle = '#4f7d61'; x.fillRect(W * .42, H * .18, W * .18, H * .3); }
+    else if (kind === 'obra') { x.fillStyle = '#9aa1a4'; for (let f = 0; f < 3; f++) { x.fillRect(W * .2, H * (.62 - f * .18), W * .6, 6); for (let k = 0; k <= 4; k++) x.fillRect(W * (.2 + k * .15) - 2, H * (.62 - f * .18) + 6, 4, H * .12); } x.strokeStyle = '#ff5f0f'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .88, H * .72); x.lineTo(W * .88, H * .05); x.lineTo(W * .4, H * .05); x.stroke(); }
+  }
+
+  
+  function siteWeek(c, k) {
+    const [x, W, H] = setup(c); const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#8fbbe3'); g.addColorStop(1, '#dcebf6'); x.fillStyle = g; x.fillRect(0, 0, W, H); x.fillStyle = '#b9ad97'; x.fillRect(0, H * .78, W, H);
+    const floors = Math.round(k * 8); for (let f = 0; f < Math.min(floors, 3); f++) { x.fillStyle = '#9aa1a4'; x.fillRect(W * .25, H * .78 - (f + 1) * 26, W * .5, 6); for (let c2 = 0; c2 <= 5; c2++) { x.fillStyle = '#80888b'; x.fillRect(W * .25 + c2 * W * .1 - 2, H * .78 - (f + 1) * 26 + 6, 4, 20); } }
+    if (k < .1) { x.fillStyle = '#8a7a60'; x.fillRect(W * .25, H * .78, W * .5, 14); }
+    x.strokeStyle = 'rgba(43,42,38,.25)'; x.setLineDash([3, 3]); x.strokeRect(W * .25, H * .78 - 8 * 26, W * .5, 8 * 26); x.setLineDash([]);
+    x.strokeStyle = '#ff5f0f'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .85, H * .78); x.lineTo(W * .85, H * .06); x.lineTo(W * .35, H * .06); x.stroke();
+    x.fillStyle = '#d8f526'; for (let i = 0; i < 8; i++) { x.beginPath(); x.arc(W * (.3 + i * .055), H * .78 - Math.min(floors, 3) * 26 - 4, 3, 0, 7); x.fill(); }
+  }
+
+  /* ---------- data ---------- */
+  const P = [
+    { id: 0, name: 'Depto 6B · Torre Norte', kind: 'obra', st: 'Obra', stI: 4, where: 'Zapopan · preventa', base: 3850000, pct: 28, paid: 25 },
+    { id: 1, name: 'Cocina · casa Providencia', kind: 'cocina', st: 'Diseño', stI: 2, where: 'Guadalajara · remodelación', base: 268000 },
+    { id: 2, name: 'Terraza · casa Providencia', kind: 'terraza', st: 'Idea', stI: 0, where: 'Guadalajara · azotea' }
+  ];
+  const STAGES = ['Idea', 'Diagnóstico', 'Diseño', 'Presup.', 'Obra', 'Entrega'];
+  const state = { proj: 0, sub: 0, week: 38, change: null, finish: 0, finishOk: false, renderOk: false, paid13: false, slot: -1, chat: [['them', 'Hola Mariana, hoy terminamos el colado de la losa L3. Te mando foto 👇', '11:42', 'obra'], ['me', '¡Qué bien! ¿Ya se puede ver mi piso?', '11:50'], ['them', 'La estructura llega a tu nivel el 12 de noviembre. Si quieres, agenda visita desde Equipo.', '11:52']] };
+  const CHANGE = { t: 'Ventana de piso a techo en la sala', d: 'Cambiar la ventana de 1.4 m de alto por una de piso a techo (2.6 m). Más luz de tarde y vista a la ciudad.', cost: 38400, days: 6 };
+  const FIN = [['#b98b5a', 'Roble natural', 0], ['#cfcac2', 'Porcelanato gris', 4200], ['#6d4f3a', 'Nogal', 18400]];
+  const WEEKS = { 30: [.12, 'Columnas de planta baja', 'Se colaron 18 columnas'], 34: [.2, 'Losa de nivel 2', 'Llegó la grúa torre'], 38: [.28, 'Losa de nivel 3', '61 m³ de concreto · miércoles'] };
+
+  const total = () => P[0].base + (state.change === 'ok' ? CHANGE.cost : 0) + (state.finishOk ? FIN[state.finish][2] : 0);
+  const delivery = () => state.change === 'ok' ? 'mayo 4, 2027' : 'abril 28, 2027';
+  const pending = p => p.id === 0 ? (state.change ? 0 : 1) + (state.finishOk ? 0 : 1) + (state.paid13 ? 0 : 1) : p.id === 1 ? (state.renderOk ? 0 : 1) : 1;
+
+  /* ---------- top: project switch ---------- */
+  const projBar = () => `<div class="props">${P.map(p => `<button type="button" class="prop" data-proj="${p.id}" aria-pressed="${p.id === state.proj}"><b>${p.name.split(' · ')[0]}</b><small>${p.st}${pending(p) ? ' · ' + pending(p) + ' pend.' : ''}</small></button>`).join('')}</div>`;
+  const stageBar = p => `<div class="pc" style="padding:10px 12px"><div class="stg">${STAGES.map((s, i) => `<i class="${i < p.stI ? 'd' : i === p.stI ? 'n' : ''}"></i>`).join('')}</div><div class="stg-l" style="margin-top:4px">${STAGES.map((s, i) => `<span class="${i === p.stI ? 'n' : ''}">${s}</span>`).join('')}</div></div>`;
+  const SUBS = ['Resumen', 'Avance', 'Dinero', 'Decisiones', 'Documentos', 'Equipo'];
+  const subBadge = i => { const p = P[state.proj]; if (p.id === 0) { if (i === 3) return (state.change ? 0 : 1) + (state.finishOk ? 0 : 1); if (i === 2) return state.paid13 ? 0 : 1; } if (p.id === 1 && i === 3) return state.renderOk ? 0 : 1; return 0; };
+  const subtabs = () => `<div class="subtabs">${SUBS.map((s, i) => `<button type="button" data-sub="${i}" aria-pressed="${i === state.sub}">${s}${subBadge(i) ? `<span class="b">${subBadge(i)}</span>` : ''}</button>`).join('')}</div>`;
+
+  /* ---------- obra (Depto 6B) ---------- */
+  function resumen0() {
+    const todos = [];
+    if (!state.change) todos.push(['🪟', 'Cambio propuesto: ventana de piso a techo', '+$38,400 · +6 días', 3, 'Revisar']);
+    if (!state.finishOk) todos.push(['🎨', 'Elegir piso de sala', 'Decide antes del 1 dic', 3, 'Elegir']);
+    if (!state.paid13) todos.push(['💳', 'Pago mensual 13', 'Oct 5 · $48,125', 2, 'Pagar']);
+    return `<div class="today"><span class="live"><i></i>EN VIVO · 11:05</span><canvas data-site="38"></canvas><div class="ov"><div><b>Hoy en tu obra</b><small>☀️ 24° · 38 personas · colando losa L3</small></div><small>${P[0].pct}%</small></div></div>
+      <div class="pc"><div class="hd"><span>Te toca a ti</span><b>${todos.length ? todos.length + ' pendientes' : 'Al día'}</b></div>${todos.length ? todos.map(t => `<div class="todo"><i>${t[0]}</i><div><b>${t[1]}</b><small>${t[2]}</small></div><button type="button" data-sub="${t[3]}">${t[4]}</button></div>`).join('') : '<p style="margin:0;font-size:13px;color:#4f7d61">✓ No tienes nada pendiente. Nosotros seguimos.</p>'}</div>
+      <div class="kpi2"><div><b>${P[0].pct}%</b><small>Construido</small></div><div><b>${state.paid13 ? 26 : 25}%</b><small>Pagado</small></div><div><b style="font-size:15px">${delivery().split(',')[0]}</b><small>Llaves</small></div></div>
+      <div class="pc"><div class="hd"><span>Próximo hito</span><b>en 42 días</b></div><div class="dstep n"><i>6</i><div><b>Tu piso recibe su losa</b><small>Nivel 6 · 12 de noviembre · te avisamos para que firmes en el concreto</small></div></div></div>`;
+  }
+  function avance0() {
+    const w = WEEKS[state.week];
+    return `<div class="pc"><div class="hd"><span>Por fases</span><b>planeado ${P[0].pct + 3}% · real ${P[0].pct}%</b></div><div class="phases">
+      ${[['Cimentación', 100, 'terminada'], ['Estructura', 38, '3 de 8 niveles'], ['Instalaciones', 4, 'inicia en dic'], ['Acabados', 0, 'feb 2027'], ['Entrega', 0, delivery()]].map((f, i) => `<div class="ph ${i === 1 ? 'now' : ''}"><b>${f[0]}</b><em>${f[1]}% · ${f[2]}</em><div class="bar"><i style="width:${f[1]}%"></i></div></div>`).join('')}</div></div>
+      <div class="pc"><div class="hd"><span>Diario por semana</span><b>sem ${state.week}</b></div><div class="wk">${Object.keys(WEEKS).map(k => `<button type="button" data-week="${k}" aria-pressed="${+k === state.week}">Sem ${k}</button>`).join('')}</div>
+      <div class="wphoto" style="margin-top:8px"><canvas data-site="${state.week}"></canvas><div class="cap2"><b>${w[1]}</b>${w[2]}</div></div></div>
+      <div class="pc"><div class="hd"><span>Atraso</span><b style="color:#8a6400">3 días</b></div><p style="margin:0;font-size:12.5px;color:#5e6259">Por lluvia la semana 36. El residente lo recupera con un turno extra el sábado; la fecha de llaves no cambia${state.change === 'ok' ? ' por esto (sí por tu cambio de ventana: +6 días)' : ''}.</p></div>`;
+  }
+  function dinero0() {
+    const t = total(), paidAmt = 962500 + (state.paid13 ? 48125 : 0);
+    const pays = [['✓', '#4f7d61', 'Enganche 10%', 'Mar 2025', 385000], ['✓', '#4f7d61', 'Mensualidades 1–12', 'hasta sep 2026', 577500], [state.paid13 ? '✓' : '13', state.paid13 ? '#4f7d61' : '#b0561f', 'Mensualidad 13', state.paid13 ? 'Pagada hoy' : 'Oct 5', 48125], ['', '#cfc8ba', 'Mensualidades 14–24', '2026–27', 529375], ['', '#cfc8ba', 'Contra entrega 60%', delivery(), t - 1540000]];
+    return `<div class="pc money"><div class="tot"><div><small>Total del contrato</small><br><b id="tot" style="color:${state.change === 'ok' || state.finishOk ? '#b0561f' : 'inherit'}">${money(t)}</b></div><small style="text-align:right">${state.change === 'ok' ? '+ ventana $38,400' : ''}${state.finishOk && FIN[state.finish][2] ? '<br>+ piso ' + money(FIN[state.finish][2]) : ''}${state.change !== 'ok' && !(state.finishOk && FIN[state.finish][2]) ? 'Sin cambios' : ''}</small></div>
+      <div class="duo"><div class="lab"><span>Pagado</span><b>${Math.round(paidAmt / t * 100)}% · ${money(paidAmt)}</b></div><div class="bar c"><i style="width:${paidAmt / t * 100}%"></i></div><div class="lab"><span>Construido</span><b>${P[0].pct}%</b></div><div class="bar"><i style="width:${P[0].pct}%"></i></div></div>
+      <small style="font-size:12px;color:#5e6259">Nunca pagas por obra que no se ha hecho: lo pagado va por debajo de lo construido.</small></div>
+      <div class="pc"><div class="hd"><span>Calendario de pagos</span></div>${pays.map(p => `<div class="pay"><i style="background:${p[1]}">${p[0]}</i><div><b>${p[2]}</b><small>${p[3]}</small></div><span class="amt">${money(p[4])}</span></div>`).join('')}</div>
+      ${state.paid13 ? '<div class="slide done"><span class="l">✓ Pagado · recibo enviado a tu correo</span></div>' : '<div class="slide" id="slide"><span class="l">Desliza para pagar $48,125</span><span class="k" id="slideK">🔑</span></div>'}
+      <div class="pc"><div class="hd"><span>Facturas</span><b>14</b></div><div class="dcat"><i>🧾</i><div><b>Factura mensualidad 12</b><small>CFDI · 5 sep 2026</small></div><span class="pill ok">PDF + XML</span></div></div>`;
+  }
+  function decisiones0() {
+    const ch = state.change;
+    return `<div class="co" id="coCh"><div class="top"><div><span class="pill new">Cambio propuesto</span><br><b class="t">${CHANGE.t}</b></div></div><canvas data-room="sala" style="width:100%;height:110px;border-radius:12px;display:block"></canvas><small>${CHANGE.d}</small>
+      <div class="imp"><div><b>+${money(CHANGE.cost)}</b><small>Costo</small></div><div><b>+${CHANGE.days} días</b><small>Entrega</small></div><div><b>+2 h</b><small>Sol en invierno</small></div></div>
+      ${ch ? `<span class="stampx">${ch === 'ok' ? 'APROBADO' : 'RECHAZADO'}<small>${new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })} · 6B</small></span>` : '<div class="acts"><button type="button" data-ch="no">No, gracias</button><button type="button" class="ok" data-ch="ok">Aprobar cambio</button></div>'}</div>
+      <div class="co"><div class="top"><div><span class="pill warn">Antes del 1 dic</span><br><b class="t">Piso de sala y recámaras</b></div></div>
+      <div class="swatches" style="margin-bottom:14px">${FIN.map((f, i) => `<button type="button" data-fin="${i}" aria-pressed="${i === state.finish}" style="background:${f[0]}" aria-label="${f[1]}"><span>${f[1].split(' ')[0]}</span></button>`).join('')}</div>
+      <small><b style="color:#2b2a26">${FIN[state.finish][1]}</b> · ${FIN[state.finish][2] ? '+' + money(FIN[state.finish][2]) : 'incluido en tu paquete'}</small>
+      ${state.finishOk ? `<span class="stampx">ELEGIDO<small>Se pide al proveedor</small></span>` : '<div class="acts"><button type="button" class="ok" data-finok="1">Confirmar elección</button></div>'}</div>
+      <div class="pc"><div class="hd"><span>Decisiones anteriores</span><b>4</b></div>${[['Cubierta de cocina', 'Cuarzo negro · +$12,900', 'Ago 12'], ['Cancel de baño', 'Sin cancel, de obra · incluido', 'Jul 30'], ['Contactos extra', '3 en sala · +$2,400', 'Jul 2']].map(d => `<div class="dcat"><i>✓</i><div><b>${d[0]}</b><small>${d[1]}</small></div><small>${d[2]}</small></div>`).join('')}</div>`;
+  }
+  function documentos0() {
+    return `<div class="pc">${[['📝', 'Contrato y anexos', 'Firmado mar 2025 · fianza vigente', 'ok', 'Al día'], ['📐', 'Planos de tu unidad', 'v3 · incluye tus cambios', 'ok', 'Vigente'], ['🏛', 'Licencia y permisos', 'Licencia de construcción · DRO', 'ok', 'Vigente'], ['💳', 'Pagos y facturas', '13 recibos · 14 CFDI', state.paid13 ? 'ok' : 'warn', state.paid13 ? 'Al día' : '1 por pagar'], ['🔁', 'Órdenes de cambio', state.change === 'ok' ? '4 aprobadas · incluye ventana' : '3 aprobadas', 'ok', 'Firmadas'], ['🛡', 'Garantías y manuales', 'Se entregan el día de llaves', 'warn', 'Abr 2027']].map(d => `<div class="dcat"><i>${d[0]}</i><div><b>${d[1]}</b><small>${d[2]}</small></div><span class="pill ${d[3]}">${d[4]}</span></div>`).join('')}</div>
+      <div class="pc"><div class="hd"><span>Buscar en tus documentos</span></div><div class="compose"><input placeholder="Ej. “altura de la ventana”" aria-label="Buscar documentos"><button type="button" data-search="1">Buscar</button></div></div>`;
+  }
+  function equipo0() {
+    const slots = [['Sáb', '4 oct', '10:00'], ['Sáb', '11 oct', '10:00'], ['Sáb', '11 oct', '12:00']];
+    return `<div class="pc">${[['AL', '#4f7d61', 'Arq. Lucía Ramos', 'Diseño de tu unidad', 0], ['JM', '#b0561f', 'Julio Martínez', 'Residente de obra · en obra ahora', 1], ['AR', '#3c6e9e', 'Andrea Ruiz', 'Tu asesora · pagos y contrato', 1]].map(p => `<div class="person"><span class="av ${p[4] ? 'on' : ''}" style="background:${p[1]}">${p[0]}</span><div><b>${p[2]}</b><small>${p[3]}</small></div><span class="acts"><button type="button" data-call="1" aria-label="Llamar">📞</button><button type="button" data-chatfocus="1" aria-label="Mensaje">💬</button></span></div>`).join('')}</div>
+      <div class="pc chat"><div class="hd"><span>Chat con tu obra</span><b>responde en ~20 min</b></div>${state.chat.map(m => `<div class="msg ${m[0] === 'me' ? 'mine' : 'theirs'}">${m[1]}${m[3] ? `<canvas data-site="38"></canvas>` : ''}<small>${m[2]}</small></div>`).join('')}<div class="compose"><input id="chatIn" placeholder="Escribe un mensaje…" aria-label="Mensaje"><button type="button" data-send="1">Enviar</button></div></div>
+      <div class="pc"><div class="hd"><span>Visita a tu obra</span><b>con casco y guía</b></div><div class="slots">${slots.map((s, i) => `<button type="button" data-slot="${i}" aria-pressed="${i === state.slot}"><b>${s[1]}</b>${s[2]}</button>`).join('')}</div>${state.slot >= 0 ? `<p style="margin:8px 0 0;font-size:12.5px;color:#4f7d61">✓ Visita el ${slots[state.slot][1]} a las ${slots[state.slot][2]} · tu Llave BuildI abre la puerta A</p>` : ''}</div>`;
+  }
+
+  /* ---------- diseño (Cocina) ---------- */
+  function cocina() {
+    const sub = state.sub;
+    if (sub === 0 || sub === 3) return `<div class="co"><div class="top"><div><span class="pill new">Render v2 · ayer</span><br><b class="t">Tu cocina con isla de 2.4 m</b></div></div><canvas data-room="cocina" style="width:100%;height:150px;border-radius:12px;display:block"></canvas>
+      <small>Cambios contra la v1: la isla crece 40 cm y la alacena sube hasta el techo. La Arq. Lucía dejó 2 notas sobre la imagen.</small>
+      <div class="imp"><div><b>$268k</b><small>Presupuesto</small></div><div><b>6 sem</b><small>Obra</small></div><div><b>v2</b><small>de 3 rondas</small></div></div>
+      ${state.renderOk ? '<span class="stampx">APROBADO<small>Pasa a presupuesto</small></span>' : '<div class="acts"><button type="button" data-comment="1">Comentar</button><button type="button" class="ok" data-render="1">Aprobar diseño</button></div>'}</div>
+      <div class="pc"><div class="hd"><span>Qué sigue</span></div>${[['d', 'Levantamiento 3D', 'Hecho · 12.4 m²'], ['d', 'Render v1', 'Comentado'], [state.renderOk ? 'd' : 'n', 'Render v2', state.renderOk ? 'Aprobado hoy' : 'Esperando tu revisión'], [state.renderOk ? 'n' : '', 'Presupuesto cerrado', 'En 3 días hábiles'], ['', 'Firma y anticipo', 'Al aprobar el presupuesto']].map((s, i) => `<div class="dstep ${s[0]}"><i>${s[0] === 'd' ? '✓' : i + 1}</i><div><b>${s[1]}</b><small>${s[2]}</small></div></div>`).join('')}</div>`;
+    if (sub === 2) return `<div class="pc money"><div class="tot"><div><small>Presupuesto estimado</small><br><b>$268,000</b></div><small>±8% hasta<br>cerrar diseño</small></div></div><div class="pc"><div class="hd"><span>Por partida</span></div>${[['Gabinetes y carpintería', 112000], ['Cubierta de cuarzo', 46000], ['Electrodomésticos', 52000], ['Instalaciones', 28000], ['Mano de obra y demolición', 30000]].map(r => `<div class="pay"><i style="background:#c9a24a">·</i><div><b>${r[0]}</b></div><span class="amt">${money(r[1])}</span></div>`).join('')}</div>`;
+    return `<div class="pc" style="font-size:13px;color:#5e6259">En diseño esta sección todavía tiene poco: ${SUBS[sub].toLowerCase()} se llena cuando empiece la obra.</div>`;
+  }
+  /* ---------- idea (Terraza) ---------- */
+  function terraza() {
+    return `<canvas data-room="terraza" style="width:100%;height:140px;border-radius:18px;display:block"></canvas>
+      <div class="pc"><div class="hd"><span>Para empezar</span><b>sin costo</b></div>${[['d', 'Guardaste la idea', 'Pérgola de madera en azotea · $95k–$160k'], ['n', 'Agenda la visita técnica', '45 min · medimos y revisamos la impermeabilización'], ['', 'Recibe 2 propuestas', 'En 5 días hábiles'], ['', 'Elige y firma', 'Con calendario y pagos por avance']].map((s, i) => `<div class="dstep ${s[0]}"><i>${s[0] === 'd' ? '✓' : i + 1}</i><div><b>${s[1]}</b><small>${s[2]}</small></div></div>`).join('')}</div>
+      <div class="pc"><div class="hd"><span>Elige día para la visita</span></div><div class="slots">${[['Lun', '6 oct', '9:00'], ['Mié', '8 oct', '16:00'], ['Sáb', '11 oct', '11:00']].map((s, i) => `<button type="button" data-tslot="${i}" aria-pressed="${state.tslot === i}"><b>${s[1]}</b>${s[0]} ${s[2]}</button>`).join('')}</div></div>
+      <div class="pc"><div class="hd"><span>Ayúdanos a llegar preparados</span></div><button class="cta ghost" type="button" data-photos="1">📷 Subir 3 fotos de tu azotea</button></div>`;
+  }
+
+  /* ---------- render ---------- */
+  const scroll = $('scroll');
+  function render(keep) {
+    const p = P[state.proj], st = scroll.scrollTop;
+    let body;
+    if (p.id === 0) body = [resumen0, avance0, dinero0, decisiones0, documentos0, equipo0][state.sub]();
+    else if (p.id === 1) body = cocina();
+    else body = terraza();
+    scroll.innerHTML = `<div class="view"><div class="greet"><small><span>Mis obras</span><span>${P.reduce((a, q) => a + pending(q), 0)} pendientes</span></small><h3>${p.name.split(' · ')[0]} <em>${p.name.split(' · ')[1]}</em></h3></div>${projBar()}${stageBar(p)}${p.id === 2 ? '' : subtabs()}${body}</div>`;
+    if (keep) { scroll.scrollTop = st; scroll.querySelector('.view').style.animation = 'none'; }
+    scroll.querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room));
+    scroll.querySelectorAll('canvas[data-site]').forEach(c => siteWeek(c, WEEKS[c.dataset.site][0]));
+    const tot = P.reduce((a, q) => a + pending(q), 0); $('tbBadge').textContent = tot; $('tbBadge').style.display = tot ? '' : 'none';
+    bindSlide();
+  }
+  function bindSlide() {
+    const s = $('slide'); if (!s) return; const k = $('slideK'); let x0 = null, dx = 0; const max = () => s.clientWidth - 54;
+    k.onpointerdown = e => { x0 = e.clientX; k.setPointerCapture(e.pointerId); k.style.transition = 'none'; };
+    k.onpointermove = e => { if (x0 === null) return; dx = Math.max(0, Math.min(max(), e.clientX - x0)); k.style.transform = `translateX(${dx}px) rotate(${dx / max() * 90}deg)`; };
+    k.onpointerup = () => { x0 = null; k.style.transition = 'transform .3s'; if (dx > max() * .9) { state.paid13 = true; toast('Pago recibido · recibo y CFDI enviados'); render(true); } else k.style.transform = ''; dx = 0; };
+  }
+  scroll.addEventListener('click', e => {
+    const pj = e.target.closest('[data-proj]'); if (pj) { state.proj = +pj.dataset.proj; state.sub = 0; render(); return; }
+    const sb = e.target.closest('[data-sub]'); if (sb) { state.sub = +sb.dataset.sub; render(); scroll.scrollTop = 0; return; }
+    const wk = e.target.closest('[data-week]'); if (wk) { state.week = +wk.dataset.week; render(true); return; }
+    const ch = e.target.closest('[data-ch]'); if (ch) { state.change = ch.dataset.ch; render(true); try { navigator.vibrate && navigator.vibrate(25); } catch (_) {} toast(ch.dataset.ch === 'ok' ? 'Cambio aprobado · total y entrega al día' : 'Cambio rechazado · se queda la ventana original'); return; }
+    const fn = e.target.closest('[data-fin]'); if (fn && !state.finishOk) { state.finish = +fn.dataset.fin; render(true); return; }
+    if (e.target.closest('[data-finok]')) { state.finishOk = true; render(true); toast(`${FIN[state.finish][1]} elegido · se pide al proveedor`); return; }
+    if (e.target.closest('[data-render]')) { state.renderOk = true; render(true); toast('Diseño aprobado · presupuesto en 3 días'); return; }
+    if (e.target.closest('[data-comment]')) { toast('Toca la imagen para dejar una nota en el lugar exacto'); return; }
+    const sl = e.target.closest('[data-slot]'); if (sl) { state.slot = +sl.dataset.slot; render(true); toast('Visita agendada · guía y casco listos'); return; }
+    const ts = e.target.closest('[data-tslot]'); if (ts) { state.tslot = +ts.dataset.tslot; render(true); toast('Visita técnica agendada · te confirmamos por WhatsApp'); return; }
+    if (e.target.closest('[data-photos]')) { toast('Abriendo cámara con guías…'); return; }
+    if (e.target.closest('[data-search]')) { toast('Planos v3, hoja A-04: ventana de sala, 1.40 m de alto'); return; }
+    if (e.target.closest('[data-call]')) { toast('Llamando…'); return; }
+    if (e.target.closest('[data-chatfocus]')) { const i = $('chatIn'); if (i) i.focus(); return; }
+    if (e.target.closest('[data-send]')) { const i = $('chatIn'); const v = (i && i.value.trim()) || '¿Puedo ir el sábado a ver la obra?'; state.chat.push(['me', v, 'ahora']); render(true); scroll.scrollTop = scroll.scrollHeight; setTimeout(() => { state.chat.push(['them', 'Claro, te aparto el sábado a las 10 con casco. Te veo en la puerta A.', 'ahora']); if (state.sub === 5 && state.proj === 0) { render(true); scroll.scrollTop = scroll.scrollHeight; } }, reduce ? 50 : 1400); return; }
+  });
+  scroll.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'chatIn') { e.preventDefault(); scroll.querySelector('[data-send]').click(); } });
+  const tb = [...$('tabs').querySelectorAll('button')]; const b = tb[1]; requestAnimationFrame(() => { $('ind').style.width = b.offsetWidth + 'px'; $('ind').style.transform = `translateX(${b.offsetLeft - 5}px)`; });
+  tb.forEach((t, i) => { if (i !== 1) t.onclick = () => toast('Esta sección se trabaja después'); });
+  render();
+  addEventListener('resize', () => render(true));
+})();
+</script>
