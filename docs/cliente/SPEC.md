@@ -233,3 +233,158 @@ Revisa primero qué ya está instalado. Lo que se necesita para que se sienta co
 - `expo-haptics`, `expo-blur` (barra de vidrio), `expo-linear-gradient`.
 - `@expo-google-fonts/fraunces`, `@expo-google-fonts/archivo`, `@expo-google-fonts/ibm-plex-mono` con `expo-font`.
 - Opcional: `@shopify/react-native-skia` para el efecto holográfico y texturas procedurales (si no, usar imágenes y gradientes).
+
+---
+
+## Apéndice A — Lógica exacta de los prototipos 02, 03 y 05
+
+Este apéndice existe para que **no haga falta leer el HTML/JS**. Copia estas reglas tal cual. Aun así, aísla cada una en una función pura (p. ej. `lib/cliente/logic.ts`) con pruebas, para poder cambiarla después.
+
+### A.1 Asistente "¿No sabes por dónde empezar?" (02)
+
+**Preguntas** (índices empiezan en 0; las respuestas se guardan como índices):
+
+| # | Pregunta | Opciones (ícono · texto · subtexto) |
+|---|---|---|
+| 0 | ¿Qué espacio quieres cambiar? | 🍳 Cocina · 🛁 Baño · 🛋 Sala · 🛏 Recámara · 🌿 Exterior · 🤷 No sé, toda la casa |
+| 1 | ¿Qué es lo que más te molesta hoy? | 🌑 Es oscuro · Falta luz natural / 📦 No me cabe nada · Falta guardado / 🧱 Está cerrado · Quiero integrarlo / 🕰 Se ve viejo · Acabados gastados |
+| 2 | ¿Cuánto quieres invertir? | $ Menos de $80k · Cambios rápidos / $$ $80k–$200k · Remodelación / $$$ $200k–$400k · Obra completa / ? No sé todavía · Ayúdame a decidir |
+| 3 | ¿Qué estilo te gusta? | 🌿 Cálido y natural · Madera, verde, luz cálida / ⬜ Minimalista · Blanco, líneas limpias / 🏺 Mexicano contemporáneo · Barro, piedra, color / 🖤 Industrial · Concreto, negro, metal |
+
+Al tocar una opción avanza solo (220 ms). Barra de 4 segmentos, "PREGUNTA n DE 4", botón Atrás desde la 2.
+
+**Paso foto (opcional):** "¿Nos mandas una foto de tu {espacio}?" → *Tomar o subir foto* / *Saltar, ver opciones*.
+**Escaneo simulado (2.5 s):** etiquetas que aparecen una cada 330 ms: `≈ 12 m²`, `Ventana al norte · poca luz`, `Muro de 3.1 m hacia sala`, `Gabinetes de los 2000`, `Piso cerámico 33×33`, `Techo a 2.5 m`.
+
+**Las 3 opciones** (fijas en el prototipo; luego vendrán del backend):
+
+| idx | Título | Descripción | Rango | Tiempo |
+|---|---|---|---|---|
+| 0 | Refrescar | gabinetes nuevos, luz cálida y pintura | $58k–$95k | 2 sem |
+| 1 | Abrir y renovar | muro abierto a la sala, isla y acabados nuevos | $220k–$340k | 6 sem |
+| 2 | Más luz y guardado | alacena a techo, cubierta nueva y tragaluz | $140k–$210k | 4 sem |
+
+**Recomendación** (`pain` = respuesta 1, `budget` = respuesta 2):
+
+```ts
+export function recommendOption(pain: number, budget: number): 0 | 1 | 2 {
+  if (pain === 2) return budget === 0 ? 0 : 1; // "Está cerrado": abrir, salvo presupuesto bajo
+  if (pain === 3) return 0;                    // "Se ve viejo": refrescar
+  return budget === 0 ? 0 : 2;                 // oscuro / sin guardado: luz y guardado, salvo presupuesto bajo
+}
+```
+
+Texto: "3 caminos para tu {espacio}" · "Porque {molestia en minúsculas}, con estilo {estilo}{budget === 3 ? '' : ' y tu presupuesto'}." La recomendada lleva borde sage y etiqueta "Recomendado para ti". Botones: *Pedir visita técnica sin costo* · *Guardar en un tablero* (crea tablero "Mi {espacio}" y abre Guardado).
+
+### A.2 Ideas de ejemplo y "Caben en tu casa" (02)
+
+Campos: `space`, `title`, `type`, `lo`, `hi`, `weeks`, `desc`, `fits` (cabe en la cocina de 12.4 m² de Casa Providencia).
+
+| Título | Espacio | Tipo | Rango | Tiempo | Cabe |
+|---|---|---|---|---|---|
+| Cocina abierta con isla | Cocina | Constructivo | 220k–340k | 5–7 sem | sí |
+| Gabinetes nuevos sin obra | Cocina | Muebles | 68k–120k | 2 sem | sí |
+| Clóset de piso a techo | Recámara | Muebles | 32k–58k | 3 sem | |
+| Pérgola en azotea | Exterior | Exterior | 95k–160k | 4 sem | |
+| Home office en recámara de visitas | Home office | Interiorismo | 38k–70k | 2 sem | |
+| Baño con regadera de piso | Baño | Constructivo | 85k–140k | 3 sem | |
+| Sala con muro de madera | Sala | Interiorismo | 45k–90k | 2 sem | |
+| Renovar fachada y entrada | Fachada | Exterior | 120k–210k | 4 sem | |
+| Cocina con desayunador | Cocina | Interiorismo | 140k–210k | 4 sem | sí |
+| Recámara para un bebé | Recámara | Interiorismo | 30k–55k | 2 sem | |
+
+"Caben en tu casa" = ideas con `fits`, título "Caben en tu cocina · 12.4 m² · Casa Providencia", cada tarjeta "✓ cabe · $Xk+".
+Tipos para filtrar: Interiorismo, Muebles, Constructivo, Exterior. Tableros iniciales: "Cocina soñada" (cocina abierta, cocina con desayunador, gabinetes), "Azotea" (pérgola), "Para el bebé" (recámara bebé, clóset).
+
+### A.3 Nivel de acabados y precio (02, 03)
+
+```ts
+export const FINISH_FACTOR = { basico: 0.85, medio: 1, premium: 1.4 };
+export const STYLE_FACTOR = [1, 0.95, 1.1]; // Cálido, Minimalista, Mexicano (pestaña "En tu casa")
+export const priceRange = (lo: number, hi: number, finish: keyof typeof FINISH_FACTOR, style = 0) =>
+  [lo * FINISH_FACTOR[finish] * STYLE_FACTOR[style], hi * FINISH_FACTOR[finish] * STYLE_FACTOR[style]];
+```
+
+Descripciones por estilo (cocina): Cálido "Gabinetes laca salvia, cubierta cuarzo negro, piso roble." · Minimalista "Gabinetes blancos sin jaladeras, cubierta blanca, piso porcelanato." · Mexicano "Gabinetes terracota, cubierta de piedra clara, piso de barro."
+
+### A.4 Pagarlo (03)
+
+```ts
+export function monthlyPayment(total: number, downPct: number, months: number, rate = 0.012) {
+  const financed = total * (1 - downPct / 100);
+  return financed * rate / (1 - Math.pow(1 + rate, -months));
+}
+```
+
+`total` = punto medio del rango. Enganche 10–60% en pasos de 5 (inicial 30). Plazo 6–48 meses en pasos de 6 (inicial 24). Leyenda: "Ejemplo con tasa de 1.2% mensual. El financiamiento lo da un aliado y requiere aprobación." Otras formas: Meses sin intereses (hasta 12), Crédito de mejoras (banco o Infonavit), Pago por avance (4 partes). En Perfil, la buena reputación baja la tasa a 1.0%.
+
+### A.5 Tu estilo: tarjetas deslizables (03)
+
+8 tarjetas, cada una con un estilo: Sala con madera y luz cálida (cálido) · Baño blanco y limpio (mini) · Terraza con pérgola (cálido) · Fachada de barro y celosía (mex) · Clóset de madera oscura (cálido) · Oficina de concreto y negro (ind) · Recámara verde y suave (cálido) · Cocina con color terracota (mex).
+
+Deslizar > 90 px decide (derecha = me gusta), si no regresa. Sellos "ME GUSTA"/"NO" con opacidad = desplazamiento/90. Botones ✕ y ♥ hacen lo mismo.
+
+```ts
+export function styleProfile(likes: boolean[], cards: StyleKey[]) {
+  const liked = cards.filter((_, i) => likes[i]);
+  const n = liked.length || 1;
+  const pct = Object.fromEntries(STYLE_KEYS.map(k => [k, Math.round(liked.filter(s => s === k).length / n * 100)]));
+  const top = [...STYLE_KEYS].sort((a, b) => pct[b] - pct[a])[0];
+  return { top, pct, ...STYLES[top] };
+}
+```
+
+| Clave | Nombre | Paleta | Palabras |
+|---|---|---|---|
+| calido | Cálido natural | #efe8dc #b98b5a #4f7d61 #9fb7a6 #c9a24a | Madera, Luz cálida, Verde salvia, Textiles, Plantas |
+| mini | Minimalista | #f4f4f2 #d9d9d6 #cfcac2 #2b2a26 #9aa1a4 | Blanco, Líneas limpias, Sin adornos, Mucho guardado |
+| mex | Mexicano contemporáneo | #efe2cf #b0561f #8a5a3c #e8b04a #4f7d61 | Barro, Piedra, Celosías, Color tierra |
+| ind | Industrial | #9aa1a4 #2b2a26 #6b6f70 #b98b5a #d9d9d6 | Concreto, Metal negro, Ladrillo, Focos expuestos |
+
+### A.6 Por necesidad (03)
+
+Campos por solución: `title`, `desc`, `lo`, `hi`, `time`, `result`.
+
+- **🌑 Mi casa es oscura** (Falta luz natural): Tragaluz en pasillo 28k–45k · 1 sem · "Entra 3× más luz al pasillo" / Ventana de piso a techo 38k–60k · 2 sem · "+2 h de sol en invierno" / Abrir cocina a sala 220k–340k · 6 sem · "Un solo espacio iluminado"
+- **🌡 Hace mucho calor** (Arriba de 30 °C adentro): Azotea verde o aislante 45k–90k · 2 sem · "−4 °C en planta alta" / Ventilación cruzada 18k–32k · 1 sem · "−2 °C sin aire acondicionado" / Minisplit inverter 16k–24k · 1 día · "40% menos luz que uno normal"
+- **👶 Viene un bebé** (Necesito un cuarto más): Recámara para el bebé 30k–55k · 2 sem · "Lista antes de la fecha" / Dividir la recámara grande 60k–95k · 3 sem · "+1 recámara, +$400k de valor"
+- **👵 Mis papás vienen a vivir** (Accesibilidad): Baño accesible 70k–110k · 3 sem · "Seguro para adultos mayores" / Recámara en planta baja 180k–260k · 6 sem · "Sin subir escaleras"
+- **💻 Trabajo desde casa** (Necesito concentrarme): Home office cerrado 45k–80k · 2 sem · "Menos ruido de la casa" / Clóset convertido en escritorio 18k–30k · 1 sem · "Sin perder un cuarto"
+- **🔇 Hay mucho ruido** (Calle o vecinos): Ventanas de doble vidrio 32k–55k · 1 sem · "−25 dB de la calle" / Muro acústico 24k–40k · 1 sem · "−15 dB del vecino"
+
+### A.7 Comparar dos ideas (03)
+
+Máximo 2 seleccionadas (la tercera muestra "Solo dos a la vez"). Filas y regla del ganador (verde); **si los dos valores mostrados son iguales, ninguno gana**:
+
+| Fila | Valor mostrado | Gana |
+|---|---|---|
+| Costo | `$lo k–$hi k` | menor `lo + hi` |
+| Tiempo | `time` | menor número |
+| Resultado | `result` | — |
+| Sube valor | `lo > 100000 ? 'Mucho' : 'Algo'` | mayor `lo` |
+| Sin usar el espacio | `lo > 100000 ? '2–3 sem' : '2–4 días'` | menor `lo` |
+
+Nota al pie: "Las dos se pueden hacer juntas: si lo pides así, se programan en la misma obra y ahorras un 10% en mano de obra." Botones: Pedir visita · Cotizar las dos.
+
+### A.8 Cómo se vive la obra (03)
+
+Medidores 1–5: Ruido 4 ("Días 1–6 fuerte"), Polvo 3 ("Con sellado de puertas"), Molestia 3 ("Casa habitable"). Línea de tiempo (cocina abierta): Sem 1 Demolición del muro · Sem 2–3 Sin cocina (cocineta provisional en el comedor: parrilla, tarja y refri) · Sem 4 Instalaciones y piso · Sem 5–6 Gabinetes y cubierta · Día 42 Lista (limpieza profunda incluida).
+
+### A.9 Redistribución (05) — dónde vive cada pieza
+
+| Pieza | Destino |
+|---|---|
+| Asistente | Inicio › Para ti (arriba; se oculta cuando ya hay ideas guardadas) |
+| Ideas que caben, Antes y después, Expertos, Guías y tu colonia | Inicio › Para ti (secciones deslizables) |
+| Por necesidad | Atajos en Para ti + filtro en Explorar |
+| Explorar espacios | Inicio › Explorar |
+| Mis tableros, Comparar | Inicio › Guardado |
+| En tu casa, En tu plano, Luz y color, Cómo se construye, Nivel de acabados, Pagarlo, Quién lo hace, Compra el look | Dentro de la hoja de idea (solo las que aplican) |
+| Cómo se vive la obra | Idea › Cómo se vive → al contratar: Mis obras › "Esta semana en casa" |
+| Revisiones con foto | Mis obras › Avance |
+| Plan a 5 años | Mi hogar › Plan / Valor |
+| Muebles en tu plano | Mi hogar › Tu plano (también se abre desde ideas de muebles) |
+| Tu estilo | Perfil › Mi estilo (en Inicio solo una invitación si falta) |
+| Presupuesto anual | Perfil › Preferencias |
+
+Lo que llega a otra pestaña desde Inicio lleva la etiqueta "de Inicio · {pieza}". Pestañas de la hoja de idea, en orden: En tu casa, En tu plano, Luz y color, Cómo se construye, Cómo se vive, Pagarlo, Quién lo hace. Pie fijo: Guardar · Hazlo con BuildI (crea el proyecto, cambia a Mis obras, toast "Proyecto creado · ya está en Mis obras").
