@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Frentes a destajo: each work front is a priced concept (volume × unit price)
-// the crew executes for the builder. Mirrors the WorkConcept / JobBoardPost
-// shape (item_code, unit, quantity, unit_price_mxn) plus daily progress.
+// Frentes a destajo: cada frente es un concepto con precio unitario
+// (volumen × precio) que la cuadrilla ejecuta para la constructora. Usa la
+// misma forma que WorkConcept / JobBoardPost (item_code, unit, quantity,
+// unit_price_mxn) más el avance diario. Datos de ejemplo.
 
 interface WorkFront {
   id: string;
@@ -27,6 +28,7 @@ interface WorkFront {
   crew: string[];
   needed: number;
   rate_per_person_day: number;
+  atHeight?: string;
   blocked?: string;
   completed?: boolean;
 }
@@ -46,32 +48,38 @@ interface CatalogConcept {
 }
 
 const COLORS = {
-  ink: '#1C2124',
-  ink2: '#5D666E',
-  concrete: '#E9EBEA',
+  background: '#F9FAFB',
   card: '#FFFFFF',
-  line: '#E2E5E4',
-  orange: '#FF5F0F',
-  orangeSoft: '#FFE6D9',
-  hivis: '#D8F526',
-  green: '#1F8A4C',
-  greenSoft: '#DCF1E3',
-  red: '#D23A1F',
-  redSoft: '#FBE1DB',
+  text: '#111827',
+  body: '#374151',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+  divider: '#F3F4F6',
+  primary: '#2563EB',
+  primarySoft: '#EBF4FF',
+  primaryLight: '#BFDBFE',
+  success: '#10B981',
+  successSoft: '#D1FAE5',
+  warning: '#F59E0B',
+  warningSoft: '#FEF3C7',
+  warningText: '#B45309',
+  error: '#EF4444',
+  errorSoft: '#FEE2E2',
 };
 
-const WORKERS: Record<string, { name: string; color: string; present: boolean }> = {
-  JL: { name: 'Juan López', color: '#FF5F0F', present: true },
-  MA: { name: 'Miguel Ángel', color: '#2D6FD6', present: true },
-  IC: { name: 'Iván Cruz', color: '#7A4BB8', present: false },
-  EG: { name: 'Esteban G.', color: '#1F8A4C', present: true },
-  CV: { name: 'Carlos V.', color: '#5D666E', present: true },
-  PS: { name: 'Pedro S.', color: '#D23A1F', present: true },
-  JD: { name: 'Jorge D.', color: '#6B7D2A', present: true },
-  LR: { name: 'Luis Ramos', color: '#E8A100', present: true },
-  HT: { name: 'Hugo T.', color: '#3C4F8A', present: true },
-  BM: { name: 'Beto M.', color: '#A8521C', present: true },
-  TR: { name: 'Toño R.', color: '#0E7C86', present: true },
+// heights: tiene la DC-3 de trabajo en alturas (NOM-009).
+const WORKERS: Record<string, { name: string; color: string; present: boolean; heights: boolean }> = {
+  JL: { name: 'Juan López', color: '#2563EB', present: true, heights: true },
+  MA: { name: 'Miguel Ángel', color: '#7C3AED', present: true, heights: true },
+  IC: { name: 'Iván Cruz', color: '#DB2777', present: false, heights: false },
+  EG: { name: 'Esteban García', color: '#059669', present: true, heights: false },
+  CV: { name: 'Carlos Vega', color: '#0F766E', present: true, heights: true },
+  PS: { name: 'Pedro Sánchez', color: '#DC2626', present: true, heights: false },
+  JD: { name: 'Jorge Domínguez', color: '#65A30D', present: true, heights: true },
+  LR: { name: 'Luis Ramos', color: '#D97706', present: true, heights: true },
+  HT: { name: 'Hugo Treviño', color: '#4338CA', present: true, heights: false },
+  BM: { name: 'Beto Morales', color: '#C2410C', present: true, heights: true },
+  TR: { name: 'Toño Ramírez', color: '#0E7490', present: true, heights: false },
 };
 
 const SITES: Site[] = [
@@ -81,8 +89,8 @@ const SITES: Site[] = [
 
 const INITIAL_FRONTS: Record<string, WorkFront[]> = {
   alameda: [
-    { id: 'f1', item_code: 'ALB-015', description: 'Muro de block 15 cm', unit: 'm²', quantity: 420, done: 286, week: 120, unit_price_mxn: 185, crew: ['JL', 'MA', 'IC', 'EG'], needed: 4, rate_per_person_day: 9 },
-    { id: 'f2', item_code: 'ALB-030', description: 'Aplanado fino en muros', unit: 'm²', quantity: 840, done: 410, week: 260, unit_price_mxn: 95, crew: ['CV', 'PS', 'JD'], needed: 3, rate_per_person_day: 16 },
+    { id: 'f1', item_code: 'ALB-015', description: 'Muro de block 15 cm', unit: 'm²', quantity: 420, done: 286, week: 120, unit_price_mxn: 185, crew: ['JL', 'MA', 'IC', 'EG'], needed: 4, rate_per_person_day: 9, atHeight: 'el nivel 3' },
+    { id: 'f2', item_code: 'ALB-030', description: 'Aplanado fino en muros', unit: 'm²', quantity: 840, done: 410, week: 260, unit_price_mxn: 95, crew: ['CV', 'PS', 'JD'], needed: 3, rate_per_person_day: 16, atHeight: 'andamios a 2.5 m' },
     { id: 'f3', item_code: 'TAB-010', description: 'Tablaroca muro divisorio', unit: 'm²', quantity: 260, done: 150, week: 120, unit_price_mxn: 160, crew: ['LR', 'HT'], needed: 2, rate_per_person_day: 12 },
     { id: 'f4', item_code: 'PIS-060', description: 'Piso porcelanato 60×60', unit: 'm²', quantity: 380, done: 0, week: 0, unit_price_mxn: 210, crew: ['BM', 'TR'], needed: 2, rate_per_person_day: 10, blocked: 'Falta porcelanato: llega el jueves' },
     { id: 'f5', item_code: 'CIM-008', description: 'Firme de concreto 8 cm', unit: 'm²', quantity: 120, done: 120, week: 60, unit_price_mxn: 140, crew: [], needed: 0, rate_per_person_day: 20, completed: true },
@@ -108,6 +116,13 @@ const PAYROLL_TAX = 0.12;
 
 const money = (n: number) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const presentCount = (front: WorkFront) => front.crew.filter(id => WORKERS[id]?.present).length;
+// Recomendación (no bloqueo): quién trabaja en altura sin la DC-3 de alturas.
+const missingHeightCert = (front: WorkFront) =>
+  front.atHeight && !front.completed ? front.crew.filter(id => !WORKERS[id]?.heights) : [];
+const namesList = (ids: string[]) => {
+  const names = ids.map(id => WORKERS[id].name);
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}` : names[0];
+};
 
 function ProgressBar({ done, week, total }: { done: number; week: number; total: number }) {
   const before = Math.max(0, done - week) / total;
@@ -140,14 +155,20 @@ function Stepper({ value, onChange, step, min, max, suffix }: {
   return (
     <View style={styles.stepper}>
       <TouchableOpacity style={styles.stepBtn} onPress={() => onChange(clamp(value - step))} accessibilityLabel="Menos">
-        <Ionicons name="remove" size={22} color={COLORS.ink} />
+        <Ionicons name="remove" size={22} color={COLORS.primary} />
       </TouchableOpacity>
       <Text style={styles.stepValue}>{value} {suffix}</Text>
       <TouchableOpacity style={styles.stepBtn} onPress={() => onChange(clamp(value + step))} accessibilityLabel="Más">
-        <Ionicons name="add" size={22} color={COLORS.ink} />
+        <Ionicons name="add" size={22} color={COLORS.primary} />
       </TouchableOpacity>
     </View>
   );
+}
+
+function statusOf(front: WorkFront) {
+  if (front.completed) return { label: 'TERMINADO', color: COLORS.success };
+  if (front.blocked) return { label: 'DETENIDO', color: COLORS.error };
+  return { label: 'EN CURSO', color: COLORS.primary };
 }
 
 export default function WorkFronts() {
@@ -157,6 +178,7 @@ export default function WorkFronts() {
   const [today, setToday] = useState(0);
   const [reason, setReason] = useState<string | null>(null);
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [enrolled, setEnrolled] = useState<string[]>([]);
 
   const list = fronts[siteId];
   const site = SITES.find(s => s.id === siteId)!;
@@ -203,18 +225,28 @@ export default function WorkFronts() {
       }),
     }));
     setSelected(null);
-    Alert.alert('Gente movida', `${moving.map(id => WORKERS[id].name).join(', ')} pasa a ${target.description}.`);
+    const noCert = target.atHeight ? moving.filter(id => !WORKERS[id].heights) : [];
+    Alert.alert(
+      'Gente movida',
+      `${namesList(moving)} pasa a ${target.description}.` +
+        (noCert.length ? ` Recomendación: ${namesList(noCert)} no tiene la DC-3 de alturas y ese frente es en ${target.atHeight}.` : ''),
+    );
+  };
+
+  const enroll = (ids: string[]) => {
+    setEnrolled(prev => [...prev, ...ids]);
+    Alert.alert('Inscritos', `${namesList(ids)} al curso de trabajo en alturas del sábado.`);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.eyebrow}>CUADRILLA PÉREZ · {site.builder.toUpperCase()}</Text>
-        <Text style={styles.title}>
-          Frentes <Text style={styles.titleAccent}>a destajo</Text>
-        </Text>
+      <ScrollView>
+        <View style={styles.header}>
+          <Text style={styles.title}>Frentes a destajo</Text>
+          <Text style={styles.subtitle}>Mano de Obra Pérez · {site.builder}</Text>
+        </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.siteRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.siteRow}>
           {SITES.map(s => (
             <TouchableOpacity
               key={s.id}
@@ -226,71 +258,92 @@ export default function WorkFronts() {
           ))}
         </ScrollView>
 
-        <View style={styles.kpis}>
-          <View style={styles.kpi}>
-            <Text style={styles.kpiLabel}>CONTRATO</Text>
-            <Text style={styles.kpiValue}>{money(totals.contract / 1000)}k</Text>
+        <View style={styles.summary}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>{money(totals.contract / 1000)}k</Text>
+            <Text style={styles.summaryLabel}>Contrato</Text>
           </View>
-          <View style={styles.kpi}>
-            <Text style={styles.kpiLabel}>EJECUTADO</Text>
-            <Text style={[styles.kpiValue, { color: COLORS.orange }]}>{totals.pct}%</Text>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>{totals.pct}%</Text>
+            <Text style={styles.summaryLabel}>Ejecutado</Text>
           </View>
-          <View style={styles.kpi}>
-            <Text style={styles.kpiLabel}>ESTA SEMANA</Text>
-            <Text style={styles.kpiValue}>{money(totals.week / 1000)}k</Text>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>{money(totals.week / 1000)}k</Text>
+            <Text style={styles.summaryLabel}>Esta semana</Text>
           </View>
         </View>
 
-        {list.map(front => {
-          const short = !front.blocked && !front.completed && presentCount(front) < front.needed;
-          return (
-            <TouchableOpacity
-              key={front.id}
-              style={[
-                styles.front,
-                front.completed && styles.frontDone,
-                front.blocked && styles.frontBlocked,
-              ]}
-              onPress={() => openFront(front)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.frontHeader}>
-                <Text style={styles.frontTitle}>{front.description}</Text>
-                <Text style={styles.frontPrice}>{money(front.unit_price_mxn)}/{front.unit}</Text>
-              </View>
-              <ProgressBar done={front.done} week={front.week} total={front.quantity} />
-              <View style={styles.frontMeta}>
-                <Text style={styles.metaText}>{front.done} de {front.quantity} {front.unit}</Text>
-                <Text style={[styles.metaText, { color: COLORS.orange }]}>+{front.week} esta semana</Text>
-                <View style={styles.crew}>
-                  {front.crew.map((id, i) => (
-                    <View
-                      key={id}
-                      style={[
-                        styles.avatar,
-                        { backgroundColor: WORKERS[id].color, marginLeft: i ? -6 : 0 },
-                        !WORKERS[id].present && styles.avatarAbsent,
-                      ]}
-                    >
-                      <Text style={styles.avatarText}>{id}</Text>
-                    </View>
-                  ))}
+        <View style={styles.list}>
+          {list.map(front => {
+            const short = !front.blocked && !front.completed && presentCount(front) < front.needed;
+            const noCert = missingHeightCert(front).filter(id => !enrolled.includes(id));
+            const status = statusOf(front);
+            return (
+              <TouchableOpacity key={front.id} style={styles.card} onPress={() => openFront(front)} activeOpacity={0.8}>
+                <View style={styles.cardHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.cardTitle}>{front.description}</Text>
+                    <Text style={styles.cardSubtitle}>{money(front.unit_price_mxn)}/{front.unit} · {front.item_code}</Text>
+                  </View>
+                  <View style={[styles.statusBadge, { backgroundColor: status.color }]}>
+                    <Text style={styles.statusText}>{status.label}</Text>
+                  </View>
                 </View>
-              </View>
-              {front.blocked && <Text style={styles.blockedText}>⛔ {front.blocked}</Text>}
-              {front.completed && <Text style={styles.doneText}>✓ Terminado y recibido por el residente</Text>}
-              {short && (
-                <Text style={styles.shortText}>
-                  Hay {presentCount(front)} de {front.needed} personas hoy
-                </Text>
-              )}
-            </TouchableOpacity>
-          );
-        })}
+                <ProgressBar done={front.done} week={front.week} total={front.quantity} />
+                <View style={styles.cardMeta}>
+                  <Text style={styles.metaText}>{front.done} de {front.quantity} {front.unit}</Text>
+                  <Text style={[styles.metaText, { color: COLORS.primary }]}>+{front.week} esta semana</Text>
+                  <View style={styles.crew}>
+                    {front.crew.map((id, i) => (
+                      <View
+                        key={id}
+                        style={[
+                          styles.avatar,
+                          { backgroundColor: WORKERS[id].color, marginLeft: i ? -6 : 0 },
+                          !WORKERS[id].present && styles.avatarAbsent,
+                        ]}
+                      >
+                        <Text style={styles.avatarText}>{id}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+                {front.blocked && (
+                  <View style={styles.detailItem}>
+                    <Ionicons name="alert-circle" size={16} color={COLORS.error} />
+                    <Text style={[styles.detailText, { color: COLORS.error }]}>{front.blocked}</Text>
+                  </View>
+                )}
+                {front.completed && (
+                  <View style={styles.detailItem}>
+                    <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
+                    <Text style={styles.detailText}>Terminado y recibido por el residente</Text>
+                  </View>
+                )}
+                {short && (
+                  <View style={styles.detailItem}>
+                    <Ionicons name="people" size={16} color={COLORS.warning} />
+                    <Text style={[styles.detailText, { color: COLORS.warningText }]}>
+                      Hay {presentCount(front)} de {front.needed} personas hoy
+                    </Text>
+                  </View>
+                )}
+                {noCert.length > 0 && (
+                  <View style={styles.detailItem}>
+                    <Ionicons name="bulb" size={16} color={COLORS.warning} />
+                    <Text style={[styles.detailText, { color: COLORS.warningText }]}>
+                      Recomendación: {noCert.length} {noCert.length === 1 ? 'persona' : 'personas'} sin curso de alturas
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-        <TouchableOpacity style={styles.primaryBtn} onPress={() => setQuoteOpen(true)}>
-          <Ionicons name="add-circle" size={20} color="#FFFFFF" />
-          <Text style={styles.primaryBtnText}>COTIZAR CONCEPTO NUEVO</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={() => setQuoteOpen(true)}>
+          <Ionicons name="add-circle" size={24} color="#FFFFFF" />
+          <Text style={styles.primaryButtonText}>Cotizar concepto nuevo</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -305,6 +358,8 @@ export default function WorkFronts() {
               setToday={setToday}
               reason={reason}
               setReason={setReason}
+              noCert={missingHeightCert(selected).filter(id => !enrolled.includes(id))}
+              onEnroll={enroll}
               onSave={saveProgress}
               onMoveCrew={() => moveCrewFromBlocked(selected)}
             />
@@ -322,16 +377,19 @@ export default function WorkFronts() {
   );
 }
 
-function FrontSheet({ front, siteName, today, setToday, reason, setReason, onSave, onMoveCrew }: {
+function FrontSheet({ front, siteName, today, setToday, reason, setReason, noCert, onEnroll, onSave, onMoveCrew }: {
   front: WorkFront;
   siteName: string;
   today: number;
   setToday: (v: number) => void;
   reason: string | null;
   setReason: (r: string) => void;
+  noCert: string[];
+  onEnroll: (ids: string[]) => void;
   onSave: () => void;
   onMoveCrew: () => void;
 }) {
+  const [dismissed, setDismissed] = useState(false);
   const people = Math.max(1, presentCount(front));
   const expected = front.rate_per_person_day * people;
   const remaining = front.quantity - front.done;
@@ -345,18 +403,41 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, onSav
         <Text style={styles.sheetEyebrow}>{siteName} · {front.item_code}</Text>
         <Text style={styles.sheetTitle}>{front.description}</Text>
 
+        {noCert.length > 0 && !dismissed && (
+          <View style={styles.recCard}>
+            <View style={styles.recIcon}>
+              <Ionicons name="bulb" size={20} color={COLORS.warning} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.recTitle}>Recomendación de seguridad</Text>
+              <Text style={styles.recText}>
+                Este frente es en {front.atHeight}. {namesList(noCert)} no {noCert.length === 1 ? 'tiene' : 'tienen'} la DC-3 de trabajo en alturas (NOM-009). Te recomendamos inscribirlos o pasarlos a un frente a nivel de piso.
+              </Text>
+              <View style={styles.recActions}>
+                <TouchableOpacity style={styles.actionButton} onPress={() => onEnroll(noCert)}>
+                  <Text style={styles.actionText}>Inscribir al curso</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.laterButton} onPress={() => setDismissed(true)}>
+                  <Text style={styles.laterText}>Entendido</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+
         {front.blocked ? (
-          <View style={[styles.notice, { backgroundColor: COLORS.redSoft }]}>
-            <Text style={[styles.noticeText, { color: COLORS.red }]}>
-              ⛔ {front.blocked}. Mientras, la cuadrilla puede pasar a otro frente.
+          <View style={[styles.notice, { backgroundColor: COLORS.errorSoft }]}>
+            <Text style={[styles.noticeText, { color: '#B91C1C' }]}>
+              {front.blocked}. Mientras, la cuadrilla puede pasar a otro frente.
             </Text>
-            <TouchableOpacity style={styles.darkBtn} onPress={onMoveCrew}>
-              <Text style={styles.darkBtnText}>Mover gente</Text>
+            <TouchableOpacity style={styles.actionButton} onPress={onMoveCrew}>
+              <Ionicons name="swap-horizontal" size={16} color={COLORS.primary} />
+              <Text style={styles.actionText}>Mover gente</Text>
             </TouchableOpacity>
           </View>
         ) : front.completed ? (
-          <View style={[styles.notice, { backgroundColor: COLORS.greenSoft }]}>
-            <Text style={[styles.noticeText, { color: COLORS.green }]}>
+          <View style={[styles.notice, { backgroundColor: COLORS.successSoft }]}>
+            <Text style={[styles.noticeText, { color: '#047857' }]}>
               Terminado: {front.quantity} {front.unit} recibidos por el residente.
             </Text>
           </View>
@@ -364,12 +445,12 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, onSav
           <>
             <View style={styles.compare}>
               <View style={styles.compareBox}>
-                <Text style={styles.kpiLabel}>ESPERADO HOY ({people} PERS.)</Text>
+                <Text style={styles.compareLabel}>Esperado hoy ({people} pers.)</Text>
                 <Text style={styles.compareValue}>{expected} {front.unit}</Text>
               </View>
               <View style={styles.compareBox}>
-                <Text style={styles.kpiLabel}>REAL HOY</Text>
-                <Text style={[styles.compareValue, { color: onPace ? COLORS.green : COLORS.orange }]}>
+                <Text style={styles.compareLabel}>Real hoy</Text>
+                <Text style={[styles.compareValue, { color: onPace ? COLORS.success : COLORS.warning }]}>
                   {today} {front.unit}
                 </Text>
               </View>
@@ -414,12 +495,12 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, onSav
 
         {!front.blocked && !front.completed && (
           <TouchableOpacity
-            style={[styles.primaryBtn, today <= 0 && { opacity: 0.4 }]}
+            style={[styles.primaryButton, styles.sheetButton, today <= 0 && { opacity: 0.4 }]}
             onPress={onSave}
             disabled={today <= 0}
           >
-            <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
-            <Text style={styles.primaryBtnText}>GUARDAR AVANCE</Text>
+            <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
+            <Text style={styles.primaryButtonText}>Guardar avance</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -475,8 +556,8 @@ function QuoteSheet({ builder, onSend }: { builder: string; onSend: () => void }
           <Stepper value={price} onChange={setPrice} step={5} min={5} max={5000} suffix={`$/${concept.unit}`} />
         </View>
 
-        <View style={[styles.notice, { backgroundColor: inRange ? COLORS.greenSoft : COLORS.orangeSoft }]}>
-          <Text style={[styles.noticeText, { color: inRange ? COLORS.green : '#6E2A08' }]}>
+        <View style={[styles.notice, { backgroundColor: inRange ? COLORS.successSoft : COLORS.warningSoft }]}>
+          <Text style={[styles.noticeText, { color: inRange ? '#047857' : COLORS.warningText }]}>
             Promedio en la zona: {money(concept.market_price_mxn)}/{concept.unit}.{' '}
             {inRange
               ? 'Estás en rango.'
@@ -493,13 +574,13 @@ function QuoteSheet({ builder, onSend }: { builder: string; onSend: () => void }
           <Row label="Raya + IMSS" value={`−${money(payroll)}`} />
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Tu utilidad</Text>
-            <Text style={[styles.totalValue, { color: profit > 0 ? COLORS.green : COLORS.red }]}>{money(profit)}</Text>
+            <Text style={[styles.totalValue, { color: profit > 0 ? COLORS.success : COLORS.error }]}>{money(profit)}</Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.primaryBtn} onPress={send}>
-          <Ionicons name="send" size={18} color="#FFFFFF" />
-          <Text style={styles.primaryBtnText}>ENVIAR PROPUESTA</Text>
+        <TouchableOpacity style={[styles.primaryButton, styles.sheetButton]} onPress={send}>
+          <Ionicons name="send" size={20} color="#FFFFFF" />
+          <Text style={styles.primaryButtonText}>Enviar propuesta</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -515,73 +596,89 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
+const cardShadow = {
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+};
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.concrete },
-  content: { padding: 16, paddingTop: 60, paddingBottom: 40, gap: 12 },
-  eyebrow: { fontSize: 11, letterSpacing: 1.2, color: COLORS.ink2, fontWeight: '600' },
-  title: { fontSize: 34, fontWeight: '900', color: COLORS.ink, textTransform: 'uppercase', marginTop: -6 },
-  titleAccent: { color: COLORS.orange },
-  siteRow: { flexGrow: 0 },
-  siteChip: { borderWidth: 2, borderColor: COLORS.ink, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7, marginRight: 8, backgroundColor: COLORS.card },
-  siteChipActive: { backgroundColor: COLORS.ink },
-  siteChipText: { fontWeight: '700', color: COLORS.ink },
-  siteChipTextActive: { color: COLORS.hivis },
-  kpis: { flexDirection: 'row', gap: 8 },
-  kpi: { flex: 1, backgroundColor: COLORS.card, borderRadius: 6, padding: 10 },
-  kpiLabel: { fontSize: 9, fontWeight: '700', color: COLORS.ink2, letterSpacing: 0.5 },
-  kpiValue: { fontSize: 24, fontWeight: '900', color: COLORS.ink, marginTop: 2 },
-  front: { backgroundColor: COLORS.card, borderRadius: 6, padding: 12, gap: 8, borderLeftWidth: 5, borderLeftColor: COLORS.orange },
-  frontDone: { borderLeftColor: COLORS.green, opacity: 0.85 },
-  frontBlocked: { borderLeftColor: COLORS.red },
-  frontHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  frontTitle: { flex: 1, fontSize: 15, fontWeight: '700', color: COLORS.ink },
-  frontPrice: { fontSize: 12, fontWeight: '600', color: COLORS.ink2 },
-  bar: { height: 10, borderRadius: 2, backgroundColor: COLORS.line, overflow: 'hidden', flexDirection: 'row' },
-  barBefore: { backgroundColor: COLORS.ink },
-  barWeek: { backgroundColor: COLORS.orange },
-  frontMeta: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
-  metaText: { fontSize: 11, color: COLORS.ink2, fontWeight: '500' },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  header: { padding: 20, paddingTop: 60 },
+  title: { fontSize: 28, fontWeight: 'bold', color: COLORS.text, marginBottom: 4 },
+  subtitle: { fontSize: 16, color: COLORS.muted },
+  siteRow: { paddingHorizontal: 20, gap: 8, marginBottom: 20 },
+  siteChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: COLORS.primarySoft },
+  siteChipActive: { backgroundColor: COLORS.primary },
+  siteChipText: { fontSize: 14, fontWeight: '600', color: COLORS.primary },
+  siteChipTextActive: { color: '#FFFFFF' },
+  summary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: COLORS.card, marginHorizontal: 20, marginBottom: 20, borderRadius: 12, padding: 20, ...cardShadow },
+  summaryItem: { alignItems: 'center' },
+  summaryValue: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, marginBottom: 4 },
+  summaryLabel: { fontSize: 12, color: COLORS.muted, textAlign: 'center' },
+  list: { paddingHorizontal: 20 },
+  card: { backgroundColor: COLORS.card, borderRadius: 12, padding: 16, marginBottom: 12, gap: 10, ...cardShadow },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 },
+  cardTitle: { fontSize: 18, fontWeight: '600', color: COLORS.text, marginBottom: 2 },
+  cardSubtitle: { fontSize: 14, color: COLORS.muted },
+  statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  statusText: { fontSize: 10, fontWeight: '600', color: '#FFFFFF' },
+  bar: { height: 8, borderRadius: 4, backgroundColor: COLORS.divider, overflow: 'hidden', flexDirection: 'row' },
+  barBefore: { backgroundColor: COLORS.primaryLight },
+  barWeek: { backgroundColor: COLORS.primary },
+  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  metaText: { fontSize: 13, color: COLORS.muted },
   crew: { flexDirection: 'row', marginLeft: 'auto' },
-  avatar: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: COLORS.card, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: COLORS.card, alignItems: 'center', justifyContent: 'center' },
   avatarAbsent: { opacity: 0.3 },
-  avatarText: { color: '#FFFFFF', fontSize: 8, fontWeight: '800' },
-  blockedText: { color: COLORS.red, fontWeight: '700', fontSize: 12 },
-  doneText: { color: COLORS.green, fontWeight: '600', fontSize: 12 },
-  shortText: { color: COLORS.orange, fontWeight: '700', fontSize: 12 },
-  primaryBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.orange, borderRadius: 8, paddingVertical: 14 },
-  primaryBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 15, letterSpacing: 0.6 },
-  scrim: { flex: 1, backgroundColor: 'rgba(17,21,24,0.5)', justifyContent: 'flex-end' },
+  avatarText: { color: '#FFFFFF', fontSize: 9, fontWeight: 'bold' },
+  detailItem: { flexDirection: 'row', alignItems: 'center' },
+  detailText: { fontSize: 14, color: COLORS.body, marginLeft: 8, flex: 1 },
+  primaryButton: { backgroundColor: COLORS.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, margin: 20, borderRadius: 12, gap: 8 },
+  sheetButton: { margin: 0 },
+  primaryButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  scrim: { flex: 1, backgroundColor: 'rgba(17,24,39,0.4)', justifyContent: 'flex-end' },
   scrimTap: { flex: 1 },
-  sheet: { maxHeight: '88%', backgroundColor: '#F3F4F3', borderTopLeftRadius: 22, borderTopRightRadius: 22 },
-  grab: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#C4C9C7', alignSelf: 'center', marginTop: 8 },
-  sheetContent: { padding: 16, paddingBottom: 36, gap: 12 },
-  sheetEyebrow: { fontSize: 11, color: COLORS.ink2 },
-  sheetTitle: { fontSize: 28, fontWeight: '900', color: COLORS.ink, textTransform: 'uppercase' },
-  compare: { flexDirection: 'row', gap: 8 },
-  compareBox: { flex: 1, backgroundColor: COLORS.card, borderRadius: 6, padding: 10 },
-  compareValue: { fontSize: 26, fontWeight: '900', color: COLORS.ink, marginTop: 2 },
-  sheetCard: { backgroundColor: COLORS.card, borderRadius: 6, padding: 12, gap: 8 },
-  sheetLabel: { fontSize: 13, color: COLORS.ink, fontWeight: '600' },
+  sheet: { maxHeight: '88%', backgroundColor: COLORS.background, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  grab: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 8 },
+  sheetContent: { padding: 20, paddingBottom: 40, gap: 12 },
+  sheetEyebrow: { fontSize: 13, color: COLORS.muted },
+  sheetTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.text },
+  recCard: { flexDirection: 'row', gap: 12, backgroundColor: COLORS.card, borderRadius: 12, padding: 16, borderLeftWidth: 4, borderLeftColor: COLORS.warning, ...cardShadow },
+  recIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.warningSoft, justifyContent: 'center', alignItems: 'center' },
+  recTitle: { fontSize: 15, fontWeight: '600', color: COLORS.text, marginBottom: 2 },
+  recText: { fontSize: 13, color: COLORS.body },
+  recActions: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  actionButton: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: COLORS.primarySoft, gap: 4 },
+  actionText: { fontSize: 12, color: COLORS.primary, fontWeight: '500' },
+  laterButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: COLORS.divider },
+  laterText: { fontSize: 12, color: COLORS.muted, fontWeight: '500' },
+  compare: { flexDirection: 'row', gap: 12 },
+  compareBox: { flex: 1, backgroundColor: COLORS.card, borderRadius: 12, padding: 16, alignItems: 'center', ...cardShadow },
+  compareLabel: { fontSize: 12, color: COLORS.muted, textAlign: 'center' },
+  compareValue: { fontSize: 24, fontWeight: 'bold', color: COLORS.text, marginTop: 4 },
+  sheetCard: { backgroundColor: COLORS.card, borderRadius: 12, padding: 16, gap: 10, ...cardShadow },
+  sheetLabel: { fontSize: 14, color: COLORS.text, fontWeight: '600' },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  stepBtn: { width: 48, height: 48, borderRadius: 8, borderWidth: 2, borderColor: COLORS.ink, alignItems: 'center', justifyContent: 'center' },
-  stepValue: { fontSize: 22, fontWeight: '800', color: COLORS.ink },
+  stepBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  stepValue: { fontSize: 22, fontWeight: 'bold', color: COLORS.text },
   quickRow: { flexDirection: 'row', gap: 8 },
-  quickBtn: { flex: 1, backgroundColor: COLORS.ink, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
-  quickBtnText: { color: COLORS.hivis, fontWeight: '800' },
-  hint: { fontSize: 12.5, color: COLORS.ink2 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { borderWidth: 1.5, borderColor: COLORS.ink, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: COLORS.card },
-  chipActive: { backgroundColor: COLORS.ink },
-  chipText: { fontSize: 12, fontWeight: '700', color: COLORS.ink },
-  chipTextActive: { color: COLORS.hivis },
-  notice: { borderRadius: 6, padding: 10, gap: 8 },
-  noticeText: { fontSize: 13, fontWeight: '500' },
-  darkBtn: { alignSelf: 'flex-start', backgroundColor: COLORS.ink, borderRadius: 6, paddingHorizontal: 12, paddingVertical: 8 },
-  darkBtnText: { color: COLORS.hivis, fontWeight: '700', fontSize: 12.5 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, gap: 8 },
-  rowLabel: { fontSize: 13, color: COLORS.ink2, flex: 1 },
-  rowValue: { fontSize: 13, fontWeight: '700', color: COLORS.ink },
-  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 3, borderTopColor: COLORS.ink, paddingTop: 8, marginTop: 4 },
-  totalLabel: { fontSize: 14, fontWeight: '700', color: COLORS.ink },
-  totalValue: { fontSize: 24, fontWeight: '900' },
+  quickBtn: { flex: 1, backgroundColor: COLORS.primarySoft, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
+  quickBtnText: { color: COLORS.primary, fontWeight: '600', fontSize: 15 },
+  hint: { fontSize: 13, color: COLORS.muted },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: { borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, backgroundColor: COLORS.divider },
+  chipActive: { backgroundColor: COLORS.primary },
+  chipText: { fontSize: 13, fontWeight: '500', color: COLORS.body },
+  chipTextActive: { color: '#FFFFFF' },
+  notice: { borderRadius: 12, padding: 14, gap: 10 },
+  noticeText: { fontSize: 14 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
+  rowLabel: { fontSize: 14, color: COLORS.muted, flex: 1 },
+  rowValue: { fontSize: 14, fontWeight: '600', color: COLORS.text },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10, marginTop: 2 },
+  totalLabel: { fontSize: 16, fontWeight: '600', color: COLORS.text },
+  totalValue: { fontSize: 24, fontWeight: 'bold' },
 });

@@ -70,28 +70,30 @@ interface Course {
 }
 
 const COLORS = {
-  ink: '#1C2124',
-  ink2: '#5D666E',
-  concrete: '#E9EBEA',
+  background: '#F9FAFB',
   card: '#FFFFFF',
-  line: '#E2E5E4',
-  orange: '#FF5F0F',
-  orangeSoft: '#FFE6D9',
-  hivis: '#D8F526',
-  green: '#1F8A4C',
-  greenSoft: '#DCF1E3',
-  red: '#D23A1F',
-  redSoft: '#FBE1DB',
-  amber: '#E8A100',
-  amberSoft: '#FCEFCF',
-  blue: '#2D6FD6',
-  blueSoft: '#DFE9F8',
+  text: '#111827',
+  body: '#374151',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+  divider: '#F3F4F6',
+  primary: '#2563EB',
+  primarySoft: '#EBF4FF',
+  success: '#10B981',
+  successSoft: '#D1FAE5',
+  successText: '#047857',
+  warning: '#F59E0B',
+  warningSoft: '#FEF3C7',
+  warningText: '#B45309',
+  error: '#EF4444',
+  errorSoft: '#FEE2E2',
+  errorText: '#B91C1C',
 };
 
 const LEVELS: Level[] = [
-  { key: 'bronce', name: 'Bronce', min: 0, color: '#A8521C' },
-  { key: 'plata', name: 'Plata', min: 60, color: '#AEB7BF' },
-  { key: 'oro', name: 'Oro', min: 80, color: '#C9A24A' },
+  { key: 'bronce', name: 'Bronce', min: 0, color: '#B45309' },
+  { key: 'plata', name: 'Plata', min: 60, color: '#64748B' },
+  { key: 'oro', name: 'Oro', min: 80, color: '#D97706' },
 ];
 
 const CREW_SIZE = 24;
@@ -116,7 +118,7 @@ const BENEFITS: Benefit[] = [
     id: 'cobro',
     title: 'Cobro en 48 h',
     summary: 'Cobra la estimación firmada sin esperar a la constructora.',
-    icon: 'flash-outline',
+    icon: 'flash',
     minLevel: 'bronce',
     byLevel: { bronce: 'Comisión 2.5%', plata: 'Comisión 1.8%', oro: 'Comisión 1.2%' },
     partner: 'Con un aliado financiero',
@@ -130,7 +132,7 @@ const BENEFITS: Benefit[] = [
     id: 'herramienta',
     title: 'Descuento en herramienta y equipo de protección',
     summary: 'Precio de volumen con proveedores BuildI.',
-    icon: 'construct-outline',
+    icon: 'construct',
     minLevel: 'bronce',
     byLevel: { bronce: '5% de descuento', plata: '8% de descuento', oro: '12% de descuento' },
     partner: 'Proveedores BuildI',
@@ -140,7 +142,7 @@ const BENEFITS: Benefit[] = [
     id: 'cursos',
     title: 'Cursos BuildI gratis',
     summary: 'Seguridad, cotizar a destajo y finanzas de tu cuadrilla.',
-    icon: 'school-outline',
+    icon: 'school',
     minLevel: 'bronce',
     how: ['Clases cortas en video que se descargan para verlas sin internet.', 'Al aprobar, la constancia queda en el gafete de cada persona.'],
   },
@@ -148,7 +150,7 @@ const BENEFITS: Benefit[] = [
     id: 'seguro',
     title: 'Seguro de accidentes para tu cuadrilla',
     summary: 'Cubre a tu gente mientras está en obra.',
-    icon: 'medkit-outline',
+    icon: 'medkit',
     minLevel: 'plata',
     byLevel: { bronce: 'Con costo por persona', plata: 'Incluido hasta 15 personas', oro: 'Incluido para toda tu gente' },
     partner: 'Con una aseguradora aliada',
@@ -158,7 +160,7 @@ const BENEFITS: Benefit[] = [
     id: 'adelanto',
     title: 'Adelanto de raya para tu gente',
     summary: 'Tus trabajadores cobran parte de lo ya trabajado antes del sábado, sin que tú pongas el dinero.',
-    icon: 'cash-outline',
+    icon: 'cash',
     minLevel: 'plata',
     partner: 'Con un aliado financiero',
     how: ['Solo sobre días ya trabajados y registrados.', 'Se descuenta solo de la raya del sábado.'],
@@ -167,7 +169,7 @@ const BENEFITS: Benefit[] = [
     id: 'destacado',
     title: 'Perfil destacado',
     summary: 'Apareces primero cuando una constructora busca mano de obra.',
-    icon: 'star-outline',
+    icon: 'star',
     minLevel: 'plata',
     how: ['Tu ficha muestra tus números verificados: entregas, ajustes y calificación.'],
   },
@@ -175,7 +177,7 @@ const BENEFITS: Benefit[] = [
     id: 'raya',
     title: 'Raya garantizada',
     summary: 'Con la estimación firmada, la raya del sábado sale aunque la constructora no haya pagado.',
-    icon: 'shield-checkmark-outline',
+    icon: 'shield-checkmark',
     minLevel: 'oro',
     partner: 'Con un aliado financiero',
     how: ['Aplica a estimaciones firmadas por el residente.', 'BuildI cobra después a la constructora.'],
@@ -184,7 +186,7 @@ const BENEFITS: Benefit[] = [
     id: 'credito',
     title: 'Crédito para equipo',
     summary: 'Revolvedora, andamios o herramienta, pagando con tus estimaciones.',
-    icon: 'card-outline',
+    icon: 'card',
     minLevel: 'oro',
     byLevel: { bronce: 'No disponible', plata: 'No disponible', oro: 'Hasta $150,000' },
     partner: 'Con un aliado financiero',
@@ -194,17 +196,17 @@ const BENEFITS: Benefit[] = [
     id: 'prioridad',
     title: 'Prioridad en obras grandes',
     summary: 'Te avisamos primero de las obras que necesitan tu especialidad.',
-    icon: 'trophy-outline',
+    icon: 'trophy',
     minLevel: 'oro',
     how: ['Cuando un frente tuyo va al 80%, te mostramos las siguientes obras cerca.'],
   },
 ];
 
-const CREDENTIALS: Record<Credential, { label: string; color: string; soft: string; issuer: string; steps: string[] }> = {
+const CREDENTIALS: Record<Credential, { label: string; color: string; bg: string; issuer: string; steps: string[] }> = {
   buildi: {
     label: 'Constancia BuildI',
-    color: COLORS.ink,
-    soft: COLORS.hivis,
+    color: COLORS.primary,
+    bg: COLORS.primarySoft,
     issuer: 'La emite BuildI. No es oficial, pero cuenta para tu nivel y se verifica con el QR del gafete.',
     steps: [
       'Clases en video de 3 a 5 minutos, con audio y sin internet.',
@@ -215,8 +217,8 @@ const CREDENTIALS: Record<Credential, { label: string; color: string; soft: stri
   },
   dc3: {
     label: 'DC-3 · STPS',
-    color: COLORS.blue,
-    soft: COLORS.blueSoft,
+    color: COLORS.warningText,
+    bg: COLORS.warningSoft,
     issuer: 'La emite un agente capacitador registrado ante la STPS, aliado de BuildI.',
     steps: [
       'Te inscribes y eliges fecha y sede.',
@@ -227,8 +229,8 @@ const CREDENTIALS: Record<Credential, { label: string; color: string; soft: stri
   },
   conocer: {
     label: 'Certificado CONOCER',
-    color: COLORS.green,
-    soft: COLORS.greenSoft,
+    color: COLORS.successText,
+    bg: COLORS.successSoft,
     issuer: 'Lo emite CONOCER después de una evaluación con un evaluador acreditado.',
     steps: [
       'Curso de preparación en la app.',
@@ -241,7 +243,7 @@ const CREDENTIALS: Record<Credential, { label: string; color: string; soft: stri
 
 const INITIAL_COURSES: Course[] = [
   { id: 'seguridad', title: 'Seguridad básica en obra', credential: 'buildi', audience: 'cuadrilla', hours: '2 h', modality: 'En la app · sin internet', price: 0, discountByLevel: { bronce: 1, plata: 1, oro: 1 }, certified: 18, enrolled: 0 },
-  { id: 'alturas', title: 'Trabajo en alturas (NOM-009)', credential: 'dc3', audience: 'cuadrilla', hours: '8 h', modality: 'Presencial · sábado', price: 950, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 9, enrolled: 0, requiredFor: 'Obligatorio para trabajar a más de 1.8 m' },
+  { id: 'alturas', title: 'Trabajo en alturas (NOM-009)', credential: 'dc3', audience: 'cuadrilla', hours: '8 h', modality: 'Presencial · sábado', price: 950, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 9, enrolled: 0, requiredFor: 'Recomendado para trabajar a más de 1.8 m' },
   { id: 'construccion', title: 'Seguridad en obras de construcción (NOM-031)', credential: 'dc3', audience: 'cuadrilla', hours: '8 h', modality: 'Presencial · sábado', price: 900, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 6, enrolled: 0 },
   { id: 'epp', title: 'Uso de equipo de protección (NOM-017)', credential: 'dc3', audience: 'cuadrilla', hours: '4 h', modality: 'Presencial en obra', price: 600, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 14, enrolled: 0 },
   { id: 'albanil', title: 'Certificación de albañil', credential: 'conocer', audience: 'cuadrilla', hours: 'Evaluación en obra', modality: 'Con evaluador acreditado', price: 2800, discountByLevel: { bronce: 0, plata: 0.25, oro: 0.5 }, certified: 2, enrolled: 0 },
@@ -249,12 +251,13 @@ const INITIAL_COURSES: Course[] = [
   { id: 'finanzas', title: 'Finanzas de tu cuadrilla: raya, IMSS e impuestos', credential: 'buildi', audience: 'tu', hours: '3 h', modality: 'En la app', price: 0, discountByLevel: { bronce: 1, plata: 1, oro: 1 }, certified: 0, enrolled: 0, progress: 0 },
 ];
 
-const SETTINGS: { title: string; icon: IconName; color: string }[] = [
-  { title: 'Datos de la cuenta', icon: 'settings-outline', color: COLORS.ink2 },
-  { title: 'Notificaciones', icon: 'notifications-outline', color: COLORS.ink2 },
-  { title: 'Invitar a otro contratista', icon: 'gift-outline', color: COLORS.orange },
-  { title: 'Ayuda', icon: 'help-circle-outline', color: COLORS.ink2 },
-  { title: 'Cerrar sesión', icon: 'log-out-outline', color: COLORS.red },
+const MENU_ITEMS: { title: string; icon: IconName; color: string }[] = [
+  { title: 'Datos de la cuenta', icon: 'settings-outline', color: '#6B7280' },
+  { title: 'Notificaciones', icon: 'notifications-outline', color: '#6B7280' },
+  { title: 'Protocolos de seguridad', icon: 'shield-outline', color: '#10B981' },
+  { title: 'Reportes de la cuadrilla', icon: 'document-text-outline', color: '#3B82F6' },
+  { title: 'Ayuda', icon: 'help-circle-outline', color: '#6B7280' },
+  { title: 'Cerrar sesión', icon: 'log-out-outline', color: '#EF4444' },
 ];
 
 const money = (n: number) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -318,118 +321,162 @@ export default function ChiefOfLaborProfile() {
 
   const crewCourses = courses.filter(c => c.audience === 'cuadrilla');
   const myCourses = courses.filter(c => c.audience === 'tu');
+  const activeBenefits = BENEFITS.filter(b => levelIndex(b.minLevel) <= levelIndex(level.key)).length;
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={styles.header}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>RP</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name}>Ramiro Pérez</Text>
-            <Text style={styles.role}>Contratista de mano de obra</Text>
-            <Text style={styles.company}>Mano de Obra Pérez · Guadalajara</Text>
-          </View>
-        </View>
-
-        <View style={styles.kpis}>
-          <Kpi label="CUADRILLAS" value="3" />
-          <Kpi label="PERSONAS" value={String(CREW_SIZE)} />
-          <Kpi label="OBRAS ACTIVAS" value="2" />
-        </View>
-
-        <TouchableOpacity style={[styles.levelCard, { borderColor: level.color }]} onPress={() => setShowScore(true)} activeOpacity={0.85}>
-          <View style={styles.levelTop}>
-            <View>
-              <Text style={styles.levelEyebrow}>BUILDI PRO</Text>
-              <Animated.Text style={[styles.levelName, { color: level.color, transform: [{ scale: pop }] }]}>
-                Nivel {level.name}
-              </Animated.Text>
+          <View style={styles.profileImageContainer}>
+            <View style={styles.profileImage}>
+              <Ionicons name="person" size={40} color="#FFFFFF" />
             </View>
-            <View style={styles.scoreBubble}>
-              <Text style={styles.scoreValue}>{Math.round(score)}</Text>
-              <Text style={styles.scoreMax}>de 100</Text>
-            </View>
-          </View>
-          <LevelBar score={score} />
-          {next ? (
-            <Text style={styles.levelHint}>
-              Te faltan {Math.max(0, next.min - score).toFixed(1)} puntos para {next.name}.
-              {expired.length ? ` Renueva "${expired[0].name}" y sumas ${(20 / docs.length).toFixed(0)} puntos.` : ''}
-            </Text>
-          ) : (
-            <Text style={styles.levelHint}>Estás en el nivel más alto. Mantén tus papeles al día para conservarlo.</Text>
-          )}
-          <Text style={styles.link}>Ver cómo se calcula ›</Text>
-        </TouchableOpacity>
-
-        <Section title="Tus beneficios" note={`${BENEFITS.filter(b => levelIndex(b.minLevel) <= levelIndex(level.key)).length} de ${BENEFITS.length} activos`} />
-        {BENEFITS.map(b => {
-          const unlocked = levelIndex(b.minLevel) <= levelIndex(level.key);
-          const minName = LEVELS[levelIndex(b.minLevel)].name;
-          return (
-            <TouchableOpacity key={b.id} style={[styles.benefit, !unlocked && styles.benefitLocked]} onPress={() => setBenefit(b)} activeOpacity={0.8}>
-              <View style={[styles.benefitIcon, { backgroundColor: unlocked ? COLORS.hivis : COLORS.line }]}>
-                <Ionicons name={unlocked ? b.icon : 'lock-closed'} size={20} color={COLORS.ink} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.benefitTitle}>{b.title}</Text>
-                <Text style={styles.benefitSummary} numberOfLines={2}>
-                  {unlocked ? b.byLevel?.[level.key] ?? b.summary : `Se desbloquea en ${minName}`}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#B9C0C5" />
+            <TouchableOpacity style={styles.editImageButton}>
+              <Ionicons name="camera" size={16} color="#FFFFFF" />
             </TouchableOpacity>
-          );
-        })}
+          </View>
+          <Text style={styles.name}>Ramiro Pérez</Text>
+          <Text style={styles.title}>Contratista de mano de obra</Text>
+          <Text style={styles.company}>Mano de Obra Pérez · Guadalajara</Text>
+        </View>
 
-        <Section title="Expediente de cumplimiento" note="lo ven las constructoras" />
-        <View style={styles.card}>
-          {docs.map((d, i) => (
-            <View key={d.id} style={[styles.docRow, i > 0 && styles.rowBorder]}>
-              <Ionicons
-                name={d.status === 'vigente' ? 'checkmark-circle' : d.status === 'por_vencer' ? 'time-outline' : 'alert-circle'}
-                size={22}
-                color={d.status === 'vigente' ? COLORS.green : d.status === 'por_vencer' ? COLORS.amber : COLORS.red}
-              />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.docName}>{d.name}</Text>
-                <Text style={styles.docDetail}>{d.detail} · {d.expires}</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>3</Text>
+            <Text style={styles.statLabel}>Cuadrillas</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{CREW_SIZE}</Text>
+            <Text style={styles.statLabel}>Trabajadores</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>2</Text>
+            <Text style={styles.statLabel}>Obras activas</Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>BuildI Pro</Text>
+          <TouchableOpacity style={styles.infoCard} onPress={() => setShowScore(true)} activeOpacity={0.85}>
+            <View style={styles.levelTop}>
+              <View style={[styles.levelIcon, { backgroundColor: COLORS.warningSoft }]}>
+                <Ionicons name="medal" size={26} color={level.color} />
               </View>
-              {d.status !== 'vigente' && (
-                <TouchableOpacity style={[styles.smallBtn, d.status === 'vencido' && { backgroundColor: COLORS.red }]} onPress={() => renewDoc(d.id)}>
-                  <Text style={styles.smallBtnText}>{d.status === 'vencido' ? 'Renovar' : 'Actualizar'}</Text>
-                </TouchableOpacity>
-              )}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.levelEyebrow}>Tu nivel</Text>
+                <Animated.Text style={[styles.levelName, { color: level.color, transform: [{ scale: pop }] }]}>
+                  {level.name}
+                </Animated.Text>
+              </View>
+              <View style={styles.scoreBubble}>
+                <Text style={styles.scoreValue}>{Math.round(score)}</Text>
+                <Text style={styles.scoreMax}>de 100</Text>
+              </View>
             </View>
-          ))}
-          <TouchableOpacity
-            style={styles.ghostBtn}
-            onPress={() => Alert.alert('Expediente compartido', 'La constructora recibe un enlace con tus documentos vigentes.')}
-          >
-            <Ionicons name="share-social-outline" size={18} color={COLORS.ink} />
-            <Text style={styles.ghostBtnText}>Compartir expediente</Text>
+            <LevelBar score={score} />
+            {next ? (
+              <Text style={styles.levelHint}>
+                Te faltan {Math.max(0, next.min - score).toFixed(1)} puntos para {next.name}.
+                {expired.length ? ` Renueva "${expired[0].name}" y sumas ${(20 / docs.length).toFixed(0)} puntos.` : ''}
+              </Text>
+            ) : (
+              <Text style={styles.levelHint}>Estás en el nivel más alto. Mantén tus papeles al día para conservarlo.</Text>
+            )}
+            <Text style={styles.link}>Ver cómo se calcula</Text>
           </TouchableOpacity>
         </View>
 
-        <Section title="Cursos para tu cuadrilla" note={`${CREW_SIZE} personas`} />
-        {crewCourses.map(c => (
-          <CourseRow key={c.id} course={c} level={level.key} onPress={() => setCourse(c)} />
-        ))}
+        <View style={styles.section}>
+          <SectionTitle title="Tus beneficios" note={`${activeBenefits} de ${BENEFITS.length} activos`} />
+          {BENEFITS.map(b => {
+            const unlocked = levelIndex(b.minLevel) <= levelIndex(level.key);
+            const minName = LEVELS[levelIndex(b.minLevel)].name;
+            return (
+              <TouchableOpacity key={b.id} style={styles.achievementCard} onPress={() => setBenefit(b)} activeOpacity={0.8}>
+                <View style={[styles.achievementIcon, !unlocked && { backgroundColor: COLORS.divider }]}>
+                  <Ionicons name={unlocked ? b.icon : 'lock-closed'} size={22} color={unlocked ? COLORS.warning : '#9CA3AF'} />
+                </View>
+                <View style={styles.achievementInfo}>
+                  <Text style={[styles.achievementTitle, !unlocked && { color: COLORS.muted }]}>{b.title}</Text>
+                  <Text style={styles.achievementYear} numberOfLines={2}>
+                    {unlocked ? b.byLevel?.[level.key] ?? b.summary : `Se desbloquea en ${minName}`}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-        <Section title="Cursos para ti" note="negocio" />
-        {myCourses.map(c => (
-          <CourseRow key={c.id} course={c} level={level.key} onPress={() => setCourse(c)} />
-        ))}
+        <View style={styles.section}>
+          <SectionTitle title="Expediente de cumplimiento" note="lo ven las constructoras" />
+          <View style={styles.infoCard}>
+            {docs.map((d, i) => (
+              <View key={d.id} style={[styles.docRow, i > 0 && styles.rowBorder]}>
+                <Ionicons
+                  name={d.status === 'vigente' ? 'checkmark-circle' : d.status === 'por_vencer' ? 'time' : 'alert-circle'}
+                  size={22}
+                  color={d.status === 'vigente' ? COLORS.success : d.status === 'por_vencer' ? COLORS.warning : COLORS.error}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.docName}>{d.name}</Text>
+                  <Text style={styles.docDetail}>{d.detail} · {d.expires}</Text>
+                </View>
+                {d.status !== 'vigente' && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, d.status === 'vencido' && { backgroundColor: COLORS.errorSoft }]}
+                    onPress={() => renewDoc(d.id)}
+                  >
+                    <Text style={[styles.actionText, d.status === 'vencido' && { color: COLORS.errorText }]}>
+                      {d.status === 'vencido' ? 'Renovar' : 'Actualizar'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+            <TouchableOpacity
+              style={styles.outlineButton}
+              onPress={() => Alert.alert('Expediente compartido', 'La constructora recibe un enlace con tus documentos vigentes.')}
+            >
+              <Ionicons name="share-social-outline" size={18} color={COLORS.primary} />
+              <Text style={styles.outlineButtonText}>Compartir expediente</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        <Section title="Ajustes" />
-        <View style={styles.card}>
-          {SETTINGS.map((item, i) => (
-            <TouchableOpacity key={item.title} style={[styles.menuItem, i > 0 && styles.rowBorder]}>
-              <Ionicons name={item.icon} size={22} color={item.color} />
-              <Text style={[styles.menuText, { color: item.color }]}>{item.title}</Text>
-              <Ionicons name="chevron-forward" size={18} color="#B9C0C5" />
+        <View style={styles.section}>
+          <SectionTitle title="Cursos para tu cuadrilla" note={`${CREW_SIZE} personas`} />
+          {crewCourses.map(c => (
+            <CourseRow key={c.id} course={c} level={level.key} onPress={() => setCourse(c)} />
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <SectionTitle title="Cursos para ti" note="negocio" />
+          {myCourses.map(c => (
+            <CourseRow key={c.id} course={c} level={level.key} onPress={() => setCourse(c)} />
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Información profesional</Text>
+          <View style={styles.infoCard}>
+            <InfoRow icon="briefcase" text="Experiencia: 12 años" />
+            <InfoRow icon="ribbon" text="REPSE vigente · obras especializadas" />
+            <InfoRow icon="mail" text="ramiro.perez@ejemplo.com" />
+            <InfoRow icon="call" text="+52 33 0000 0000" last />
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Ajustes</Text>
+          {MENU_ITEMS.map(item => (
+            <TouchableOpacity key={item.title} style={styles.menuItem}>
+              <View style={styles.menuItemLeft}>
+                <Ionicons name={item.icon} size={24} color={item.color} />
+                <Text style={[styles.menuItemText, { color: item.color }]}>{item.title}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
             </TouchableOpacity>
           ))}
         </View>
@@ -438,23 +485,23 @@ export default function ChiefOfLaborProfile() {
       <Sheet visible={showScore} onClose={() => setShowScore(false)}>
         <Text style={styles.sheetEyebrow}>BuildI Pro</Text>
         <Text style={styles.sheetTitle}>Cómo se calcula tu nivel</Text>
-        <View style={styles.card}>
+        <View style={styles.infoCard}>
           {factors.map((f, i) => (
             <View key={f.label} style={[styles.factor, i > 0 && styles.rowBorder]}>
               <View style={styles.factorTop}>
                 <Text style={styles.factorLabel}>{f.label}</Text>
                 <Text style={styles.factorValue}>{f.value}</Text>
               </View>
-              <View style={styles.factorBar}>
-                <View style={[styles.factorFill, { width: `${(f.points / f.max) * 100}%` as const }]} />
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${(f.points / f.max) * 100}%` as const }]} />
               </View>
               <Text style={styles.factorPoints}>{f.points.toFixed(1)} de {f.max} puntos</Text>
             </View>
           ))}
         </View>
-        <View style={styles.card}>
-          {LEVELS.map(l => (
-            <View key={l.key} style={styles.levelRow}>
+        <View style={styles.infoCard}>
+          {LEVELS.map((l, i) => (
+            <View key={l.key} style={[styles.levelRow, i > 0 && styles.rowBorder]}>
               <View style={[styles.levelDot, { backgroundColor: l.color }]} />
               <Text style={styles.levelRowName}>{l.name}</Text>
               <Text style={styles.levelRowMin}>desde {l.min} puntos</Text>
@@ -475,20 +522,20 @@ export default function ChiefOfLaborProfile() {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function SectionTitle({ title, note }: { title: string; note?: string }) {
   return (
-    <View style={styles.kpi}>
-      <Text style={styles.kpiLabel}>{label}</Text>
-      <Text style={styles.kpiValue}>{value}</Text>
+    <View style={styles.sectionHeader}>
+      <Text style={[styles.sectionTitle, { marginBottom: 0, flex: 1 }]}>{title}</Text>
+      {note ? <Text style={styles.sectionNote}>{note}</Text> : null}
     </View>
   );
 }
 
-function Section({ title, note }: { title: string; note?: string }) {
+function InfoRow({ icon, text, last }: { icon: IconName; text: string; last?: boolean }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {note ? <Text style={styles.sectionNote}>{note}</Text> : null}
+    <View style={[styles.infoRow, last && { marginBottom: 0 }]}>
+      <Ionicons name={icon} size={20} color="#6B7280" />
+      <Text style={styles.infoText}>{text}</Text>
     </View>
   );
 }
@@ -501,9 +548,9 @@ function LevelBar({ score }: { score: number }) {
 
   return (
     <View style={styles.levelBarWrap}>
-      <View style={styles.levelBar}>
+      <View style={styles.progressTrack}>
         <Animated.View
-          style={[styles.levelFill, { width: anim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] }) }]}
+          style={[styles.progressFill, { width: anim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] }) }]}
         />
       </View>
       {LEVELS.slice(1).map(l => (
@@ -520,35 +567,44 @@ function CourseRow({ course, level, onPress }: { course: Course; level: LevelKey
   const cred = CREDENTIALS[course.credential];
   const price = coursePrice(course, level);
   const mine = course.audience === 'tu';
+  const pct = mine ? course.progress ?? 0 : course.certified / CREW_SIZE;
   return (
-    <TouchableOpacity style={styles.course} onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.courseCard} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.courseTop}>
-        <View style={[styles.credBadge, { backgroundColor: cred.soft }]}>
-          <Text style={[styles.credText, { color: cred.color }]}>{cred.label}</Text>
+        <View style={[styles.badge, { backgroundColor: cred.bg }]}>
+          <Text style={[styles.badgeText, { color: cred.color }]}>{cred.label}</Text>
         </View>
         <Text style={styles.coursePrice}>{price === 0 ? 'Gratis' : money(price)}</Text>
       </View>
       <Text style={styles.courseTitle}>{course.title}</Text>
       <Text style={styles.courseMeta}>{course.hours} · {course.modality}</Text>
       {course.requiredFor && <Text style={styles.courseRequired}>{course.requiredFor}</Text>}
-      {mine ? (
-        <View style={styles.progressRow}>
-          <View style={styles.factorBar}>
-            <View style={[styles.factorFill, { width: `${(course.progress ?? 0) * 100}%` as const }]} />
-          </View>
-          <Text style={styles.courseMeta}>{Math.round((course.progress ?? 0) * 100)}%</Text>
+      <View style={styles.progressRow}>
+        <View style={[styles.progressTrack, { flex: 1 }]}>
+          <View style={[styles.progressFill, { width: `${pct * 100}%` as const }]} />
         </View>
-      ) : (
-        <View style={styles.progressRow}>
-          <View style={styles.factorBar}>
-            <View style={[styles.factorFill, { width: `${(course.certified / CREW_SIZE) * 100}%` as const }]} />
-          </View>
-          <Text style={styles.courseMeta}>
-            {course.certified} de {CREW_SIZE}{course.enrolled ? ` · ${course.enrolled} inscritos` : ''}
-          </Text>
-        </View>
-      )}
+        <Text style={styles.courseMeta}>
+          {mine
+            ? `${Math.round(pct * 100)}%`
+            : `${course.certified} de ${CREW_SIZE}${course.enrolled ? ` · ${course.enrolled} inscritos` : ''}`}
+        </Text>
+      </View>
     </TouchableOpacity>
+  );
+}
+
+function Steps({ steps }: { steps: string[] }) {
+  return (
+    <>
+      {steps.map((s, i) => (
+        <View key={s} style={styles.stepRow}>
+          <View style={styles.stepNum}>
+            <Text style={styles.stepNumText}>{i + 1}</Text>
+          </View>
+          <Text style={styles.stepText}>{s}</Text>
+        </View>
+      ))}
+    </>
   );
 }
 
@@ -556,39 +612,36 @@ function BenefitDetail({ benefit, level }: { benefit: Benefit; level: Level }) {
   const unlocked = levelIndex(benefit.minLevel) <= levelIndex(level.key);
   return (
     <>
-      <Text style={styles.sheetEyebrow}>{unlocked ? `Activo en tu nivel ${level.name}` : `Se desbloquea en ${LEVELS[levelIndex(benefit.minLevel)].name}`}</Text>
+      <Text style={styles.sheetEyebrow}>
+        {unlocked ? `Activo en tu nivel ${level.name}` : `Se desbloquea en ${LEVELS[levelIndex(benefit.minLevel)].name}`}
+      </Text>
       <Text style={styles.sheetTitle}>{benefit.title}</Text>
       <Text style={styles.sheetText}>{benefit.summary}</Text>
       {benefit.byLevel && (
-        <View style={styles.card}>
+        <View style={styles.infoCard}>
           {LEVELS.map((l, i) => (
             <View key={l.key} style={[styles.levelRow, i > 0 && styles.rowBorder]}>
               <View style={[styles.levelDot, { backgroundColor: l.color }]} />
-              <Text style={[styles.levelRowName, l.key === level.key && { fontWeight: '900' }]}>{l.name}</Text>
-              <Text style={[styles.levelRowMin, l.key === level.key && { color: COLORS.ink, fontWeight: '700' }]}>
+              <Text style={[styles.levelRowName, l.key === level.key && { color: COLORS.primary }]}>{l.name}</Text>
+              <Text style={[styles.levelRowMin, l.key === level.key && { color: COLORS.text, fontWeight: '600' }]}>
                 {benefit.byLevel?.[l.key]}
               </Text>
             </View>
           ))}
         </View>
       )}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>CÓMO FUNCIONA</Text>
-        {benefit.how.map((h, i) => (
-          <View key={h} style={styles.stepRow}>
-            <Text style={styles.stepNum}>{i + 1}</Text>
-            <Text style={styles.stepText}>{h}</Text>
-          </View>
-        ))}
+      <View style={styles.infoCard}>
+        <Text style={styles.cardLabel}>Cómo funciona</Text>
+        <Steps steps={benefit.how} />
       </View>
       {benefit.partner && <Text style={styles.sheetNote}>{benefit.partner}. BuildI lo ofrece; el aliado lo otorga.</Text>}
       {unlocked ? (
-        <TouchableOpacity style={styles.primaryBtn} onPress={() => Alert.alert(benefit.title, 'Listo. Te avisamos por WhatsApp cuando esté aplicado.')}>
-          <Text style={styles.primaryBtnText}>USAR BENEFICIO</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={() => Alert.alert(benefit.title, 'Listo. Te avisamos por WhatsApp cuando esté aplicado.')}>
+          <Text style={styles.primaryButtonText}>Usar beneficio</Text>
         </TouchableOpacity>
       ) : (
-        <View style={[styles.notice, { backgroundColor: COLORS.orangeSoft }]}>
-          <Text style={styles.noticeText}>Sube de nivel con entregas a tiempo, menos ajustes del residente y tus papeles al día.</Text>
+        <View style={[styles.notice, { backgroundColor: COLORS.primarySoft }]}>
+          <Text style={[styles.noticeText, { color: COLORS.primary }]}>Sube de nivel con entregas a tiempo, menos ajustes del residente y tus papeles al día.</Text>
         </View>
       )}
     </>
@@ -605,46 +658,43 @@ function CourseDetail({ course, level, onEnroll }: { course: Course; level: Leve
 
   return (
     <>
-      <View style={[styles.credBadge, { backgroundColor: cred.soft, alignSelf: 'flex-start' }]}>
-        <Text style={[styles.credText, { color: cred.color }]}>{cred.label}</Text>
+      <View style={[styles.badge, { backgroundColor: cred.bg, alignSelf: 'flex-start' }]}>
+        <Text style={[styles.badgeText, { color: cred.color }]}>{cred.label}</Text>
       </View>
       <Text style={styles.sheetTitle}>{course.title}</Text>
       <Text style={styles.sheetText}>{course.hours} · {course.modality}</Text>
       {course.requiredFor && (
-        <View style={[styles.notice, { backgroundColor: COLORS.redSoft }]}>
-          <Text style={[styles.noticeText, { color: COLORS.red }]}>{course.requiredFor}. Sin esta constancia la app no deja asignar a la persona a ese frente.</Text>
+        <View style={[styles.notice, { backgroundColor: COLORS.warningSoft }]}>
+          <Text style={[styles.noticeText, { color: COLORS.warningText }]}>
+            {course.requiredFor}. Si alguien no la tiene, la app te lo recomienda antes de mandarlo a un frente en altura; tú decides.
+          </Text>
         </View>
       )}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>CÓMO SE CERTIFICA</Text>
-        {cred.steps.map((s, i) => (
-          <View key={s} style={styles.stepRow}>
-            <Text style={styles.stepNum}>{i + 1}</Text>
-            <Text style={styles.stepText}>{s}</Text>
-          </View>
-        ))}
+      <View style={styles.infoCard}>
+        <Text style={styles.cardLabel}>Cómo se certifica</Text>
+        <Steps steps={cred.steps} />
         <Text style={styles.sheetNote}>{cred.issuer}</Text>
       </View>
 
       {mine ? (
-        <TouchableOpacity style={styles.primaryBtn} onPress={() => Alert.alert(course.title, 'Abriría la siguiente clase.')}>
-          <Text style={styles.primaryBtnText}>{course.progress ? 'CONTINUAR' : 'EMPEZAR'}</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={() => Alert.alert(course.title, 'Abriría la siguiente clase.')}>
+          <Text style={styles.primaryButtonText}>{course.progress ? 'Continuar' : 'Empezar'}</Text>
         </TouchableOpacity>
       ) : missing === 0 ? (
-        <View style={[styles.notice, { backgroundColor: COLORS.greenSoft }]}>
-          <Text style={[styles.noticeText, { color: COLORS.green }]}>Toda tu cuadrilla ya lo tiene o está inscrita.</Text>
+        <View style={[styles.notice, { backgroundColor: COLORS.successSoft }]}>
+          <Text style={[styles.noticeText, { color: COLORS.successText }]}>Toda tu cuadrilla ya lo tiene o está inscrita.</Text>
         </View>
       ) : (
         <>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>INSCRIBIR A TU GENTE</Text>
+          <View style={styles.infoCard}>
+            <Text style={styles.cardLabel}>Inscribir a tu gente</Text>
             <View style={styles.stepper}>
               <TouchableOpacity style={styles.stepBtn} onPress={() => setPeople(Math.max(1, people - 1))} accessibilityLabel="Menos personas">
-                <Ionicons name="remove" size={22} color={COLORS.ink} />
+                <Ionicons name="remove" size={22} color={COLORS.primary} />
               </TouchableOpacity>
               <Text style={styles.stepValue}>{people} {people === 1 ? 'persona' : 'personas'}</Text>
               <TouchableOpacity style={styles.stepBtn} onPress={() => setPeople(Math.min(missing, people + 1))} accessibilityLabel="Más personas">
-                <Ionicons name="add" size={22} color={COLORS.ink} />
+                <Ionicons name="add" size={22} color={COLORS.primary} />
               </TouchableOpacity>
             </View>
             <Text style={styles.sheetNote}>Faltan {missing} de tu cuadrilla.</Text>
@@ -655,19 +705,19 @@ function CourseDetail({ course, level, onEnroll }: { course: Course; level: Leve
                 {discount > 0 && discount < 1 ? `  (−${Math.round(discount * 100)}% por tu nivel)` : ''}
               </Text>
             </View>
-            <View style={styles.priceRow}>
-              <Text style={[styles.priceLabel, { fontWeight: '800', color: COLORS.ink }]}>Total</Text>
+            <View style={[styles.priceRow, styles.rowBorder]}>
+              <Text style={[styles.priceLabel, { fontWeight: '600', color: COLORS.text }]}>Total</Text>
               <Text style={[styles.priceValue, { fontSize: 18 }]}>{unit * people === 0 ? 'Gratis' : money(unit * people)}</Text>
             </View>
           </View>
           <TouchableOpacity
-            style={styles.primaryBtn}
+            style={styles.primaryButton}
             onPress={() => {
               onEnroll(course.id, people);
               Alert.alert('Inscritos', `${people} ${people === 1 ? 'persona' : 'personas'} en "${course.title}". Les llega la fecha por WhatsApp.`);
             }}
           >
-            <Text style={styles.primaryBtnText}>INSCRIBIR</Text>
+            <Text style={styles.primaryButtonText}>Inscribir</Text>
           </TouchableOpacity>
         </>
       )}
@@ -689,93 +739,112 @@ function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () =
   );
 }
 
+const cardShadow = {
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+};
+
+const lightShadow = {
+  elevation: 1,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.05,
+  shadowRadius: 2,
+};
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.concrete },
-  content: { padding: 16, paddingTop: 60, paddingBottom: 40, gap: 10 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  avatar: { width: 64, height: 64, borderRadius: 12, backgroundColor: COLORS.ink, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: COLORS.hivis, fontSize: 24, fontWeight: '900' },
-  name: { fontSize: 26, fontWeight: '900', color: COLORS.ink, textTransform: 'uppercase' },
-  role: { fontSize: 13, fontWeight: '700', color: COLORS.orange },
-  company: { fontSize: 12.5, color: COLORS.ink2 },
-  kpis: { flexDirection: 'row', gap: 8 },
-  kpi: { flex: 1, backgroundColor: COLORS.card, borderRadius: 6, padding: 10 },
-  kpiLabel: { fontSize: 9, fontWeight: '700', color: COLORS.ink2, letterSpacing: 0.5 },
-  kpiValue: { fontSize: 24, fontWeight: '900', color: COLORS.ink, marginTop: 2 },
-  levelCard: { backgroundColor: COLORS.ink, borderRadius: 10, padding: 14, gap: 10, borderWidth: 2 },
-  levelTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  levelEyebrow: { color: '#AAB4BD', fontSize: 10.5, fontWeight: '700', letterSpacing: 1.2 },
-  levelName: { fontSize: 30, fontWeight: '900', textTransform: 'uppercase' },
-  scoreBubble: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
-  scoreValue: { color: COLORS.hivis, fontSize: 28, fontWeight: '900' },
-  scoreMax: { color: '#AAB4BD', fontSize: 10 },
-  levelBarWrap: { height: 30, justifyContent: 'flex-start' },
-  levelBar: { height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.15)', overflow: 'hidden' },
-  levelFill: { height: '100%', backgroundColor: COLORS.hivis },
-  levelMark: { position: 'absolute', top: 0, alignItems: 'center', marginLeft: -14, width: 28 },
-  levelTick: { width: 2, height: 14, backgroundColor: '#FFFFFF' },
-  levelMarkText: { color: '#D5DADE', fontSize: 9.5, fontWeight: '700' },
-  levelHint: { color: '#E8EDF2', fontSize: 13 },
-  link: { color: COLORS.hivis, fontWeight: '700', fontSize: 12.5 },
-  section: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 12 },
-  sectionTitle: { flex: 1, fontSize: 20, fontWeight: '900', color: COLORS.ink, textTransform: 'uppercase' },
-  sectionNote: { fontSize: 11, color: COLORS.ink2, marginLeft: 8 },
-  benefit: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.card, borderRadius: 8, padding: 12 },
-  benefitLocked: { opacity: 0.6 },
-  benefitIcon: { width: 40, height: 40, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  benefitTitle: { fontSize: 14.5, fontWeight: '700', color: COLORS.ink },
-  benefitSummary: { fontSize: 12, color: COLORS.ink2, marginTop: 1 },
-  card: { backgroundColor: COLORS.card, borderRadius: 8, padding: 12, gap: 6 },
-  cardLabel: { fontSize: 10, fontWeight: '700', color: COLORS.ink2, letterSpacing: 0.8 },
-  rowBorder: { borderTopWidth: 1, borderTopColor: COLORS.line },
-  docRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8 },
-  docName: { fontSize: 13.5, fontWeight: '700', color: COLORS.ink },
-  docDetail: { fontSize: 11.5, color: COLORS.ink2 },
-  smallBtn: { backgroundColor: COLORS.ink, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 7 },
-  smallBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 12 },
-  ghostBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 2, borderColor: COLORS.ink, borderRadius: 8, paddingVertical: 10, marginTop: 6 },
-  ghostBtnText: { fontWeight: '800', color: COLORS.ink },
-  course: { backgroundColor: COLORS.card, borderRadius: 8, padding: 12, gap: 4 },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  header: { alignItems: 'center', padding: 20, paddingTop: 60, backgroundColor: COLORS.card },
+  profileImageContainer: { position: 'relative', marginBottom: 16 },
+  profileImage: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  editImageButton: { position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: COLORS.success, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: COLORS.card },
+  name: { fontSize: 24, fontWeight: 'bold', color: COLORS.text, marginBottom: 4 },
+  title: { fontSize: 16, color: COLORS.primary, fontWeight: '600', marginBottom: 2 },
+  company: { fontSize: 14, color: COLORS.muted },
+  statsContainer: { flexDirection: 'row', backgroundColor: COLORS.card, paddingVertical: 20, justifyContent: 'space-around', borderTopWidth: 1, borderTopColor: COLORS.divider },
+  statItem: { alignItems: 'center' },
+  statValue: { fontSize: 20, fontWeight: 'bold', color: COLORS.primary, marginBottom: 4 },
+  statLabel: { fontSize: 12, color: COLORS.muted },
+  section: { padding: 20, paddingBottom: 0 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'baseline', marginBottom: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: '600', color: COLORS.text, marginBottom: 16 },
+  sectionNote: { fontSize: 12, color: COLORS.muted, marginLeft: 8 },
+  infoCard: { backgroundColor: COLORS.card, borderRadius: 12, padding: 16, ...cardShadow },
+  infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  infoText: { fontSize: 16, color: COLORS.body, marginLeft: 12 },
+  levelTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  levelIcon: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
+  levelEyebrow: { fontSize: 13, color: COLORS.muted },
+  levelName: { fontSize: 24, fontWeight: 'bold' },
+  scoreBubble: { alignItems: 'center', backgroundColor: COLORS.primarySoft, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6 },
+  scoreValue: { color: COLORS.primary, fontSize: 24, fontWeight: 'bold' },
+  scoreMax: { color: COLORS.muted, fontSize: 11 },
+  levelBarWrap: { height: 36, marginTop: 16 },
+  levelMark: { position: 'absolute', top: 0, alignItems: 'center', marginLeft: -16, width: 32 },
+  levelTick: { width: 2, height: 14, backgroundColor: '#9CA3AF' },
+  levelMarkText: { color: COLORS.muted, fontSize: 10, fontWeight: '600' },
+  levelHint: { color: COLORS.body, fontSize: 14 },
+  link: { color: COLORS.primary, fontWeight: '600', fontSize: 14, marginTop: 8 },
+  progressTrack: { height: 8, borderRadius: 4, backgroundColor: COLORS.border, overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: COLORS.primary },
+  achievementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.card, borderRadius: 12, padding: 16, marginBottom: 8, ...lightShadow },
+  achievementIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.warningSoft, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  achievementInfo: { flex: 1 },
+  achievementTitle: { fontSize: 16, fontWeight: '600', color: COLORS.text, marginBottom: 2 },
+  achievementYear: { fontSize: 14, color: COLORS.muted },
+  rowBorder: { borderTopWidth: 1, borderTopColor: COLORS.divider },
+  docRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  docName: { fontSize: 15, fontWeight: '600', color: COLORS.text },
+  docDetail: { fontSize: 13, color: COLORS.muted },
+  actionButton: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: COLORS.primarySoft, gap: 4 },
+  actionText: { fontSize: 12, color: COLORS.primary, fontWeight: '500' },
+  outlineButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: COLORS.primary, borderRadius: 12, paddingVertical: 12, marginTop: 10 },
+  outlineButtonText: { fontWeight: '600', color: COLORS.primary, fontSize: 15 },
+  courseCard: { backgroundColor: COLORS.card, borderRadius: 12, padding: 16, marginBottom: 8, gap: 4, ...lightShadow },
   courseTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  credBadge: { borderRadius: 4, paddingHorizontal: 7, paddingVertical: 3 },
-  credText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
-  coursePrice: { fontSize: 13, fontWeight: '800', color: COLORS.ink },
-  courseTitle: { fontSize: 15, fontWeight: '700', color: COLORS.ink, marginTop: 2 },
-  courseMeta: { fontSize: 11.5, color: COLORS.ink2 },
-  courseRequired: { fontSize: 11.5, color: COLORS.red, fontWeight: '700' },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  factor: { paddingVertical: 8, gap: 4 },
+  badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  badgeText: { fontSize: 11, fontWeight: '600' },
+  coursePrice: { fontSize: 14, fontWeight: '600', color: COLORS.text },
+  courseTitle: { fontSize: 16, fontWeight: '600', color: COLORS.text, marginTop: 4 },
+  courseMeta: { fontSize: 13, color: COLORS.muted },
+  courseRequired: { fontSize: 13, color: COLORS.warningText, fontWeight: '500' },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
+  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.card, borderRadius: 12, padding: 16, marginBottom: 8, ...lightShadow },
+  menuItemLeft: { flexDirection: 'row', alignItems: 'center' },
+  menuItemText: { fontSize: 16, marginLeft: 12, fontWeight: '500' },
+  factor: { paddingVertical: 10, gap: 6 },
   factorTop: { flexDirection: 'row', justifyContent: 'space-between' },
-  factorLabel: { fontSize: 13, color: COLORS.ink, fontWeight: '600', flex: 1 },
-  factorValue: { fontSize: 13, color: COLORS.ink, fontWeight: '800' },
-  factorBar: { flex: 1, height: 8, borderRadius: 4, backgroundColor: COLORS.line, overflow: 'hidden' },
-  factorFill: { height: '100%', backgroundColor: COLORS.orange },
-  factorPoints: { fontSize: 11, color: COLORS.ink2 },
-  levelRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7 },
+  factorLabel: { fontSize: 14, color: COLORS.text, fontWeight: '500', flex: 1 },
+  factorValue: { fontSize: 14, color: COLORS.text, fontWeight: '600' },
+  factorPoints: { fontSize: 12, color: COLORS.muted },
+  levelRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8 },
   levelDot: { width: 14, height: 14, borderRadius: 7 },
-  levelRowName: { fontSize: 14, fontWeight: '700', color: COLORS.ink, width: 64 },
-  levelRowMin: { fontSize: 13, color: COLORS.ink2, flex: 1, textAlign: 'right' },
-  menuItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
-  menuText: { flex: 1, fontSize: 15, fontWeight: '600' },
-  scrim: { flex: 1, backgroundColor: 'rgba(17,21,24,0.5)', justifyContent: 'flex-end' },
-  sheet: { maxHeight: '88%', backgroundColor: '#F3F4F3', borderTopLeftRadius: 22, borderTopRightRadius: 22 },
-  grab: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#C4C9C7', alignSelf: 'center', marginTop: 8 },
-  sheetContent: { padding: 16, paddingBottom: 36, gap: 12 },
-  sheetEyebrow: { fontSize: 11, color: COLORS.ink2, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
-  sheetTitle: { fontSize: 26, fontWeight: '900', color: COLORS.ink, textTransform: 'uppercase' },
-  sheetText: { fontSize: 14, color: COLORS.ink2 },
-  sheetNote: { fontSize: 12, color: COLORS.ink2 },
-  stepRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingVertical: 4 },
-  stepNum: { width: 22, height: 22, borderRadius: 11, backgroundColor: COLORS.ink, color: COLORS.hivis, textAlign: 'center', lineHeight: 22, fontWeight: '800', fontSize: 12, overflow: 'hidden' },
-  stepText: { flex: 1, fontSize: 13.5, color: COLORS.ink },
-  notice: { borderRadius: 8, padding: 10 },
-  noticeText: { fontSize: 13, color: '#6E2A08' },
-  stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  stepBtn: { width: 48, height: 48, borderRadius: 8, borderWidth: 2, borderColor: COLORS.ink, alignItems: 'center', justifyContent: 'center' },
-  stepValue: { fontSize: 20, fontWeight: '800', color: COLORS.ink },
-  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6 },
-  priceLabel: { fontSize: 13, color: COLORS.ink2 },
-  priceValue: { fontSize: 14, fontWeight: '800', color: COLORS.ink },
-  primaryBtn: { backgroundColor: COLORS.orange, borderRadius: 8, paddingVertical: 14, alignItems: 'center' },
-  primaryBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 15, letterSpacing: 0.6 },
+  levelRowName: { fontSize: 15, fontWeight: '600', color: COLORS.text, width: 64 },
+  levelRowMin: { fontSize: 14, color: COLORS.muted, flex: 1, textAlign: 'right' },
+  scrim: { flex: 1, backgroundColor: 'rgba(17,24,39,0.4)', justifyContent: 'flex-end' },
+  sheet: { maxHeight: '88%', backgroundColor: COLORS.background, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  grab: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 8 },
+  sheetContent: { padding: 20, paddingBottom: 40, gap: 12 },
+  sheetEyebrow: { fontSize: 13, color: COLORS.muted },
+  sheetTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.text },
+  sheetText: { fontSize: 15, color: COLORS.body },
+  sheetNote: { fontSize: 13, color: COLORS.muted },
+  cardLabel: { fontSize: 14, fontWeight: '600', color: COLORS.text, marginBottom: 6 },
+  stepRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingVertical: 5 },
+  stepNum: { width: 24, height: 24, borderRadius: 12, backgroundColor: COLORS.primarySoft, justifyContent: 'center', alignItems: 'center' },
+  stepNumText: { color: COLORS.primary, fontWeight: '600', fontSize: 12 },
+  stepText: { flex: 1, fontSize: 14, color: COLORS.body },
+  notice: { borderRadius: 12, padding: 14 },
+  noticeText: { fontSize: 14 },
+  stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 4 },
+  stepBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  stepValue: { fontSize: 20, fontWeight: 'bold', color: COLORS.text },
+  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, marginTop: 4 },
+  priceLabel: { fontSize: 14, color: COLORS.muted },
+  priceValue: { fontSize: 15, fontWeight: '600', color: COLORS.text },
+  primaryButton: { backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center', padding: 16, borderRadius: 12 },
+  primaryButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
 });
