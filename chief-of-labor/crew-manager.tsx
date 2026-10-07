@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal,
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import {
+  AttendanceStatus,
   BadgeScanLog,
   ChiefOfLaborService,
   Contractor,
@@ -10,31 +11,39 @@ import {
   Crew,
   CredentialType,
   Enrollment,
+  LaborSite,
+  ProLevel,
   RecommendationAction,
   Worker,
   WorkerLevel,
   badgeVerifyUrl,
+  credentialState,
   formatDate,
   formatDayTime,
+  hasValidCertificate,
   isExpiringSoon,
 } from '@/app/services/ChiefOfLaborService';
 import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
+import { Chips, CourseEnrollPanel, LaborField, LaborSheet, SheetButton, sheetStyles } from '@/app/components/LaborSheets';
 
 // Cuadrillas y gafete digital de cada trabajador: sus constancias (BuildI,
-// DC-3 de la STPS, CONOCER), un QR que abre la verificación pública
-// (labor_verify_badge), las obras donde ha trabajado y recomendaciones
-// (no bloqueos). Datos en Supabase: tablas labor_*.
+// DC-3 de la STPS, CONOCER), un QR que verifica el residente desde la app
+// de constructor, las obras donde ha trabajado y recomendaciones (no
+// bloqueos). Aquí se da de alta a la gente, se arman las cuadrillas y se
+// pasa lista con el día de cada obra. Datos en Supabase: tablas labor_*.
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 interface CrewData {
   contractor: Contractor;
+  sites: LaborSite[];
   crews: Crew[];
   workers: Worker[];
   courses: Course[];
   enrollments: Enrollment[];
   actions: RecommendationAction[];
   lastScans: Record<string, BadgeScanLog>;
+  level: ProLevel;
 }
 
 interface Recommendation {
@@ -46,7 +55,6 @@ interface Recommendation {
   action: string;
   kind: 'imss' | 'enroll';
   courseId?: string;
-  done: string;
 }
 
 const TYPE_STYLE: Record<CredentialType, { label: string; color: string; bg: string }> = {
@@ -56,44 +64,51 @@ const TYPE_STYLE: Record<CredentialType, { label: string; color: string; bg: str
 };
 
 const LEVEL_LABEL: Record<WorkerLevel, string> = { ayudante: 'Ayudante', oficial: 'Oficial', maestro: 'Maestro' };
+const LEVEL_OPTIONS = (Object.keys(LEVEL_LABEL) as WorkerLevel[]).map(value => ({ value, label: LEVEL_LABEL[value] }));
+const TRADES = ['Albañil', 'Ayudante general', 'Yesero', 'Pintor', 'Tablaroquero', 'Pisero', 'Electricista', 'Plomero', 'Herrero', 'Carpintero'];
+const CURP_PATTERN = /^[A-Z][AEIOUX][A-Z]{2}[0-9]{6}[HMX][A-Z]{5}[A-Z0-9][0-9]$/;
+
+const isPresent = (w: Worker) => w.attendance === 'present' || w.attendance === 'late';
+const activeEnrollment = (data: CrewData, workerId: string, courseId: string) =>
+  data.enrollments.some(e => e.worker_id === workerId && e.course_id === courseId && (e.status === 'enrolled' || e.status === 'attended'));
 
 // Recomendaciones: la app sugiere, el contratista decide.
 function recommendationsFor(w: Worker, data: CrewData): Recommendation[] {
   const crew = data.crews.find(c => c.id === w.crew_id);
-  const has = (courseId: string) => w.credentials.some(c => c.course_id === courseId);
-  const enrolled = (courseId: string) => data.enrollments.some(e => e.worker_id === w.id && e.course_id === courseId);
   const handled = (key: string) => data.actions.some(a => a.worker_id === w.id && a.rec_key === key);
-  const title = (courseId: string) => data.courses.find(c => c.id === courseId)?.title ?? courseId;
+  const course = (courseId: string) => data.courses.find(c => c.id === courseId);
   const recs: Recommendation[] = [];
   if (!w.imss_registered) {
-    recs.push({ key: 'imss', kind: 'imss', icon: 'alert-circle', color: '#EF4444', title: 'Dar de alta en IMSS', text: 'Las constructoras piden que todos estén dados de alta. Te recomendamos hacerlo antes de su siguiente turno.', action: 'Dar de alta', done: 'Alta en IMSS registrada.' });
+    recs.push({ key: 'imss', kind: 'imss', icon: 'alert-circle', color: '#EF4444', title: 'Dar de alta en IMSS', text: 'Las constructoras piden que todos estén dados de alta. Te recomendamos hacerlo antes de su siguiente turno.', action: 'Ya está dado de alta' });
   }
-  if (crew?.height_note && !has('alturas') && !enrolled('alturas')) {
-    recs.push({ key: 'alturas', kind: 'enroll', courseId: 'alturas', icon: 'warning', color: '#F59E0B', title: 'Curso de trabajo en alturas', text: `Su cuadrilla trabaja en ${crew.height_note}. Te recomendamos la DC-3 de alturas (NOM-009) o asignarlo a un frente a nivel de piso.`, action: 'Inscribir', done: 'Inscrito al curso del sábado.' });
+  if (crew?.height_note && course('alturas') && !hasValidCertificate(w, 'alturas') && !activeEnrollment(data, w.id, 'alturas')) {
+    recs.push({ key: 'alturas', kind: 'enroll', courseId: 'alturas', icon: 'warning', color: '#F59E0B', title: 'Curso de trabajo en alturas', text: `Su cuadrilla trabaja en ${crew.height_note}. Te recomendamos la DC-3 de alturas (NOM-009) o asignarlo a un frente a nivel de piso.`, action: 'Inscribir' });
   }
   w.credentials
-    .filter(c => isExpiringSoon(c.renew_on) && !enrolled(c.course_id))
+    .filter(c => c.status === 'valid' && isExpiringSoon(c.expires_on) && course(c.course_id) && !activeEnrollment(data, w.id, c.course_id))
     .forEach(c => {
-      recs.push({ key: `renovar:${c.course_id}`, kind: 'enroll', courseId: c.course_id, icon: 'time', color: '#F59E0B', title: `Renovar: ${title(c.course_id)}`, text: `Se recomienda revalidar antes del ${formatDate(c.renew_on)}.`, action: 'Renovar', done: 'Inscrito a la renovación.' });
+      recs.push({ key: `renovar:${c.course_id}`, kind: 'enroll', courseId: c.course_id, icon: 'time', color: '#F59E0B', title: `Renovar: ${course(c.course_id)?.title}`, text: `Se recomienda revalidar antes del ${formatDate(c.expires_on)}.`, action: 'Renovar' });
     });
-  if (!has('seguridad') && !enrolled('seguridad')) {
-    recs.push({ key: 'seguridad', kind: 'enroll', courseId: 'seguridad', icon: 'school', color: '#2563EB', title: title('seguridad'), text: 'Curso gratis de 2 h en la app, sin internet.', action: 'Inscribir', done: 'Le llegó el curso por WhatsApp.' });
+  if (course('seguridad') && !w.credentials.some(c => c.course_id === 'seguridad') && !activeEnrollment(data, w.id, 'seguridad')) {
+    recs.push({ key: 'seguridad', kind: 'enroll', courseId: 'seguridad', icon: 'school', color: '#2563EB', title: course('seguridad')!.title, text: `Curso gratis de ${course('seguridad')!.hours_label} en la app, sin internet.`, action: 'Inscribir' });
   }
   return recs.filter(r => !handled(r.key));
 }
 
 async function loadCrewData(): Promise<CrewData> {
-  const [contractor, crews, workers, courses, enrollments, actions, lastScans] = await Promise.all([
+  const [contractor, sites, crews, courses, enrollments, actions, lastScans, score] = await Promise.all([
     ChiefOfLaborService.getContractor(),
+    ChiefOfLaborService.getSites(),
     ChiefOfLaborService.getCrews(),
-    ChiefOfLaborService.getWorkers(),
     ChiefOfLaborService.getCourses(),
     ChiefOfLaborService.getEnrollments(),
     ChiefOfLaborService.getRecommendationActions(),
     ChiefOfLaborService.getLastScans(),
+    ChiefOfLaborService.getScore(),
   ]);
   if (!contractor) throw new Error('No hay contratista.');
-  return { contractor, crews, workers, courses, enrollments, actions, lastScans };
+  const workers = await ChiefOfLaborService.getWorkers(sites);
+  return { contractor, sites, crews, workers, courses, enrollments, actions, lastScans, level: score.level };
 }
 
 export default function CrewManager() {
@@ -105,13 +120,22 @@ export default function CrewManager() {
   );
 }
 
+type SheetState =
+  | { kind: 'menu' }
+  | { kind: 'worker' }
+  | { kind: 'crew'; crew: Crew | null }
+  | { kind: 'attendance'; crew: Crew | null };
+
 function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolean) => Promise<void> }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [openCrew, setOpenCrew] = useState<string | null>(null);
   const [badgeId, setBadgeId] = useState<string | null>(null);
+  const [sheet, setSheet] = useState<SheetState | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const { crews, workers } = data;
   const badge = workers.find(w => w.id === badgeId) ?? null;
+  const siteName = (id: string | null) => data.sites.find(s => s.id === id)?.name ?? null;
+  const unassigned = workers.filter(w => !w.crew_id || !crews.some(c => c.id === w.crew_id));
 
   const query = searchQuery.trim().toLowerCase();
   const matches = useMemo(
@@ -128,12 +152,16 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
     }
   };
 
-  const avgEfficiency = crews.length ? Math.round(crews.reduce((a, c) => a + c.efficiency, 0) / crews.length) : 0;
-
   const refresh = async () => {
     setRefreshing(true);
     await reload(true);
     setRefreshing(false);
+  };
+
+  const saved = async (message?: string) => {
+    setSheet(null);
+    await reload(true);
+    if (message) Alert.alert('Listo', message);
   };
 
   return (
@@ -141,7 +169,7 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <View style={styles.header}>
           <Text style={styles.title}>Cuadrillas</Text>
-          <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Agregar trabajador', 'Abriría el alta con su INE, IMSS y oficio.')}>
+          <TouchableOpacity style={styles.addButton} onPress={() => setSheet({ kind: 'menu' })} accessibilityLabel="Agregar">
             <Ionicons name="add" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
@@ -166,8 +194,8 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
             <Text style={styles.summaryLabel}>Trabajadores</Text>
           </View>
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{avgEfficiency}%</Text>
-            <Text style={styles.summaryLabel}>Rendimiento prom.</Text>
+            <Text style={styles.summaryValue}>{workers.filter(isPresent).length}</Text>
+            <Text style={styles.summaryLabel}>Llegaron hoy</Text>
           </View>
         </View>
 
@@ -184,11 +212,23 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
           </View>
         ) : (
           <View style={styles.crewsList}>
+            {crews.length === 0 && (
+              <View style={[styles.crewCard, styles.emptyCard]}>
+                <Ionicons name="people" size={32} color="#2563EB" />
+                <Text style={styles.crewName}>Arma tu primera cuadrilla</Text>
+                <Text style={styles.emptyText}>Dale un nombre, elige la obra donde trabaja y después agrega a tu gente.</Text>
+                <TouchableOpacity style={styles.primaryButton} onPress={() => setSheet({ kind: 'crew', crew: null })}>
+                  <Ionicons name="add-circle" size={22} color="#FFFFFF" />
+                  <Text style={styles.primaryButtonText}>Nueva cuadrilla</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             {crews.map(crew => {
               const members = workers.filter(w => w.crew_id === crew.id);
               const lead = workers.find(w => w.id === crew.lead_worker_id);
               const recs = members.reduce((a, w) => a + recommendationsFor(w, data).length, 0);
               const open = openCrew === crew.id;
+              const site = siteName(crew.labor_site_id);
               return (
                 <View key={crew.id} style={styles.crewCard}>
                   <View style={styles.crewHeader}>
@@ -204,18 +244,18 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
                   <View style={styles.crewDetails}>
                     <View style={styles.detailItem}>
                       <Ionicons name="people" size={16} color="#6B7280" />
-                      <Text style={styles.detailText}>{members.length} trabajadores</Text>
+                      <Text style={styles.detailText}>{members.length} {members.length === 1 ? 'trabajador' : 'trabajadores'}</Text>
                     </View>
-                    {crew.site_label ? (
-                      <View style={styles.detailItem}>
-                        <Ionicons name="construct" size={16} color="#6B7280" />
-                        <Text style={styles.detailText}>{crew.site_label}</Text>
-                      </View>
-                    ) : null}
                     <View style={styles.detailItem}>
-                      <Ionicons name="trending-up" size={16} color="#6B7280" />
-                      <Text style={styles.detailText}>{crew.efficiency}% de rendimiento</Text>
+                      <Ionicons name="construct" size={16} color="#6B7280" />
+                      <Text style={styles.detailText}>{site ?? 'Sin obra asignada'}</Text>
                     </View>
+                    {members.length > 0 && (
+                      <View style={styles.detailItem}>
+                        <Ionicons name="checkmark-circle" size={16} color="#6B7280" />
+                        <Text style={styles.detailText}>{members.filter(isPresent).length} de {members.length} llegaron hoy</Text>
+                      </View>
+                    )}
                     {recs > 0 && (
                       <View style={styles.detailItem}>
                         <Ionicons name="bulb" size={16} color="#F59E0B" />
@@ -231,7 +271,13 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
                       <Ionicons name={open ? 'chevron-up' : 'id-card'} size={16} color="#2563EB" />
                       <Text style={styles.actionText}>{open ? 'Ocultar' : 'Gafetes'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => Alert.alert(crew.name, 'Abriría la edición de la cuadrilla.')}>
+                    {members.length > 0 && (
+                      <TouchableOpacity style={styles.actionButton} onPress={() => setSheet({ kind: 'attendance', crew })}>
+                        <Ionicons name="checkbox" size={16} color="#2563EB" />
+                        <Text style={styles.actionText}>Pase de lista</Text>
+                      </TouchableOpacity>
+                    )}
+                    <TouchableOpacity style={styles.actionButton} onPress={() => setSheet({ kind: 'crew', crew })}>
                       <Ionicons name="create" size={16} color="#2563EB" />
                       <Text style={styles.actionText}>Editar</Text>
                     </TouchableOpacity>
@@ -239,14 +285,31 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
 
                   {open && (
                     <View style={styles.memberList}>
-                      {members.map((w, i) => (
-                        <WorkerRow key={w.id} worker={w} recs={recommendationsFor(w, data).length} first={i === 0} onPress={() => setBadgeId(w.id)} />
-                      ))}
+                      {members.length ? (
+                        members.map((w, i) => (
+                          <WorkerRow key={w.id} worker={w} recs={recommendationsFor(w, data).length} first={i === 0} onPress={() => setBadgeId(w.id)} />
+                        ))
+                      ) : (
+                        <TouchableOpacity style={styles.workerRow} onPress={() => setSheet({ kind: 'worker' })}>
+                          <Ionicons name="person-add" size={20} color="#2563EB" />
+                          <Text style={[styles.detailText, { color: '#2563EB' }]}>Agregar a alguien a esta cuadrilla</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   )}
                 </View>
               );
             })}
+            {unassigned.length > 0 && (
+              <>
+                <Text style={styles.sectionTitle}>Sin cuadrilla</Text>
+                <View style={styles.crewCard}>
+                  {unassigned.map((w, i) => (
+                    <WorkerRow key={w.id} worker={w} recs={recommendationsFor(w, data).length} first={i === 0} onPress={() => setBadgeId(w.id)} />
+                  ))}
+                </View>
+              </>
+            )}
           </View>
         )}
       </ScrollView>
@@ -254,7 +317,245 @@ function CrewScreen({ data, reload }: { data: CrewData; reload: (silent?: boolea
       <Modal visible={!!badge} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setBadgeId(null)}>
         {badge && <BadgeSheet worker={badge} data={data} reload={reload} onClose={() => setBadgeId(null)} />}
       </Modal>
+
+      <LaborSheet visible={sheet?.kind === 'menu'} onClose={() => setSheet(null)}>
+        <Text style={sheetStyles.title}>Agregar</Text>
+        <View style={sheetStyles.card}>
+          <MenuRow icon="person-add" title="Trabajador" text="Su nombre, oficio, cuadrilla e IMSS. El gafete sale al guardar." onPress={() => setSheet({ kind: 'worker' })} />
+          <MenuRow icon="people" title="Cuadrilla" text="Un grupo con su obra y su cabo." onPress={() => setSheet({ kind: 'crew', crew: null })} border />
+        </View>
+      </LaborSheet>
+
+      <LaborSheet visible={sheet?.kind === 'worker'} onClose={() => setSheet(null)}>
+        {sheet?.kind === 'worker' && <WorkerForm data={data} onSaved={saved} />}
+      </LaborSheet>
+
+      <LaborSheet visible={sheet?.kind === 'crew'} onClose={() => setSheet(null)}>
+        {sheet?.kind === 'crew' && <CrewForm data={data} crew={sheet.crew} onSaved={saved} />}
+      </LaborSheet>
+
+      <LaborSheet visible={sheet?.kind === 'attendance'} onClose={() => setSheet(null)}>
+        {sheet?.kind === 'attendance' && <AttendanceForm data={data} crew={sheet.crew} onSaved={saved} />}
+      </LaborSheet>
     </View>
+  );
+}
+
+function MenuRow({ icon, title, text, onPress, border }: { icon: IconName; title: string; text: string; onPress: () => void; border?: boolean }) {
+  return (
+    <TouchableOpacity style={[styles.workerRow, border && styles.rowBorder]} onPress={onPress}>
+      <View style={[styles.recIcon, { backgroundColor: '#EBF4FF' }]}>
+        <Ionicons name={icon} size={20} color="#2563EB" />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.workerName}>{title}</Text>
+        <Text style={styles.workerMeta}>{text}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+    </TouchableOpacity>
+  );
+}
+
+// Alta de un trabajador.
+function WorkerForm({ data, onSaved }: { data: CrewData; onSaved: (message?: string) => void }) {
+  const [name, setName] = useState('');
+  const [trade, setTrade] = useState<string | null>(null);
+  const [otherTrade, setOtherTrade] = useState('');
+  const [level, setLevel] = useState<WorkerLevel>('ayudante');
+  const [crewId, setCrewId] = useState<string>(data.crews[0]?.id ?? 'none');
+  const [imss, setImss] = useState<'yes' | 'no'>('yes');
+  const [curp, setCurp] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const tradeValue = trade === 'Otro' ? otherTrade.trim() : trade ?? '';
+  const curpValue = curp.trim().toUpperCase();
+  const curpOk = !curpValue || CURP_PATTERN.test(curpValue);
+  const ready = name.trim().split(/\s+/).length >= 2 && tradeValue.length > 1 && curpOk;
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await ChiefOfLaborService.addWorker(
+        { full_name: name, trade: tradeValue, level, crew_id: crewId === 'none' ? null : crewId, imss_registered: imss === 'yes', curp: curpValue || null },
+        data.workers.length,
+      );
+      onSaved(`${name.trim()} ya tiene su gafete BuildI.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <Text style={sheetStyles.eyebrow}>{data.contractor.business_name}</Text>
+      <Text style={sheetStyles.title}>Nuevo trabajador</Text>
+      <LaborField label="Nombre completo" value={name} onChangeText={setName} placeholder="Nombre y apellidos" autoCapitalize="words" />
+      <Text style={sheetStyles.label}>Oficio</Text>
+      <Chips options={[...TRADES, 'Otro'].map(t => ({ value: t, label: t }))} value={trade} onChange={setTrade} />
+      {trade === 'Otro' && <LaborField label="¿Cuál?" value={otherTrade} onChangeText={setOtherTrade} placeholder="Ej. Impermeabilizador" />}
+      <Text style={sheetStyles.label}>Nivel</Text>
+      <Chips options={LEVEL_OPTIONS} value={level} onChange={setLevel} />
+      <Text style={sheetStyles.label}>Cuadrilla</Text>
+      <Chips options={[...data.crews.map(c => ({ value: c.id, label: c.name })), { value: 'none', label: 'Sin cuadrilla' }]} value={crewId} onChange={setCrewId} />
+      <Text style={sheetStyles.label}>¿Tiene alta en el IMSS?</Text>
+      <Chips options={[{ value: 'yes' as const, label: 'Sí' }, { value: 'no' as const, label: 'Todavía no' }]} value={imss} onChange={setImss} />
+      <LaborField
+        label="CURP (opcional)"
+        value={curp}
+        onChangeText={setCurp}
+        placeholder="18 caracteres"
+        autoCapitalize="characters"
+        hint={curpOk ? 'Va en su DC-3 cuando tome un curso de la STPS.' : 'Revisa la CURP: son 18 letras y números.'}
+      />
+      {error && <Text style={sheetStyles.error}>{error}</Text>}
+      <SheetButton label="Guardar y crear gafete" icon="id-card" onPress={save} busy={saving} disabled={!ready} />
+    </>
+  );
+}
+
+// Nueva cuadrilla o editar una.
+function CrewForm({ data, crew, onSaved }: { data: CrewData; crew: Crew | null; onSaved: (message?: string) => void }) {
+  const activeSites = data.sites.filter(s => s.active);
+  const members = crew ? data.workers.filter(w => w.crew_id === crew.id) : [];
+  const [name, setName] = useState(crew?.name ?? '');
+  const [siteId, setSiteId] = useState<string>(crew?.labor_site_id ?? activeSites[0]?.id ?? 'none');
+  const [heightNote, setHeightNote] = useState(crew?.height_note ?? '');
+  const [status, setStatus] = useState<Crew['status']>(crew?.status ?? 'active');
+  const [leadId, setLeadId] = useState<string>(crew?.lead_worker_id ?? 'none');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    const fields = {
+      name: name.trim(),
+      labor_site_id: siteId === 'none' ? null : siteId,
+      height_note: heightNote.trim() || null,
+    };
+    try {
+      if (crew) await ChiefOfLaborService.updateCrew(crew.id, { ...fields, status, lead_worker_id: leadId === 'none' ? null : leadId });
+      else await ChiefOfLaborService.createCrew(fields);
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <Text style={sheetStyles.title}>{crew ? 'Editar cuadrilla' : 'Nueva cuadrilla'}</Text>
+      <LaborField label="Nombre" value={name} onChangeText={setName} placeholder="Ej. Cuadrilla Albañilería" />
+      <Text style={sheetStyles.label}>Obra</Text>
+      {activeSites.length ? (
+        <Chips options={[...activeSites.map(s => ({ value: s.id, label: s.name })), { value: 'none', label: 'Sin obra' }]} value={siteId} onChange={setSiteId} />
+      ) : (
+        <Text style={styles.workerMeta}>Agrega tus obras en la pestaña Frentes y aquí podrás elegirlas.</Text>
+      )}
+      <LaborField
+        label="¿Trabaja en altura? ¿Dónde?"
+        value={heightNote}
+        onChangeText={setHeightNote}
+        placeholder="Ej. el nivel 3 o andamios a 2.5 m"
+        hint="Si trabaja a más de 1.8 m, la app te recomienda el curso de alturas para quien no lo tenga."
+      />
+      {crew && (
+        <>
+          <Text style={sheetStyles.label}>Estado</Text>
+          <Chips
+            options={[
+              { value: 'active' as const, label: 'Activa' },
+              { value: 'break' as const, label: 'En descanso' },
+              { value: 'inactive' as const, label: 'Inactiva' },
+            ]}
+            value={status}
+            onChange={setStatus}
+          />
+          {members.length > 0 && (
+            <>
+              <Text style={sheetStyles.label}>Cabo</Text>
+              <Chips options={[...members.map(w => ({ value: w.id, label: w.full_name })), { value: 'none', label: 'Sin cabo' }]} value={leadId} onChange={setLeadId} />
+            </>
+          )}
+        </>
+      )}
+      {error && <Text style={sheetStyles.error}>{error}</Text>}
+      <SheetButton label="Guardar" onPress={save} busy={saving} disabled={name.trim().length < 2} />
+    </>
+  );
+}
+
+const ATTENDANCE_OPTIONS: { value: AttendanceStatus; label: string }[] = [
+  { value: 'present', label: 'Llegó' },
+  { value: 'late', label: 'Tarde' },
+  { value: 'absent', label: 'Faltó' },
+];
+
+// Pase de lista: el día y la hora son los de la obra de la cuadrilla.
+function AttendanceForm({ data, crew, onSaved }: { data: CrewData; crew: Crew | null; onSaved: (message?: string) => void }) {
+  const activeSites = data.sites.filter(s => s.active);
+  const members = data.workers.filter(w => (crew ? w.crew_id === crew.id : true));
+  const [siteId, setSiteId] = useState<string | null>(crew?.labor_site_id ?? activeSites[0]?.id ?? null);
+  const [marks, setMarks] = useState<Record<string, AttendanceStatus>>(
+    Object.fromEntries(members.filter(w => w.attendance).map(w => [w.id, w.attendance as AttendanceStatus])),
+  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const site = data.sites.find(s => s.id === siteId) ?? null;
+
+  const save = async () => {
+    if (!site) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const editable = members.filter(w => w.attendance_source !== 'scan' && marks[w.id]);
+      for (const status of ['present', 'late', 'absent'] as AttendanceStatus[]) {
+        await ChiefOfLaborService.markAttendance(editable.filter(w => marks[w.id] === status).map(w => w.id), site.id, status);
+      }
+      onSaved(`Pase de lista del ${formatDate(site.local_date)} guardado.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <Text style={sheetStyles.eyebrow}>{crew?.name ?? 'Toda tu gente'}</Text>
+      <Text style={sheetStyles.title}>Pase de lista</Text>
+      {activeSites.length === 0 ? (
+        <View style={sheetStyles.card}>
+          <Text style={sheetStyles.text}>Primero agrega la obra donde trabajan en la pestaña Frentes: el pase de lista se guarda con el día de esa obra.</Text>
+        </View>
+      ) : (
+        <>
+          <Chips options={activeSites.map(s => ({ value: s.id, label: s.name }))} value={siteId} onChange={setSiteId} />
+          {site && <Text style={styles.workerMeta}>Día de la obra: {formatDate(site.local_date)}</Text>}
+          <View style={sheetStyles.card}>
+            {members.map((w, i) => (
+              <View key={w.id} style={[styles.attendanceRow, i > 0 && styles.rowBorder]}>
+                <View style={styles.attendanceName}>
+                  <Avatar worker={w} size={32} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.workerName} numberOfLines={1}>{w.full_name}</Text>
+                    {w.attendance_source === 'scan' && <Text style={styles.workerMeta}>Entrada registrada por el residente</Text>}
+                  </View>
+                </View>
+                {w.attendance_source !== 'scan' && (
+                  <Chips options={ATTENDANCE_OPTIONS} value={marks[w.id] ?? null} onChange={v => setMarks(m => ({ ...m, [w.id]: v }))} />
+                )}
+              </View>
+            ))}
+          </View>
+          {error && <Text style={sheetStyles.error}>{error}</Text>}
+          <SheetButton label="Guardar pase de lista" icon="checkmark-circle" onPress={save} busy={saving} disabled={!site || !Object.keys(marks).length} />
+        </>
+      )}
+    </>
   );
 }
 
@@ -267,7 +568,7 @@ function Avatar({ worker, size }: { worker: Worker; size: number }) {
 }
 
 function WorkerRow({ worker, recs, first, onPress }: { worker: Worker; recs: number; first: boolean; onPress: () => void }) {
-  const n = worker.credentials.length;
+  const n = worker.credentials.filter(c => c.status === 'valid').length;
   return (
     <TouchableOpacity style={[styles.workerRow, !first && styles.rowBorder]} onPress={onPress}>
       <Avatar worker={worker} size={40} />
@@ -290,25 +591,31 @@ function WorkerRow({ worker, recs, first, onPress }: { worker: Worker; recs: num
 function BadgeSheet({ worker, data, reload, onClose }: { worker: Worker; data: CrewData; reload: (silent?: boolean) => Promise<void>; onClose: () => void }) {
   const crew = data.crews.find(c => c.id === worker.crew_id);
   const [busy, setBusy] = useState<string | null>(null);
+  const [enrolling, setEnrolling] = useState<string | null>(null);
   const recs = recommendationsFor(worker, data);
-  const courseTitle = (id: string) => data.courses.find(c => c.id === id);
+  const course = (id: string) => data.courses.find(c => c.id === id);
+  const siteName = (id: string) => data.sites.find(s => s.id === id)?.name ?? 'Obra';
   const verifyUrl = badgeVerifyUrl(worker.verify_code);
+  const lastScan = data.lastScans[worker.id];
 
   const act = async (r: Recommendation, choice: 'done' | 'later') => {
     setBusy(r.key);
     try {
-      if (choice === 'done') {
-        if (r.kind === 'imss') await ChiefOfLaborService.markImssRegistered(worker.id);
-        else if (r.courseId) await ChiefOfLaborService.enroll(r.courseId, [worker.id]);
-      }
+      if (choice === 'done' && r.kind === 'imss') await ChiefOfLaborService.markImssRegistered(worker.id);
       await ChiefOfLaborService.setRecommendationAction(worker.id, r.key, choice);
       await reload(true);
-      if (choice === 'done') Alert.alert(r.action, r.done);
     } catch (e) {
       Alert.alert('No se pudo guardar', e instanceof Error ? e.message : 'Intenta de nuevo.');
     } finally {
       setBusy(null);
     }
+  };
+
+  const enrolled = async (r: Recommendation, message: string) => {
+    setEnrolling(null);
+    await ChiefOfLaborService.setRecommendationAction(worker.id, r.key, 'done').catch(() => undefined);
+    await reload(true);
+    Alert.alert(r.title, message);
   };
 
   const share = () => {
@@ -330,7 +637,7 @@ function BadgeSheet({ worker, data, reload, onClose }: { worker: Worker; data: C
         <View style={styles.badgeCard}>
           <View style={styles.badgeBand}>
             <Text style={styles.badgeBrand}>BuildI · Gafete digital</Text>
-            <Text style={styles.badgeBandMeta}>{worker.imss_registered ? 'Verificado' : 'Falta IMSS'}</Text>
+            <Text style={styles.badgeBandMeta}>{worker.imss_registered ? 'Con IMSS' : 'Falta IMSS'}</Text>
           </View>
           <View style={styles.badgeBody}>
             <Avatar worker={worker} size={72} />
@@ -355,13 +662,13 @@ function BadgeSheet({ worker, data, reload, onClose }: { worker: Worker; data: C
             </View>
             <Text style={styles.badgeCode}>{worker.verify_code}</Text>
             <Text style={styles.badgeHint}>El residente lo escanea desde la app de constructor para ver sus constancias y registrar su entrada.</Text>
-            {data.lastScans[worker.id] && (
+            {lastScan && (
               <View style={styles.lastScan}>
-                <Ionicons name={data.lastScans[worker.id].checked_in ? 'log-in' : 'eye'} size={16} color="#047857" />
+                <Ionicons name={lastScan.checked_in ? 'log-in' : 'eye'} size={16} color="#047857" />
                 <Text style={styles.lastScanText}>
-                  {data.lastScans[worker.id].checked_in
-                    ? `Entrada registrada ${formatDayTime(data.lastScans[worker.id].checked_in_at ?? data.lastScans[worker.id].scanned_at)} · ${data.lastScans[worker.id].site_name ?? ''}`
-                    : `Verificado en obra ${formatDayTime(data.lastScans[worker.id].scanned_at)}`}
+                  {lastScan.checked_in
+                    ? `Entrada registrada ${formatDayTime(lastScan.checked_in_at ?? lastScan.scanned_at, lastScan.site_timezone)} · ${lastScan.site_name ?? ''}`
+                    : `Verificado en obra ${formatDayTime(lastScan.scanned_at)}`}
                 </Text>
               </View>
             )}
@@ -371,47 +678,63 @@ function BadgeSheet({ worker, data, reload, onClose }: { worker: Worker; data: C
         {recs.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Recomendaciones</Text>
-            {recs.map(r => (
-              <View key={r.key} style={styles.recCard}>
-                <View style={[styles.recIcon, { backgroundColor: r.color + '22' }]}>
-                  <Ionicons name={r.icon} size={20} color={r.color} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.recTitle}>{r.title}</Text>
-                  <Text style={styles.recText}>{r.text}</Text>
-                  <View style={styles.recActions}>
-                    <TouchableOpacity style={[styles.actionButton, busy === r.key && { opacity: 0.5 }]} disabled={busy === r.key} onPress={() => act(r, 'done')}>
-                      <Text style={styles.actionText}>{r.action}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.laterButton} disabled={busy === r.key} onPress={() => act(r, 'later')}>
-                      <Text style={styles.laterText}>Después</Text>
-                    </TouchableOpacity>
+            {recs.map(r => {
+              const recCourse = r.courseId ? course(r.courseId) : undefined;
+              return (
+                <View key={r.key} style={styles.recCard}>
+                  <View style={[styles.recIcon, { backgroundColor: r.color + '22' }]}>
+                    <Ionicons name={r.icon} size={20} color={r.color} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.recTitle}>{r.title}</Text>
+                    <Text style={styles.recText}>{r.text}</Text>
+                    {enrolling === r.key && recCourse ? (
+                      <View style={{ marginTop: 10 }}>
+                        <CourseEnrollPanel course={recCourse} level={data.level} people={1} workerIds={[worker.id]} onEnrolled={m => enrolled(r, m)} />
+                      </View>
+                    ) : (
+                      <View style={styles.recActions}>
+                        <TouchableOpacity
+                          style={[styles.actionButton, busy === r.key && { opacity: 0.5 }]}
+                          disabled={busy === r.key}
+                          onPress={() => (r.kind === 'enroll' ? setEnrolling(r.key) : act(r, 'done'))}
+                        >
+                          <Text style={styles.actionText}>{r.action}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.laterButton} disabled={busy === r.key} onPress={() => act(r, 'later')}>
+                          <Text style={styles.laterText}>Después</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </>
         )}
 
         <Text style={styles.sectionTitle}>Constancias</Text>
         {worker.credentials.length ? (
           worker.credentials.map(c => {
-            const course = courseTitle(c.course_id);
-            const t = TYPE_STYLE[course?.credential_type ?? 'buildi'];
-            const soon = isExpiringSoon(c.renew_on);
+            const t = TYPE_STYLE[c.credential_type];
+            const state = credentialState(c.expires_on);
+            const pending = c.status === 'pending_review';
             return (
               <View key={c.id} style={styles.credCard}>
                 <View style={styles.credTop}>
                   <View style={[styles.chip, { backgroundColor: t.bg }]}>
                     <Text style={[styles.chipText, { color: t.color }]}>{t.label}</Text>
                   </View>
-                  <Text style={[styles.credStatus, { color: soon ? '#B45309' : '#047857' }]}>{soon ? 'Por renovar' : 'Vigente'}</Text>
+                  <Text style={[styles.credStatus, { color: pending || state !== 'vigente' ? '#B45309' : '#047857' }, state === 'vencida' && { color: '#B91C1C' }]}>
+                    {pending ? 'Por revisar' : state === 'vencida' ? 'Vencida' : state === 'por_renovar' ? 'Por renovar' : 'Vigente'}
+                  </Text>
                 </View>
-                <Text style={styles.credTitle}>{course?.title ?? c.course_id}</Text>
-                {course ? <Text style={styles.credMeta}>{course.issuer}</Text> : null}
+                <Text style={styles.credTitle}>{course(c.course_id)?.title ?? c.course_id}</Text>
+                <Text style={styles.credMeta}>{c.issuer_name}</Text>
                 <Text style={styles.credMeta}>
-                  Folio {c.folio} · {formatDate(c.issued_on)}{c.renew_on ? ` · renovar ${formatDate(c.renew_on)}` : ' · sin vencimiento'}
+                  Folio {c.folio} · {formatDate(c.issued_on)}{c.expires_on ? ` · vence ${formatDate(c.expires_on)}` : ' · sin vencimiento'}
                 </Text>
+                {pending && <Text style={styles.credMeta}>BuildI la está revisando; mientras, no aparece al escanear el gafete.</Text>}
               </View>
             );
           })
@@ -426,9 +749,11 @@ function BadgeSheet({ worker, data, reload, onClose }: { worker: Worker; data: C
             <Text style={styles.sectionTitle}>Obras con BuildI</Text>
             <View style={styles.credCard}>
               {worker.sites.map((s, i) => (
-                <View key={`${s.site_name}-${s.year}`} style={[styles.siteRow, i > 0 && styles.rowBorder]}>
+                <View key={`${s.labor_site_id}-${s.year}`} style={[styles.siteRow, i > 0 && styles.rowBorder]}>
                   <Ionicons name="business" size={18} color="#6B7280" />
-                  <Text style={styles.detailText}>{s.site_name} · {s.year}</Text>
+                  <Text style={styles.detailText}>
+                    {siteName(s.labor_site_id)} · {s.year} · {s.days} {s.days === 1 ? 'día' : 'días'}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -538,6 +863,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     ...cardShadow,
   },
+  emptyCard: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
   crewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -583,6 +917,7 @@ const styles = StyleSheet.create({
   crewActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    flexWrap: 'wrap',
     gap: 12,
   },
   actionButton: {
@@ -613,6 +948,15 @@ const styles = StyleSheet.create({
   rowBorder: {
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
+  },
+  attendanceRow: {
+    paddingVertical: 10,
+    gap: 8,
+  },
+  attendanceName: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   avatar: {
     justifyContent: 'center',
@@ -856,6 +1200,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     borderRadius: 12,
     gap: 8,
+    alignSelf: 'stretch',
   },
   primaryButtonText: {
     color: '#FFFFFF',

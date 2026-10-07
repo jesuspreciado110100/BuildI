@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BadgeScan, ChiefOfLaborService, formatTime } from '@/app/services/ChiefOfLaborService';
+import { BadgeScan, CheckInResult, ChiefOfLaborService } from '@/app/services/ChiefOfLaborService';
 import { BadgeVerificationCard } from '@/app/components/BadgeVerificationCard';
 
 // Resultado de escanear un gafete en la app de constructor: la verificación y
-// el registro de entrada a la obra, que llena el pase de lista del contratista.
+// el registro de entrada a la obra, que llena el pase de lista del contratista
+// con el día y la hora de la obra.
 
 export function BadgeScanResult({ code, scan, onCheckedIn }: { code: string; scan: BadgeScan | null; onCheckedIn?: () => void }) {
   const [siteId, setSiteId] = useState(scan?.sites[0]?.id ?? null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ site_name: string; checked_in_at: string } | null>(null);
+  const [done, setDone] = useState<CheckInResult | null>(null);
 
   const checkIn = async () => {
     if (!scan || !siteId) return;
@@ -38,7 +39,7 @@ export function BadgeScanResult({ code, scan, onCheckedIn }: { code: string; sca
             <View style={[styles.notice, { backgroundColor: '#ECFDF5' }]}>
               <Ionicons name="log-in" size={20} color="#059669" />
               <Text style={[styles.noticeText, { color: '#047857' }]}>
-                Entrada registrada a las {formatTime(done.checked_in_at)} en {done.site_name}. Ya aparece en el pase de lista de {scan.contractor}.
+                Entrada registrada a las {done.local_time} (hora de la obra) en {done.site_name}. Ya aparece en el pase de lista de {scan.contractor}.
               </Text>
             </View>
           ) : scan.sites.length === 0 ? (
@@ -64,7 +65,10 @@ export function BadgeScanResult({ code, scan, onCheckedIn }: { code: string; sca
               <View style={styles.chips}>
                 {scan.sites.map(s => (
                   <TouchableOpacity key={s.id} style={[styles.chip, s.id === siteId && styles.chipActive]} onPress={() => setSiteId(s.id)}>
-                    <Text style={[styles.chipText, s.id === siteId && styles.chipTextActive]}>{s.name}</Text>
+                    <Text style={[styles.chipText, s.id === siteId && styles.chipTextActive]}>
+                      {s.name}
+                      {s.mine ? ' · tu obra' : ''}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>

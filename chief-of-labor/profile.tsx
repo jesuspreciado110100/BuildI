@@ -1,36 +1,45 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Modal,
   Animated,
   Alert,
   RefreshControl,
+  Share,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Benefit,
+  Certificate,
   ChiefOfLaborService,
   ComplianceDoc,
   Contractor,
-  ContractorMetrics,
   Course as CourseRow_,
   CredentialType,
+  DocKind,
+  Enrollment,
   ProLevel,
+  Score,
+  ScoreFactor,
+  coursePriceFor,
+  deviceTimezone,
   docStatus,
   formatDate,
+  hasValidCertificate,
+  localDateIn,
 } from '@/app/services/ChiefOfLaborService';
 import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
+import { Chips, CourseEnrollPanel, LaborField, LaborSheet, MultiChips, SheetButton, money } from '@/app/components/LaborSheets';
 
-// Perfil del contratista de mano de obra: nivel BuildI Pro calculado con su
-// desempeño, beneficios que se desbloquean por nivel, expediente de
-// cumplimiento (REPSE, IMSS, Infonavit, SAT) y cursos con su tipo de
-// constancia. Datos en Supabase: labor_contractors, labor_contractor_metrics,
-// labor_compliance_docs, labor_benefits, labor_courses, labor_credentials y
-// labor_enrollments.
+// Perfil del contratista de mano de obra: nivel BuildI Pro calculado en el
+// servidor con su desempeño, beneficios que se desbloquean por nivel,
+// expediente de cumplimiento (REPSE, IMSS, Infonavit, SAT) que revisa BuildI
+// y cursos con su tipo de constancia, fechas y lugares. Datos en Supabase:
+// labor_my_score(), labor_compliance_docs, labor_benefits, labor_courses,
+// labor_open_sessions(), labor_enrollments y labor_certificates.
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -44,12 +53,15 @@ interface Level {
 interface Course extends CourseRow_ {
   certified: number;
   enrolled: number;
-  progress: number | null;
+  /** Quién de la cuadrilla no lo tiene vigente ni está inscrito. */
+  pending: { id: string; name: string }[];
+  mine: Enrollment | null;
+  myCertificate: Certificate | null;
 }
 
 interface ProfileData {
   contractor: Contractor;
-  metrics: ContractorMetrics;
+  score: Score;
   docs: ComplianceDoc[];
   benefits: Benefit[];
   courses: Course[];
@@ -93,9 +105,9 @@ const CREDENTIALS: Record<CredentialType, { label: string; color: string; bg: st
     issuer: 'La emite BuildI. No es oficial, pero cuenta para tu nivel y se verifica con el QR del gafete.',
     steps: [
       'Clases en video de 3 a 5 minutos, con audio y sin internet.',
-      'Examen corto con imágenes en la app.',
+      'Examen corto en la app; se califica solo (3 intentos por día).',
       'Prueba práctica en obra, validada por el residente con foto.',
-      'La constancia aparece en el gafete y en tu expediente.',
+      'La constancia sale sola y aparece en el gafete.',
     ],
   },
   dc3: {
@@ -104,10 +116,10 @@ const CREDENTIALS: Record<CredentialType, { label: string; color: string; bg: st
     bg: COLORS.warningSoft,
     issuer: 'La emite un agente capacitador registrado ante la STPS, aliado de BuildI.',
     steps: [
-      'Te inscribes y eliges fecha y sede.',
+      'Eliges fecha y sede. Si todavía no hay fecha, apartas el lugar.',
       'Curso presencial con el instructor del agente capacitador.',
-      'Asistencia con pase de lista e identificación.',
-      'El agente capacitador emite la DC-3 y se guarda en tu expediente.',
+      'Pase de lista con identificación y evaluación del instructor.',
+      'Con la CURP de tu trabajador y tu RFC se emite la DC-3 y queda en el gafete.',
     ],
   },
   conocer: {
@@ -116,12 +128,29 @@ const CREDENTIALS: Record<CredentialType, { label: string; color: string; bg: st
     bg: COLORS.successSoft,
     issuer: 'Lo emite CONOCER después de una evaluación con un evaluador acreditado.',
     steps: [
-      'Curso de preparación en la app.',
       'Evaluación práctica en obra con un evaluador acreditado.',
-      'Si aprueba, se tramita el certificado oficial.',
+      'Se guardan fotos, video e identificación como evidencia.',
+      'Si resulta competente, CONOCER emite el certificado con su folio.',
       'Queda en el gafete y sube el precio de la cuadrilla.',
     ],
   },
+};
+
+// Expediente que piden las constructoras. Vigencia: opiniones de
+// cumplimiento 30 días naturales desde su emisión; REPSE, 3 años.
+const REQUIRED_DOCS: { kind: DocKind; name: string; detail: string; validity: string }[] = [
+  { kind: 'repse', name: 'Registro REPSE', detail: 'STPS · obras especializadas', validity: 'Vale 3 años desde su emisión.' },
+  { kind: 'imss', name: 'Opinión de cumplimiento IMSS', detail: 'La constructora la pide cada mes', validity: 'Vale 30 días desde su emisión.' },
+  { kind: 'infonavit', name: 'Opinión de cumplimiento Infonavit', detail: 'La constructora la pide cada mes', validity: 'Vale 30 días desde su emisión.' },
+  { kind: 'sat', name: 'Opinión de cumplimiento SAT (32-D)', detail: 'Positiva', validity: 'Vale 30 días desde su emisión.' },
+];
+
+const FACTOR_LABELS: Record<ScoreFactor['key'], string> = {
+  on_time: 'Entregas a tiempo',
+  adjusted: 'Volumen ajustado por el residente',
+  rating: 'Calificación de constructoras',
+  docs: 'Papeles al día (revisados por BuildI)',
+  months: 'Antigüedad en BuildI',
 };
 
 const MENU_ITEMS: { title: string; icon: IconName; color: string }[] = [
@@ -133,69 +162,71 @@ const MENU_ITEMS: { title: string; icon: IconName; color: string }[] = [
   { title: 'Cerrar sesión', icon: 'log-out-outline', color: '#EF4444' },
 ];
 
-const money = (n: number) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+const RFC_PATTERN = /^[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}$/;
+
 const levelIndex = (key: ProLevel) => LEVELS.findIndex(l => l.key === key);
+const levelOf = (key: ProLevel) => LEVELS[Math.max(0, levelIndex(key))];
 const benefitIcon = (name: string) => name as IconName;
 
-// Puntaje BuildI Pro (0–100). Cinco factores con su peso máximo.
-function scoreFactors(m: ContractorMetrics, docs: ComplianceDoc[]) {
-  const ok = docs.filter(d => docStatus(d.expires_on) !== 'vencido').length;
-  return [
-    { label: 'Entregas a tiempo', value: `${Math.round(m.on_time_rate * 100)}%`, points: 30 * clamp01(m.on_time_rate), max: 30 },
-    { label: 'Volumen ajustado por el residente', value: `${(m.adjusted_share * 100).toFixed(1)}%`, points: 20 * clamp01(1 - m.adjusted_share / 0.05), max: 20 },
-    { label: 'Calificación de constructoras', value: `★ ${m.builder_rating.toFixed(1)}`, points: 20 * clamp01((m.builder_rating - 3) / 2), max: 20 },
-    { label: 'Papeles al día', value: `${ok} de ${docs.length}`, points: 20 * (docs.length ? ok / docs.length : 0), max: 20 },
-    { label: 'Antigüedad en BuildI', value: `${m.months_on_buildi} meses`, points: 10 * clamp01(m.months_on_buildi / 24), max: 10 },
-  ];
+function factorValue(f: ScoreFactor): string {
+  if (f.key === 'docs') return `${f.value ?? 0} de ${f.required ?? 4}`;
+  if (f.key === 'months') return `${f.value ?? 0} ${f.value === 1 ? 'mes' : 'meses'}`;
+  if (f.value === null) return 'Sin datos todavía';
+  if (f.key === 'on_time') return `${Math.round(f.value * 100)}%`;
+  if (f.key === 'adjusted') return `${(f.value * 100).toFixed(1)}%`;
+  return `★ ${f.value.toFixed(1)}`;
 }
 
-function levelFor(score: number): Level {
-  return [...LEVELS].reverse().find(l => score >= l.min) ?? LEVELS[0];
-}
+type DocView = { kind: DocKind; name: string; detail: string; validity: string; doc: ComplianceDoc | null };
 
-function coursePrice(course: Course, level: ProLevel) {
-  return course.price * (1 - (course.discount_by_level?.[level] ?? 0));
-}
-
-function docExpiresLabel(d: ComplianceDoc) {
+function docLine(v: DocView): { icon: IconName; color: string; text: string; action: string | null; danger?: boolean } {
+  const d = v.doc;
+  if (!d) return { icon: 'add-circle', color: COLORS.muted, text: 'Falta registrarlo', action: 'Registrar' };
+  const expires = d.expires_on ? ` · vence ${formatDate(d.expires_on)}` : '';
+  if (d.review_status === 'rejected') {
+    return { icon: 'close-circle', color: COLORS.error, text: `Rechazado${d.review_note ? `: ${d.review_note}` : ''}`, action: 'Volver a registrar', danger: true };
+  }
   const status = docStatus(d.expires_on);
-  if (!d.expires_on) return 'No vence';
-  return status === 'vencido' ? `Venció el ${formatDate(d.expires_on)}` : `Vence ${formatDate(d.expires_on)}`;
+  if (status === 'vencido') return { icon: 'alert-circle', color: COLORS.error, text: `Venció el ${formatDate(d.expires_on)}`, action: 'Renovar', danger: true };
+  if (d.review_status === 'pending_review') return { icon: 'time', color: COLORS.warning, text: `En revisión de BuildI${expires}`, action: 'Actualizar' };
+  if (status === 'por_vencer') return { icon: 'time', color: COLORS.warning, text: `Vence ${formatDate(d.expires_on)}`, action: 'Renovar' };
+  return { icon: 'checkmark-circle', color: COLORS.success, text: `Verificado${expires}`, action: null };
 }
 
 async function loadProfile(): Promise<ProfileData> {
-  const [contractor, metrics, docs, benefits, courseRows, workers, enrollments, crews, sites] = await Promise.all([
+  const [contractor, score, docs, benefits, courseRows, enrollments, crews, sites, myCertificates] = await Promise.all([
     ChiefOfLaborService.getContractor(),
-    ChiefOfLaborService.getMetrics(),
+    ChiefOfLaborService.getScore(),
     ChiefOfLaborService.getComplianceDocs(),
     ChiefOfLaborService.getBenefits(),
     ChiefOfLaborService.getCourses(),
-    ChiefOfLaborService.getWorkers(),
     ChiefOfLaborService.getEnrollments(),
     ChiefOfLaborService.getCrews(),
     ChiefOfLaborService.getSites(),
+    ChiefOfLaborService.getMyCertificates(),
   ]);
   if (!contractor) throw new Error('No hay contratista.');
-  const courses: Course[] = courseRows.map(c => {
-    const active = enrollments.filter(e => e.course_id === c.id && e.status !== 'completed');
-    const own = enrollments.find(e => e.course_id === c.id && !e.worker_id && c.audience === 'contractor');
-    return {
-      ...c,
-      certified: workers.filter(w => w.credentials.some(cr => cr.course_id === c.id)).length,
-      enrolled: active.reduce((a, e) => a + (e.worker_id ? 1 : e.seats), 0),
-      progress: c.audience === 'contractor' ? own?.progress ?? 0 : null,
-    };
-  });
+  const workers = await ChiefOfLaborService.getWorkers(sites);
+  const live = (e: Enrollment) => e.status === 'reserved' || e.status === 'enrolled' || e.status === 'attended';
+  const courses: Course[] = courseRows.map(c => ({
+    ...c,
+    certified: workers.filter(w => hasValidCertificate(w, c.id)).length,
+    enrolled: enrollments.filter(e => e.course_id === c.id && !e.for_contractor && live(e)).length,
+    pending: workers
+      .filter(w => !hasValidCertificate(w, c.id) && !enrollments.some(e => e.worker_id === w.id && e.course_id === c.id && live(e)))
+      .map(w => ({ id: w.id, name: w.full_name })),
+    mine: enrollments.find(e => e.course_id === c.id && e.for_contractor && e.status !== 'cancelled') ?? null,
+    myCertificate: myCertificates.find(cr => cr.course_id === c.id) ?? null,
+  }));
   return {
     contractor,
-    metrics: metrics ?? { on_time_rate: 0, adjusted_share: 0, builder_rating: 0, months_on_buildi: 0 },
+    score,
     docs,
     benefits,
     courses,
     crewSize: workers.length,
     crews: crews.length,
-    sites: sites.length,
+    sites: sites.filter(s => s.active).length,
   };
 }
 
@@ -209,19 +240,22 @@ export default function ChiefOfLaborProfile() {
 }
 
 function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: boolean) => Promise<void> }) {
-  const { contractor, docs, courses, benefits, crewSize } = data;
+  const { contractor, docs, courses, benefits, crewSize, score } = data;
   const [benefitId, setBenefitId] = useState<string | null>(null);
   const [courseId, setCourseId] = useState<string | null>(null);
+  const [docKind, setDocKind] = useState<DocKind | null>(null);
+  const [editingFiscal, setEditingFiscal] = useState(false);
   const [showScore, setShowScore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const benefit = benefits.find(b => b.id === benefitId) ?? null;
   const course = courses.find(c => c.id === courseId) ?? null;
 
-  const factors = useMemo(() => scoreFactors(data.metrics, docs), [data.metrics, docs]);
-  const score = factors.reduce((a, f) => a + f.points, 0);
-  const level = levelFor(score);
+  const level = levelOf(score.level);
   const next = LEVELS[levelIndex(level.key) + 1];
-  const expired = docs.filter(d => docStatus(d.expires_on) === 'vencido');
+  const docViews: DocView[] = REQUIRED_DOCS.map(r => ({ ...r, doc: docs.find(d => d.kind === r.kind) ?? null }));
+  const otherDocs = docs.filter(d => !REQUIRED_DOCS.some(r => r.kind === d.kind));
+  const docsFactor = score.factors.find(f => f.key === 'docs');
+  const docView = docViews.find(v => v.kind === docKind) ?? null;
 
   const pop = useRef(new Animated.Value(1)).current;
   const prevLevel = useRef(level.key);
@@ -246,20 +280,21 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
     }
   };
 
-  const renewDoc = (id: string) => run(() => ChiefOfLaborService.renewComplianceDoc(id));
-
-  const enroll = (id: string, people: number) => {
-    const c = courses.find(x => x.id === id);
-    setCourseId(null);
-    run(() => ChiefOfLaborService.enroll(id, [], people), [
-      'Inscritos',
-      `${people} ${people === 1 ? 'persona' : 'personas'} en "${c?.title ?? ''}". Les llega la fecha por WhatsApp.`,
-    ]);
-  };
-
   const requestBenefit = (b: Benefit) => {
     setBenefitId(null);
     run(() => ChiefOfLaborService.requestBenefit(b.id), [b.title, 'Solicitud enviada. Te avisamos por WhatsApp cuando esté aplicado.']);
+  };
+
+  const shareDocs = () => {
+    const lines = docViews.map(v => {
+      const d = v.doc;
+      if (!d) return `• ${v.name}: pendiente`;
+      const state = d.review_status === 'verified' ? 'verificado por BuildI' : d.review_status === 'pending_review' ? 'en revisión' : 'rechazado';
+      return `• ${v.name}: ${state}${d.expires_on ? `, vence ${formatDate(d.expires_on)}` : ''}`;
+    });
+    Share.share({ message: `Expediente de ${contractor.business_name}${contractor.rfc ? ` (RFC ${contractor.rfc})` : ''}:\n${lines.join('\n')}` }).catch(
+      () => undefined,
+    );
   };
 
   const refresh = async () => {
@@ -271,6 +306,7 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
   const crewCourses = courses.filter(c => c.audience === 'crew');
   const myCourses = courses.filter(c => c.audience === 'contractor');
   const activeBenefits = benefits.filter(b => levelIndex(b.min_level) <= levelIndex(level.key)).length;
+  const missingDocs = docViews.filter(v => !v.doc || v.doc.review_status !== 'verified' || docStatus(v.doc.expires_on) === 'vencido');
 
   return (
     <View style={styles.container}>
@@ -318,15 +354,15 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
                 </Animated.Text>
               </View>
               <View style={styles.scoreBubble}>
-                <Text style={styles.scoreValue}>{Math.round(score)}</Text>
+                <Text style={styles.scoreValue}>{Math.round(score.score)}</Text>
                 <Text style={styles.scoreMax}>de 100</Text>
               </View>
             </View>
-            <LevelBar score={score} />
+            <LevelBar score={score.score} />
             {next ? (
               <Text style={styles.levelHint}>
-                Te faltan {Math.max(0, next.min - score).toFixed(1)} puntos para {next.name}.
-                {expired.length ? ` Renueva "${expired[0].name}" y sumas ${(20 / docs.length).toFixed(0)} puntos.` : ''}
+                Te faltan {Math.max(0, next.min - score.score).toFixed(1)} puntos para {next.name}.
+                {missingDocs.length ? ` Cada papel revisado y al día suma ${(20 / REQUIRED_DOCS.length).toFixed(0)} puntos.` : ''}
               </Text>
             ) : (
               <Text style={styles.levelHint}>Estás en el nivel más alto. Mantén tus papeles al día para conservarlo.</Text>
@@ -339,7 +375,7 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
           <SectionTitle title="Tus beneficios" note={`${activeBenefits} de ${benefits.length} activos`} />
           {benefits.map(b => {
             const unlocked = levelIndex(b.min_level) <= levelIndex(level.key);
-            const minName = LEVELS[levelIndex(b.min_level)].name;
+            const minName = levelOf(b.min_level).name;
             return (
               <TouchableOpacity key={b.id} style={styles.achievementCard} onPress={() => setBenefitId(b.id)} activeOpacity={0.8}>
                 <View style={[styles.achievementIcon, !unlocked && { backgroundColor: COLORS.divider }]}>
@@ -360,36 +396,36 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
         <View style={styles.section}>
           <SectionTitle title="Expediente de cumplimiento" note="lo ven las constructoras" />
           <View style={styles.infoCard}>
-            {docs.map((d, i) => {
-              const status = docStatus(d.expires_on);
+            {docViews.map((v, i) => {
+              const line = docLine(v);
               return (
-                <View key={d.id} style={[styles.docRow, i > 0 && styles.rowBorder]}>
-                  <Ionicons
-                    name={status === 'vigente' ? 'checkmark-circle' : status === 'por_vencer' ? 'time' : 'alert-circle'}
-                    size={22}
-                    color={status === 'vigente' ? COLORS.success : status === 'por_vencer' ? COLORS.warning : COLORS.error}
-                  />
+                <View key={v.kind} style={[styles.docRow, i > 0 && styles.rowBorder]}>
+                  <Ionicons name={line.icon} size={22} color={line.color} />
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.docName}>{d.name}</Text>
-                    <Text style={styles.docDetail}>{d.detail ? `${d.detail} · ` : ''}{docExpiresLabel(d)}</Text>
+                    <Text style={styles.docName}>{v.name}</Text>
+                    <Text style={styles.docDetail}>{line.text}</Text>
                   </View>
-                  {status !== 'vigente' && (
+                  {line.action && (
                     <TouchableOpacity
-                      style={[styles.actionButton, status === 'vencido' && { backgroundColor: COLORS.errorSoft }]}
-                      onPress={() => renewDoc(d.id)}
+                      style={[styles.actionButton, line.danger && { backgroundColor: COLORS.errorSoft }]}
+                      onPress={() => setDocKind(v.kind)}
                     >
-                      <Text style={[styles.actionText, status === 'vencido' && { color: COLORS.errorText }]}>
-                        {status === 'vencido' ? 'Renovar' : 'Actualizar'}
-                      </Text>
+                      <Text style={[styles.actionText, line.danger && { color: COLORS.errorText }]}>{line.action}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
               );
             })}
-            <TouchableOpacity
-              style={styles.outlineButton}
-              onPress={() => Alert.alert('Expediente compartido', 'La constructora recibe un enlace con tus documentos vigentes.')}
-            >
+            {otherDocs.map(d => (
+              <View key={d.id} style={[styles.docRow, styles.rowBorder]}>
+                <Ionicons name="document-text" size={22} color={COLORS.muted} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.docName}>{d.name}</Text>
+                  <Text style={styles.docDetail}>{d.detail ?? (d.review_status === 'verified' ? 'Verificado' : 'En revisión de BuildI')}</Text>
+                </View>
+              </View>
+            ))}
+            <TouchableOpacity style={styles.outlineButton} onPress={shareDocs}>
               <Ionicons name="share-social-outline" size={18} color={COLORS.primary} />
               <Text style={styles.outlineButtonText}>Compartir expediente</Text>
             </TouchableOpacity>
@@ -414,9 +450,15 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
           <Text style={styles.sectionTitle}>Información profesional</Text>
           <View style={styles.infoCard}>
             {contractor.years_experience ? <InfoRow icon="briefcase" text={`Experiencia: ${contractor.years_experience} años`} /> : null}
-            {docs.some(d => d.kind === 'repse' && docStatus(d.expires_on) !== 'vencido') ? (
+            {docViews.some(v => v.kind === 'repse' && v.doc?.review_status === 'verified' && docStatus(v.doc.expires_on) !== 'vencido') ? (
               <InfoRow icon="ribbon" text="REPSE vigente · obras especializadas" />
             ) : null}
+            <TouchableOpacity onPress={() => setEditingFiscal(true)}>
+              <InfoRow
+                icon="document-text"
+                text={contractor.rfc ? `RFC ${contractor.rfc}${contractor.legal_name ? ` · ${contractor.legal_name}` : ''}` : 'Agrega tu RFC y razón social (van en las DC-3)'}
+              />
+            </TouchableOpacity>
             {contractor.email ? <InfoRow icon="mail" text={contractor.email} /> : null}
             {contractor.phone ? <InfoRow icon="call" text={contractor.phone} last /> : null}
           </View>
@@ -436,18 +478,18 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
         </View>
       </ScrollView>
 
-      <Sheet visible={showScore} onClose={() => setShowScore(false)}>
+      <LaborSheet visible={showScore} onClose={() => setShowScore(false)}>
         <Text style={styles.sheetEyebrow}>BuildI Pro</Text>
         <Text style={styles.sheetTitle}>Cómo se calcula tu nivel</Text>
         <View style={styles.infoCard}>
-          {factors.map((f, i) => (
-            <View key={f.label} style={[styles.factor, i > 0 && styles.rowBorder]}>
+          {score.factors.map((f, i) => (
+            <View key={f.key} style={[styles.factor, i > 0 && styles.rowBorder]}>
               <View style={styles.factorTop}>
-                <Text style={styles.factorLabel}>{f.label}</Text>
-                <Text style={styles.factorValue}>{f.value}</Text>
+                <Text style={styles.factorLabel}>{FACTOR_LABELS[f.key]}</Text>
+                <Text style={[styles.factorValue, f.value === null && { color: COLORS.muted, fontWeight: '500' }]}>{factorValue(f)}</Text>
               </View>
               <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${(f.points / f.max) * 100}%` as const }]} />
+                <View style={[styles.progressFill, { width: `${f.max ? (f.points / f.max) * 100 : 0}%` as const }]} />
               </View>
               <Text style={styles.factorPoints}>{f.points.toFixed(1)} de {f.max} puntos</Text>
             </View>
@@ -462,16 +504,55 @@ function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: 
             </View>
           ))}
         </View>
-        <Text style={styles.sheetNote}>El nivel se recalcula cada semana con tus estimaciones firmadas, las calificaciones de las constructoras y tu expediente.</Text>
-      </Sheet>
+        <Text style={styles.sheetNote}>
+          Las entregas, los ajustes y las calificaciones salen de tus estimaciones firmadas en BuildI; mientras no haya, no suman.
+          {docsFactor ? ' Los papeles cuentan cuando BuildI los revisa y están vigentes.' : ''}
+        </Text>
+      </LaborSheet>
 
-      <Sheet visible={!!benefit} onClose={() => setBenefitId(null)}>
+      <LaborSheet visible={!!benefit} onClose={() => setBenefitId(null)}>
         {benefit && <BenefitDetail benefit={benefit} level={level} onUse={() => requestBenefit(benefit)} />}
-      </Sheet>
+      </LaborSheet>
 
-      <Sheet visible={!!course} onClose={() => setCourseId(null)}>
-        {course && <CourseDetail course={course} crewSize={crewSize} level={level.key} onEnroll={enroll} />}
-      </Sheet>
+      <LaborSheet visible={!!course} onClose={() => setCourseId(null)}>
+        {course && (
+          <CourseDetail
+            course={course}
+            crewSize={crewSize}
+            level={level.key}
+            onEnrolled={message => {
+              setCourseId(null);
+              reload(true);
+              Alert.alert(course.title, message);
+            }}
+          />
+        )}
+      </LaborSheet>
+
+      <LaborSheet visible={!!docView} onClose={() => setDocKind(null)}>
+        {docView && (
+          <DocForm
+            view={docView}
+            onSaved={() => {
+              setDocKind(null);
+              reload(true);
+              Alert.alert(docView.name, 'Registrado. BuildI lo revisa y, si está bien, empieza a contar para tu nivel.');
+            }}
+          />
+        )}
+      </LaborSheet>
+
+      <LaborSheet visible={editingFiscal} onClose={() => setEditingFiscal(false)}>
+        {editingFiscal && (
+          <FiscalForm
+            contractor={contractor}
+            onSaved={() => {
+              setEditingFiscal(false);
+              reload(true);
+            }}
+          />
+        )}
+      </LaborSheet>
     </View>
   );
 }
@@ -517,18 +598,22 @@ function LevelBar({ score }: { score: number }) {
   );
 }
 
+function priceLabel(course: Course, level: ProLevel) {
+  const price = coursePriceFor(course, level);
+  return price === null ? 'Por confirmar' : price === 0 ? 'Gratis' : money(price);
+}
+
 function CourseRow({ course, crewSize, level, onPress }: { course: Course; crewSize: number; level: ProLevel; onPress: () => void }) {
   const cred = CREDENTIALS[course.credential_type];
-  const price = coursePrice(course, level);
   const mine = course.audience === 'contractor';
-  const pct = mine ? course.progress ?? 0 : crewSize ? course.certified / crewSize : 0;
+  const pct = mine ? (course.myCertificate ? 1 : course.mine?.progress ?? 0) : crewSize ? course.certified / crewSize : 0;
   return (
     <TouchableOpacity style={styles.courseCard} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.courseTop}>
         <View style={[styles.badge, { backgroundColor: cred.bg }]}>
           <Text style={[styles.badgeText, { color: cred.color }]}>{cred.label}</Text>
         </View>
-        <Text style={styles.coursePrice}>{price === 0 ? 'Gratis' : money(price)}</Text>
+        <Text style={styles.coursePrice}>{priceLabel(course, level)}</Text>
       </View>
       <Text style={styles.courseTitle}>{course.title}</Text>
       <Text style={styles.courseMeta}>{course.hours_label} · {course.modality}</Text>
@@ -539,7 +624,11 @@ function CourseRow({ course, crewSize, level, onPress }: { course: Course; crewS
         </View>
         <Text style={styles.courseMeta}>
           {mine
-            ? `${Math.round(pct * 100)}%`
+            ? course.myCertificate
+              ? 'Aprobado'
+              : course.mine
+                ? `${Math.round(pct * 100)}%`
+                : 'Sin empezar'
             : `${course.certified} de ${crewSize}${course.enrolled ? ` · ${course.enrolled} inscritos` : ''}`}
         </Text>
       </View>
@@ -567,7 +656,7 @@ function BenefitDetail({ benefit, level, onUse }: { benefit: Benefit; level: Lev
   return (
     <>
       <Text style={styles.sheetEyebrow}>
-        {unlocked ? `Activo en tu nivel ${level.name}` : `Se desbloquea en ${LEVELS[levelIndex(benefit.min_level)].name}`}
+        {unlocked ? `Activo en tu nivel ${level.name}` : `Se desbloquea en ${levelOf(benefit.min_level).name}`}
       </Text>
       <Text style={styles.sheetTitle}>{benefit.title}</Text>
       <Text style={styles.sheetText}>{benefit.summary}</Text>
@@ -604,13 +693,10 @@ function BenefitDetail({ benefit, level, onUse }: { benefit: Benefit; level: Lev
   );
 }
 
-function CourseDetail({ course, crewSize, level, onEnroll }: { course: Course; crewSize: number; level: ProLevel; onEnroll: (id: string, people: number) => void }) {
+function CourseDetail({ course, crewSize, level, onEnrolled }: { course: Course; crewSize: number; level: ProLevel; onEnrolled: (message: string) => void }) {
   const cred = CREDENTIALS[course.credential_type];
-  const missing = Math.max(0, crewSize - course.certified - course.enrolled);
   const mine = course.audience === 'contractor';
-  const [people, setPeople] = useState(Math.min(missing, 6) || 1);
-  const unit = coursePrice(course, level);
-  const discount = course.discount_by_level?.[level] ?? 0;
+  const [people, setPeople] = useState<string[]>(course.pending.map(p => p.id));
 
   return (
     <>
@@ -629,63 +715,121 @@ function CourseDetail({ course, crewSize, level, onEnroll }: { course: Course; c
       <View style={styles.infoCard}>
         <Text style={styles.cardLabel}>Cómo se certifica</Text>
         <Steps steps={cred.steps} />
-        <Text style={styles.sheetNote}>{cred.issuer}</Text>
+        <Text style={styles.sheetNote}>{course.provider_id ? cred.issuer : `${cred.issuer} Estamos cerrando el acuerdo con el aliado; puedes apartar lugar.`}</Text>
       </View>
 
       {mine ? (
-        <TouchableOpacity style={styles.primaryButton} onPress={() => Alert.alert(course.title, 'Abriría la siguiente clase.')}>
-          <Text style={styles.primaryButtonText}>{course.progress ? 'Continuar' : 'Empezar'}</Text>
-        </TouchableOpacity>
-      ) : missing === 0 ? (
+        course.myCertificate ? (
+          <View style={[styles.notice, { backgroundColor: COLORS.successSoft }]}>
+            <Text style={[styles.noticeText, { color: COLORS.successText }]}>Aprobado · folio {course.myCertificate.folio}</Text>
+          </View>
+        ) : course.mine ? (
+          <View style={[styles.notice, { backgroundColor: COLORS.primarySoft }]}>
+            <Text style={[styles.noticeText, { color: COLORS.primary }]}>
+              Ya estás inscrito. Las clases en video se publican en la app; te avisamos cuando estén listas.
+            </Text>
+          </View>
+        ) : (
+          <CourseEnrollPanel course={course} level={level} people={1} forMe onEnrolled={onEnrolled} />
+        )
+      ) : course.pending.length === 0 ? (
         <View style={[styles.notice, { backgroundColor: COLORS.successSoft }]}>
-          <Text style={[styles.noticeText, { color: COLORS.successText }]}>Toda tu cuadrilla ya lo tiene o está inscrita.</Text>
+          <Text style={[styles.noticeText, { color: COLORS.successText }]}>
+            {crewSize ? 'Toda tu cuadrilla ya lo tiene o está inscrita.' : 'Da de alta a tu gente en Cuadrillas para inscribirla.'}
+          </Text>
         </View>
       ) : (
-        <>
-          <View style={styles.infoCard}>
-            <Text style={styles.cardLabel}>Inscribir a tu gente</Text>
-            <View style={styles.stepper}>
-              <TouchableOpacity style={styles.stepBtn} onPress={() => setPeople(Math.max(1, people - 1))} accessibilityLabel="Menos personas">
-                <Ionicons name="remove" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
-              <Text style={styles.stepValue}>{people} {people === 1 ? 'persona' : 'personas'}</Text>
-              <TouchableOpacity style={styles.stepBtn} onPress={() => setPeople(Math.min(missing, people + 1))} accessibilityLabel="Más personas">
-                <Ionicons name="add" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.sheetNote}>Faltan {missing} de tu cuadrilla.</Text>
-            <View style={styles.priceRow}>
-              <Text style={styles.priceLabel}>Precio por persona</Text>
-              <Text style={styles.priceValue}>
-                {unit === 0 ? 'Gratis' : money(unit)}
-                {discount > 0 && discount < 1 ? `  (−${Math.round(discount * 100)}% por tu nivel)` : ''}
-              </Text>
-            </View>
-            <View style={[styles.priceRow, styles.rowBorder]}>
-              <Text style={[styles.priceLabel, { fontWeight: '600', color: COLORS.text }]}>Total</Text>
-              <Text style={[styles.priceValue, { fontSize: 18 }]}>{unit * people === 0 ? 'Gratis' : money(unit * people)}</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => onEnroll(course.id, people)}>
-            <Text style={styles.primaryButtonText}>Inscribir</Text>
-          </TouchableOpacity>
-        </>
+        <View style={styles.infoCard}>
+          <Text style={styles.cardLabel}>Inscribir a tu gente</Text>
+          <Text style={styles.sheetNote}>
+            {course.pending.length === 1 ? 'Le falta a 1 persona.' : `Les falta a ${course.pending.length} personas.`} Toca para quitar o poner.
+          </Text>
+          <MultiChips options={course.pending.map(p => ({ value: p.id, label: p.name }))} values={people} onChange={setPeople} />
+          {people.length > 0 ? (
+            <CourseEnrollPanel course={course} level={level} people={people.length} workerIds={people} onEnrolled={onEnrolled} />
+          ) : (
+            <Text style={styles.sheetNote}>Elige al menos a una persona.</Text>
+          )}
+        </View>
       )}
     </>
   );
 }
 
-function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: React.ReactNode }) {
+// Registrar o renovar un documento del expediente con su fecha de emisión.
+function DocForm({ view, onSaved }: { view: DocView; onSaved: () => void }) {
+  const today = localDateIn(deviceTimezone());
+  const options = [0, 1, 2, 3, 7].map(daysAgo => {
+    const d = new Date(today + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() - daysAgo);
+    const iso = d.toISOString().slice(0, 10);
+    return { value: iso, label: daysAgo === 0 ? 'Hoy' : daysAgo === 1 ? 'Ayer' : formatDate(iso) };
+  });
+  const [issuedOn, setIssuedOn] = useState(options[0].value);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await ChiefOfLaborService.saveComplianceDoc(view.kind, view.name, issuedOn);
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar.');
+      setSaving(false);
+    }
+  };
+
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.scrim}>
-        <TouchableOpacity style={{ flex: 1 }} onPress={onClose} accessibilityLabel="Cerrar" />
-        <View style={styles.sheet}>
-          <View style={styles.grab} />
-          <ScrollView contentContainerStyle={styles.sheetContent}>{children}</ScrollView>
-        </View>
+    <>
+      <Text style={styles.sheetEyebrow}>Expediente</Text>
+      <Text style={styles.sheetTitle}>{view.name}</Text>
+      <Text style={styles.sheetText}>{view.detail}. {view.validity}</Text>
+      <Text style={styles.cardLabel}>¿Cuándo se emitió?</Text>
+      <Chips options={options} value={issuedOn} onChange={setIssuedOn} />
+      <View style={[styles.notice, { backgroundColor: COLORS.primarySoft }]}>
+        <Text style={[styles.noticeText, { color: COLORS.primary }]}>
+          Queda en revisión hasta que BuildI vea el documento. Ya revisado y vigente, suma a tu nivel.
+        </Text>
       </View>
-    </Modal>
+      {error && <Text style={[styles.noticeText, { color: COLORS.errorText }]}>{error}</Text>}
+      <SheetButton label="Guardar" onPress={save} busy={saving} />
+    </>
+  );
+}
+
+// RFC y razón social: los pide la DC-3 de tu gente.
+function FiscalForm({ contractor, onSaved }: { contractor: Contractor; onSaved: () => void }) {
+  const [rfc, setRfc] = useState(contractor.rfc ?? '');
+  const [legalName, setLegalName] = useState(contractor.legal_name ?? contractor.business_name);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const value = rfc.trim().toUpperCase();
+  const ok = RFC_PATTERN.test(value);
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await ChiefOfLaborService.updateContractor(contractor.id, { rfc: value, legal_name: legalName.trim() || null });
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <Text style={styles.sheetEyebrow}>Datos fiscales</Text>
+      <Text style={styles.sheetTitle}>RFC y razón social</Text>
+      <Text style={styles.sheetText}>Van en la DC-3 de cada trabajador como datos del patrón.</Text>
+      <LaborField label="RFC" value={rfc} onChangeText={setRfc} placeholder="12 o 13 caracteres" autoCapitalize="characters" hint={value && !ok ? 'Revisa el RFC: letras, 6 dígitos de fecha y 3 de homoclave.' : undefined} />
+      <LaborField label="Razón social o nombre" value={legalName} onChangeText={setLegalName} placeholder="Como aparece en tu constancia del SAT" />
+      {error && <Text style={[styles.noticeText, { color: COLORS.errorText }]}>{error}</Text>}
+      <SheetButton label="Guardar" onPress={save} busy={saving} disabled={!ok} />
+    </>
   );
 }
 
@@ -724,7 +868,7 @@ const styles = StyleSheet.create({
   sectionNote: { fontSize: 12, color: COLORS.muted, marginLeft: 8 },
   infoCard: { backgroundColor: COLORS.card, borderRadius: 12, padding: 16, ...cardShadow },
   infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  infoText: { fontSize: 16, color: COLORS.body, marginLeft: 12 },
+  infoText: { fontSize: 16, color: COLORS.body, marginLeft: 12, flex: 1 },
   levelTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   levelIcon: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
   levelEyebrow: { fontSize: 13, color: COLORS.muted },
@@ -766,7 +910,7 @@ const styles = StyleSheet.create({
   menuItemLeft: { flexDirection: 'row', alignItems: 'center' },
   menuItemText: { fontSize: 16, marginLeft: 12, fontWeight: '500' },
   factor: { paddingVertical: 10, gap: 6 },
-  factorTop: { flexDirection: 'row', justifyContent: 'space-between' },
+  factorTop: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
   factorLabel: { fontSize: 14, color: COLORS.text, fontWeight: '500', flex: 1 },
   factorValue: { fontSize: 14, color: COLORS.text, fontWeight: '600' },
   factorPoints: { fontSize: 12, color: COLORS.muted },
@@ -774,10 +918,6 @@ const styles = StyleSheet.create({
   levelDot: { width: 14, height: 14, borderRadius: 7 },
   levelRowName: { fontSize: 15, fontWeight: '600', color: COLORS.text, width: 64 },
   levelRowMin: { fontSize: 14, color: COLORS.muted, flex: 1, textAlign: 'right' },
-  scrim: { flex: 1, backgroundColor: 'rgba(17,24,39,0.4)', justifyContent: 'flex-end' },
-  sheet: { maxHeight: '88%', backgroundColor: COLORS.background, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-  grab: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 8 },
-  sheetContent: { padding: 20, paddingBottom: 40, gap: 12 },
   sheetEyebrow: { fontSize: 13, color: COLORS.muted },
   sheetTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.text },
   sheetText: { fontSize: 15, color: COLORS.body },
@@ -789,12 +929,6 @@ const styles = StyleSheet.create({
   stepText: { flex: 1, fontSize: 14, color: COLORS.body },
   notice: { borderRadius: 12, padding: 14 },
   noticeText: { fontSize: 14 },
-  stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 4 },
-  stepBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.primarySoft, alignItems: 'center', justifyContent: 'center' },
-  stepValue: { fontSize: 20, fontWeight: 'bold', color: COLORS.text },
-  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, marginTop: 4 },
-  priceLabel: { fontSize: 14, color: COLORS.muted },
-  priceValue: { fontSize: 15, fontWeight: '600', color: COLORS.text },
   primaryButton: { backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center', padding: 16, borderRadius: 12 },
   primaryButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
 });

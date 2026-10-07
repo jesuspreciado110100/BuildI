@@ -170,7 +170,7 @@ function ScanHistory({ history }: { history: BadgeScanLog[] }) {
               </View>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={styles.historyTime}>{formatTime(h.checked_in_at ?? h.scanned_at)}</Text>
+              <Text style={styles.historyTime}>{formatTime(h.checked_in_at ?? h.scanned_at, h.checked_in ? h.site_timezone : null)}</Text>
               <Text style={styles.historySub}>{h.checked_in ? h.site_name : 'Solo verificado'}</Text>
             </View>
           </View>

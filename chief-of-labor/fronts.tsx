@@ -9,22 +9,43 @@ import {
   Animated,
   Alert,
   RefreshControl,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   ChiefOfLaborService,
+  Concept,
+  Contractor,
+  Course,
   Enrollment,
   Front,
   LaborSite,
-  QuoteConcept,
+  ProLevel,
+  REAL_SALARY_FACTOR,
   Worker,
+  hasValidCertificate,
+  timezoneLabel,
 } from '@/app/services/ChiefOfLaborService';
 import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
+import {
+  AddSiteSheet,
+  CourseEnrollPanel,
+  LaborField,
+  LaborSheet,
+  MultiChips,
+  SheetButton,
+  money,
+  parseAmount,
+  sheetStyles,
+} from '@/app/components/LaborSheets';
 
-// Frentes a destajo: cada frente es un concepto con precio unitario
-// (volumen × precio) que la cuadrilla ejecuta para la constructora.
-// Datos en Supabase: labor_sites, labor_fronts_summary, labor_front_members,
-// labor_front_progress, labor_quote_catalog y labor_quotes.
+// Frentes a destajo: cada frente es un concepto del catálogo de la obra con
+// precio unitario (volumen × precio) que la cuadrilla ejecuta para la
+// constructora. Las obras son los proyectos reales de BuildI y el avance se
+// guarda con el día de cada obra. Datos en Supabase: labor_my_sites(),
+// labor_site_concepts(), labor_fronts_summary, labor_front_members,
+// labor_front_progress y labor_quotes.
 
 const COLORS = {
   background: '#F9FAFB',
@@ -48,37 +69,46 @@ const COLORS = {
 
 const HEIGHT_COURSE = 'alturas';
 const DELAY_REASONS = ['Faltó material', 'Faltó gente', 'Lluvia', 'Cambio del residente'];
-const AVG_DAILY_WAGE = 560;
-const PAYROLL_TAX = 0.12;
+const STOP_REASONS = ['Falta material', 'Falta frente libre', 'Lluvia', 'Cambio del residente'];
 
 interface FrontsData {
+  contractor: Contractor;
   sites: LaborSite[];
   frontsBySite: Record<string, Front[]>;
   workers: Record<string, Worker>;
   enrollments: Enrollment[];
-  catalog: QuoteConcept[];
+  heightCourse: Course | null;
+  level: ProLevel;
 }
 
 async function loadFronts(): Promise<FrontsData> {
-  const [sites, workers, enrollments, catalog] = await Promise.all([
+  const [contractor, allSites, enrollments, courses, score] = await Promise.all([
+    ChiefOfLaborService.getContractor(),
     ChiefOfLaborService.getSites(),
-    ChiefOfLaborService.getWorkers(),
     ChiefOfLaborService.getEnrollments(),
-    ChiefOfLaborService.getQuoteCatalog(),
+    ChiefOfLaborService.getCourses(),
+    ChiefOfLaborService.getScore(),
   ]);
-  const fronts = await Promise.all(sites.map(s => ChiefOfLaborService.getFronts(s.id)));
+  if (!contractor) throw new Error('No hay contratista.');
+  const sites = allSites.filter(s => s.active);
+  const [workers, fronts] = await Promise.all([
+    ChiefOfLaborService.getWorkers(allSites),
+    Promise.all(sites.map(s => ChiefOfLaborService.getFronts(s.id))),
+  ]);
   return {
+    contractor,
     sites,
     frontsBySite: Object.fromEntries(sites.map((s, i) => [s.id, fronts[i]])),
     workers: Object.fromEntries(workers.map(w => [w.id, w])),
     enrollments,
-    catalog,
+    heightCourse: courses.find(c => c.id === HEIGHT_COURSE) ?? null,
+    level: score.level,
   };
 }
 
-const money = (n: number) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const isPresent = (w?: Worker) => w?.attendance === 'present' || w?.attendance === 'late';
-const hasHeightCert = (w?: Worker) => !!w?.credentials.some(c => c.course_id === HEIGHT_COURSE);
+const hasHeightCert = (w?: Worker) => !!w && hasValidCertificate(w, HEIGHT_COURSE);
+const fmtQty = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 
 function ProgressBar({ done, week, total }: { done: number; week: number; total: number }) {
   const before = Math.max(0, done - week) / total;
@@ -113,7 +143,7 @@ function Stepper({ value, onChange, step, min, max, suffix }: {
       <TouchableOpacity style={styles.stepBtn} onPress={() => onChange(clamp(value - step))} accessibilityLabel="Menos">
         <Ionicons name="remove" size={22} color={COLORS.primary} />
       </TouchableOpacity>
-      <Text style={styles.stepValue}>{value} {suffix}</Text>
+      <Text style={styles.stepValue}>{fmtQty(value)} {suffix}</Text>
       <TouchableOpacity style={styles.stepBtn} onPress={() => onChange(clamp(value + step))} accessibilityLabel="Más">
         <Ionicons name="add" size={22} color={COLORS.primary} />
       </TouchableOpacity>
@@ -141,17 +171,18 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [today, setToday] = useState(0);
   const [reason, setReason] = useState<string | null>(null);
-  const [quoteOpen, setQuoteOpen] = useState(false);
+  const [sheet, setSheet] = useState<'site' | 'front' | 'quote' | null>(null);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const list = data.frontsBySite[siteId] ?? [];
-  const site = data.sites.find(s => s.id === siteId);
+  const site = data.sites.find(s => s.id === siteId) ?? data.sites[0];
+  const list = site ? data.frontsBySite[site.id] ?? [] : [];
   const selected = list.find(f => f.id === selectedId) ?? null;
   const W = data.workers;
 
   const presentCount = (front: Front) => front.member_ids.filter(id => isPresent(W[id])).length;
-  const enrolledInHeights = (id: string) => data.enrollments.some(e => e.worker_id === id && e.course_id === HEIGHT_COURSE);
+  const enrolledInHeights = (id: string) =>
+    data.enrollments.some(e => e.worker_id === id && e.course_id === HEIGHT_COURSE && (e.status === 'enrolled' || e.status === 'attended'));
   // Recomendación (no bloqueo): quién trabaja en altura sin la DC-3 de alturas.
   const missingHeightCert = (front: Front) =>
     front.at_height_note && !front.completed
@@ -164,7 +195,7 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
 
   const totals = useMemo(() => {
     const contract = list.reduce((a, f) => a + f.quantity * f.unit_price, 0);
-    const executed = list.reduce((a, f) => a + f.done * f.unit_price, 0);
+    const executed = list.reduce((a, f) => a + Math.min(f.done, f.quantity) * f.unit_price, 0);
     const week = list.reduce((a, f) => a + f.week * f.unit_price, 0);
     return { contract, pct: contract ? Math.round((executed / contract) * 100) : 0, week };
   }, [list]);
@@ -172,7 +203,7 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
   const openFront = (front: Front) => {
     setSelectedId(front.id);
     setReason(null);
-    setToday(front.blocked_reason || front.completed ? 0 : Math.min(24, front.quantity - front.done));
+    setToday(front.blocked_reason || front.completed ? 0 : Math.min(Math.round(front.rate_per_person_day * Math.max(1, presentCount(front))), front.quantity - front.done));
   };
 
   const run = async (work: () => Promise<void>, done?: string) => {
@@ -196,6 +227,11 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
     run(() => ChiefOfLaborService.recordProgress(front.id, qty, reason));
   };
 
+  const setBlocked = (front: Front, blocked: string | null) => {
+    setSelectedId(null);
+    run(() => ChiefOfLaborService.setFrontBlocked(front.id, blocked));
+  };
+
   const moveCrewFromBlocked = (blocked: Front) => {
     const target = list.find(f => !f.blocked_reason && !f.completed && presentCount(f) < f.people_needed);
     if (!target) {
@@ -216,13 +252,16 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
     );
   };
 
-  const enroll = (ids: string[]) =>
-    run(() => ChiefOfLaborService.enroll(HEIGHT_COURSE, ids), `${namesList(ids)} al curso de trabajo en alturas del sábado.`);
-
   const refresh = async () => {
     setRefreshing(true);
     await reload(true);
     setRefreshing(false);
+  };
+
+  const afterSheet = async (message?: string) => {
+    setSheet(null);
+    await reload(true);
+    if (message) Alert.alert('Listo', message);
   };
 
   return (
@@ -230,109 +269,147 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <View style={styles.header}>
           <Text style={styles.title}>Frentes a destajo</Text>
-          {site ? <Text style={styles.subtitle}>{site.builder_name}</Text> : null}
+          {site ? (
+            <Text style={styles.subtitle}>
+              {site.builder_name ? `${site.builder_name} · ` : ''}{timezoneLabel(site.timezone)}
+            </Text>
+          ) : null}
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.siteRow}>
-          {data.sites.map(s => (
-            <TouchableOpacity
-              key={s.id}
-              style={[styles.siteChip, s.id === siteId && styles.siteChipActive]}
-              onPress={() => setSiteId(s.id)}
-            >
-              <Text style={[styles.siteChipText, s.id === siteId && styles.siteChipTextActive]}>{s.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={styles.summary}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{money(totals.contract / 1000)}k</Text>
-            <Text style={styles.summaryLabel}>Contrato</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{totals.pct}%</Text>
-            <Text style={styles.summaryLabel}>Ejecutado</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{money(totals.week / 1000)}k</Text>
-            <Text style={styles.summaryLabel}>Esta semana</Text>
-          </View>
-        </View>
-
-        <View style={styles.list}>
-          {list.length === 0 && <Text style={styles.metaText}>Esta obra todavía no tiene frentes.</Text>}
-          {list.map(front => {
-            const short = !front.blocked_reason && !front.completed && presentCount(front) < front.people_needed;
-            const noCert = missingHeightCert(front);
-            const status = statusOf(front);
-            return (
-              <TouchableOpacity key={front.id} style={styles.card} onPress={() => openFront(front)} activeOpacity={0.8}>
-                <View style={styles.cardHeader}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.cardTitle}>{front.description}</Text>
-                    <Text style={styles.cardSubtitle}>{money(front.unit_price)}/{front.unit} · {front.item_code}</Text>
-                  </View>
-                  <View style={[styles.statusBadge, { backgroundColor: status.color }]}>
-                    <Text style={styles.statusText}>{status.label}</Text>
-                  </View>
-                </View>
-                <ProgressBar done={front.done} week={front.week} total={front.quantity} />
-                <View style={styles.cardMeta}>
-                  <Text style={styles.metaText}>{front.done} de {front.quantity} {front.unit}</Text>
-                  <Text style={[styles.metaText, { color: COLORS.primary }]}>+{front.week} esta semana</Text>
-                  <View style={styles.crew}>
-                    {front.member_ids.filter(id => W[id]).map((id, i) => (
-                      <View
-                        key={id}
-                        style={[
-                          styles.avatar,
-                          { backgroundColor: W[id].color, marginLeft: i ? -6 : 0 },
-                          !isPresent(W[id]) && styles.avatarAbsent,
-                        ]}
-                      >
-                        <Text style={styles.avatarText}>{W[id].code}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-                {front.blocked_reason && (
-                  <View style={styles.detailItem}>
-                    <Ionicons name="alert-circle" size={16} color={COLORS.error} />
-                    <Text style={[styles.detailText, { color: COLORS.error }]}>{front.blocked_reason}</Text>
-                  </View>
-                )}
-                {front.completed && (
-                  <View style={styles.detailItem}>
-                    <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
-                    <Text style={styles.detailText}>Terminado y recibido por el residente</Text>
-                  </View>
-                )}
-                {short && (
-                  <View style={styles.detailItem}>
-                    <Ionicons name="people" size={16} color={COLORS.warning} />
-                    <Text style={[styles.detailText, { color: COLORS.warningText }]}>
-                      Hay {presentCount(front)} de {front.people_needed} personas hoy
-                    </Text>
-                  </View>
-                )}
-                {noCert.length > 0 && (
-                  <View style={styles.detailItem}>
-                    <Ionicons name="bulb" size={16} color={COLORS.warning} />
-                    <Text style={[styles.detailText, { color: COLORS.warningText }]}>
-                      Recomendación: {noCert.length} {noCert.length === 1 ? 'persona' : 'personas'} sin curso de alturas
-                    </Text>
-                  </View>
-                )}
+        {data.sites.length === 0 ? (
+          <View style={styles.list}>
+            <View style={[styles.card, { alignItems: 'center' }]}>
+              <Ionicons name="business" size={32} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Agrega la obra donde trabajas</Text>
+              <Text style={[styles.metaText, { textAlign: 'center' }]}>
+                Busca la obra en BuildI. Sus frentes salen del catálogo de conceptos de la constructora y el avance se guarda con la hora de la obra.
+              </Text>
+              <TouchableOpacity style={[styles.primaryButton, styles.sheetButton, { alignSelf: 'stretch' }]} onPress={() => setSheet('site')}>
+                <Ionicons name="add-circle" size={22} color="#FFFFFF" />
+                <Text style={styles.primaryButtonText}>Agregar obra</Text>
               </TouchableOpacity>
-            );
-          })}
-        </View>
+            </View>
+          </View>
+        ) : (
+          <>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.siteRow}>
+              {data.sites.map(s => (
+                <TouchableOpacity
+                  key={s.id}
+                  style={[styles.siteChip, s.id === site?.id && styles.siteChipActive]}
+                  onPress={() => setSiteId(s.id)}
+                >
+                  <Text style={[styles.siteChipText, s.id === site?.id && styles.siteChipTextActive]}>{s.name}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity style={styles.siteChip} onPress={() => setSheet('site')} accessibilityLabel="Agregar obra">
+                <Text style={styles.siteChipText}>+ Obra</Text>
+              </TouchableOpacity>
+            </ScrollView>
 
-        <TouchableOpacity style={styles.primaryButton} onPress={() => setQuoteOpen(true)}>
-          <Ionicons name="add-circle" size={24} color="#FFFFFF" />
-          <Text style={styles.primaryButtonText}>Cotizar concepto nuevo</Text>
-        </TouchableOpacity>
+            <View style={styles.summary}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{money(totals.contract / 1000)}k</Text>
+                <Text style={styles.summaryLabel}>Contrato</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{totals.pct}%</Text>
+                <Text style={styles.summaryLabel}>Ejecutado</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{money(totals.week / 1000)}k</Text>
+                <Text style={styles.summaryLabel}>Esta semana</Text>
+              </View>
+            </View>
+
+            <View style={styles.list}>
+              {list.length === 0 && (
+                <View style={[styles.card, { alignItems: 'center' }]}>
+                  <Text style={styles.cardTitle}>Esta obra todavía no tiene frentes</Text>
+                  <Text style={[styles.metaText, { textAlign: 'center' }]}>
+                    Elige un concepto del catálogo de la obra, pon tu precio a destajo y quién trabaja en él.
+                  </Text>
+                </View>
+              )}
+              {list.map(front => {
+                const short = !front.blocked_reason && !front.completed && presentCount(front) < front.people_needed;
+                const noCert = missingHeightCert(front);
+                const status = statusOf(front);
+                return (
+                  <TouchableOpacity key={front.id} style={styles.card} onPress={() => openFront(front)} activeOpacity={0.8}>
+                    <View style={styles.cardHeader}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.cardTitle}>{front.description}</Text>
+                        <Text style={styles.cardSubtitle}>
+                          {money(front.unit_price)}/{front.unit}{front.item_code ? ` · ${front.item_code}` : ''}
+                        </Text>
+                      </View>
+                      <View style={[styles.statusBadge, { backgroundColor: status.color }]}>
+                        <Text style={styles.statusText}>{status.label}</Text>
+                      </View>
+                    </View>
+                    <ProgressBar done={Math.min(front.done, front.quantity)} week={front.week} total={front.quantity} />
+                    <View style={styles.cardMeta}>
+                      <Text style={styles.metaText}>{fmtQty(front.done)} de {fmtQty(front.quantity)} {front.unit}</Text>
+                      <Text style={[styles.metaText, { color: COLORS.primary }]}>+{fmtQty(front.week)} esta semana</Text>
+                      <View style={styles.crew}>
+                        {front.member_ids.filter(id => W[id]).map((id, i) => (
+                          <View
+                            key={id}
+                            style={[
+                              styles.avatar,
+                              { backgroundColor: W[id].color, marginLeft: i ? -6 : 0 },
+                              !isPresent(W[id]) && styles.avatarAbsent,
+                            ]}
+                          >
+                            <Text style={styles.avatarText}>{W[id].code}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                    {front.blocked_reason && (
+                      <View style={styles.detailItem}>
+                        <Ionicons name="alert-circle" size={16} color={COLORS.error} />
+                        <Text style={[styles.detailText, { color: COLORS.error }]}>{front.blocked_reason}</Text>
+                      </View>
+                    )}
+                    {front.completed && (
+                      <View style={styles.detailItem}>
+                        <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
+                        <Text style={styles.detailText}>Terminado</Text>
+                      </View>
+                    )}
+                    {short && (
+                      <View style={styles.detailItem}>
+                        <Ionicons name="people" size={16} color={COLORS.warning} />
+                        <Text style={[styles.detailText, { color: COLORS.warningText }]}>
+                          Hay {presentCount(front)} de {front.people_needed} personas hoy
+                        </Text>
+                      </View>
+                    )}
+                    {noCert.length > 0 && (
+                      <View style={styles.detailItem}>
+                        <Ionicons name="bulb" size={16} color={COLORS.warning} />
+                        <Text style={[styles.detailText, { color: COLORS.warningText }]}>
+                          Recomendación: {noCert.length} {noCert.length === 1 ? 'persona' : 'personas'} sin curso de alturas
+                        </Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <TouchableOpacity style={styles.primaryButton} onPress={() => setSheet('front')}>
+              <Ionicons name="add-circle" size={24} color="#FFFFFF" />
+              <Text style={styles.primaryButtonText}>Nuevo frente</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.outlineButton} onPress={() => setSheet('quote')}>
+              <Ionicons name="pricetag-outline" size={20} color={COLORS.primary} />
+              <Text style={styles.outlineButtonText}>Cotizar un concepto a la constructora</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </ScrollView>
 
       <Modal visible={!!selected} transparent animationType="slide" onRequestClose={() => setSelectedId(null)}>
@@ -349,32 +426,45 @@ function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: bo
               setReason={setReason}
               noCert={missingHeightCert(selected)}
               namesList={namesList}
+              heightCourse={data.heightCourse}
+              level={data.level}
               saving={saving}
-              onEnroll={enroll}
+              onEnrolled={message => {
+                setSelectedId(null);
+                reload(true);
+                Alert.alert('Curso de alturas', message);
+              }}
               onSave={saveProgress}
+              onBlock={r => setBlocked(selected, r)}
               onMoveCrew={() => moveCrewFromBlocked(selected)}
             />
           )}
         </View>
       </Modal>
 
-      <Modal visible={quoteOpen} transparent animationType="slide" onRequestClose={() => setQuoteOpen(false)}>
-        <View style={styles.scrim}>
-          <TouchableOpacity style={styles.scrimTap} onPress={() => setQuoteOpen(false)} accessibilityLabel="Cerrar" />
-          {data.catalog.length > 0 && (
-            <QuoteSheet
-              catalog={data.catalog}
-              site={site ?? null}
-              onSent={() => setQuoteOpen(false)}
-            />
-          )}
-        </View>
-      </Modal>
+      <AddSiteSheet
+        visible={sheet === 'site'}
+        linkedProjectIds={data.sites.map(s => s.project_id)}
+        onClose={() => setSheet(null)}
+        onLinked={() => afterSheet()}
+      />
+
+      <LaborSheet visible={sheet === 'front' && !!site} onClose={() => setSheet(null)}>
+        {sheet === 'front' && site && (
+          <NewFrontForm site={site} fronts={list} workers={Object.values(W)} onSaved={afterSheet} />
+        )}
+      </LaborSheet>
+
+      <LaborSheet visible={sheet === 'quote' && !!site} onClose={() => setSheet(null)}>
+        {sheet === 'quote' && site && (
+          <QuoteForm site={site} fronts={list} contractor={data.contractor} onSent={afterSheet} />
+        )}
+      </LaborSheet>
     </View>
   );
 }
 
-function FrontSheet({ front, siteName, people, today, setToday, reason, setReason, noCert, namesList, saving, onEnroll, onSave, onMoveCrew }: {
+function FrontSheet({ front, siteName, people, today, setToday, reason, setReason, noCert, namesList, heightCourse, level, saving, onEnrolled, onSave, onBlock, onMoveCrew }: {
   front: Front;
   siteName: string;
   people: number;
@@ -384,13 +474,18 @@ function FrontSheet({ front, siteName, people, today, setToday, reason, setReaso
   setReason: (r: string) => void;
   noCert: string[];
   namesList: (ids: string[]) => string;
+  heightCourse: Course | null;
+  level: ProLevel;
   saving: boolean;
-  onEnroll: (ids: string[]) => void;
+  onEnrolled: (message: string) => void;
   onSave: () => void;
+  onBlock: (reason: string | null) => void;
   onMoveCrew: () => void;
 }) {
   const [dismissed, setDismissed] = useState(false);
-  const expected = front.rate_per_person_day * people;
+  const [enrolling, setEnrolling] = useState(false);
+  const [stopping, setStopping] = useState(false);
+  const expected = Math.round(front.rate_per_person_day * people * 10) / 10;
   const remaining = Math.max(0, front.quantity - front.done);
   const daysLeft = Math.ceil(remaining / expected);
   const onPace = today >= expected * 0.9;
@@ -399,7 +494,7 @@ function FrontSheet({ front, siteName, people, today, setToday, reason, setReaso
     <View style={styles.sheet}>
       <View style={styles.grab} />
       <ScrollView contentContainerStyle={styles.sheetContent}>
-        <Text style={styles.sheetEyebrow}>{siteName} · {front.item_code}</Text>
+        <Text style={styles.sheetEyebrow}>{siteName}{front.item_code ? ` · ${front.item_code}` : ''}</Text>
         <Text style={styles.sheetTitle}>{front.description}</Text>
 
         {noCert.length > 0 && !dismissed && (
@@ -412,14 +507,22 @@ function FrontSheet({ front, siteName, people, today, setToday, reason, setReaso
               <Text style={styles.recText}>
                 Este frente es en {front.at_height_note}. {namesList(noCert)} no {noCert.length === 1 ? 'tiene' : 'tienen'} la DC-3 de trabajo en alturas (NOM-009). Te recomendamos inscribirlos o pasarlos a un frente a nivel de piso.
               </Text>
-              <View style={styles.recActions}>
-                <TouchableOpacity style={[styles.actionButton, saving && { opacity: 0.5 }]} disabled={saving} onPress={() => onEnroll(noCert)}>
-                  <Text style={styles.actionText}>Inscribir al curso</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.laterButton} onPress={() => setDismissed(true)}>
-                  <Text style={styles.laterText}>Entendido</Text>
-                </TouchableOpacity>
-              </View>
+              {enrolling && heightCourse ? (
+                <View style={{ marginTop: 10 }}>
+                  <CourseEnrollPanel course={heightCourse} level={level} people={noCert.length} workerIds={noCert} onEnrolled={onEnrolled} />
+                </View>
+              ) : (
+                <View style={styles.recActions}>
+                  {heightCourse && (
+                    <TouchableOpacity style={[styles.actionButton, saving && { opacity: 0.5 }]} disabled={saving} onPress={() => setEnrolling(true)}>
+                      <Text style={styles.actionText}>Inscribir al curso</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity style={styles.laterButton} onPress={() => setDismissed(true)}>
+                    <Text style={styles.laterText}>Entendido</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </View>
         )}
@@ -429,15 +532,21 @@ function FrontSheet({ front, siteName, people, today, setToday, reason, setReaso
             <Text style={[styles.noticeText, { color: '#B91C1C' }]}>
               {front.blocked_reason}. Mientras, la cuadrilla puede pasar a otro frente.
             </Text>
-            <TouchableOpacity style={styles.actionButton} onPress={onMoveCrew}>
-              <Ionicons name="swap-horizontal" size={16} color={COLORS.primary} />
-              <Text style={styles.actionText}>Mover gente</Text>
-            </TouchableOpacity>
+            <View style={styles.recActions}>
+              <TouchableOpacity style={styles.actionButton} onPress={onMoveCrew}>
+                <Ionicons name="swap-horizontal" size={16} color={COLORS.primary} />
+                <Text style={styles.actionText}>Mover gente</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.actionButton} onPress={() => onBlock(null)} disabled={saving}>
+                <Ionicons name="play" size={16} color={COLORS.primary} />
+                <Text style={styles.actionText}>Reanudar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : front.completed ? (
           <View style={[styles.notice, { backgroundColor: COLORS.successSoft }]}>
             <Text style={[styles.noticeText, { color: '#047857' }]}>
-              Terminado: {front.quantity} {front.unit} recibidos por el residente.
+              Terminado: {fmtQty(front.done)} de {fmtQty(front.quantity)} {front.unit}.
             </Text>
           </View>
         ) : (
@@ -445,12 +554,12 @@ function FrontSheet({ front, siteName, people, today, setToday, reason, setReaso
             <View style={styles.compare}>
               <View style={styles.compareBox}>
                 <Text style={styles.compareLabel}>Esperado hoy ({people} pers.)</Text>
-                <Text style={styles.compareValue}>{expected} {front.unit}</Text>
+                <Text style={styles.compareValue}>{fmtQty(expected)} {front.unit}</Text>
               </View>
               <View style={styles.compareBox}>
                 <Text style={styles.compareLabel}>Real hoy</Text>
                 <Text style={[styles.compareValue, { color: onPace ? COLORS.success : COLORS.warning }]}>
-                  {today} {front.unit}
+                  {fmtQty(today)} {front.unit}
                 </Text>
               </View>
             </View>
@@ -486,122 +595,314 @@ function FrontSheet({ front, siteName, people, today, setToday, reason, setReaso
         )}
 
         <View style={styles.sheetCard}>
-          <Row label="Hecho" value={`${front.done} de ${front.quantity} ${front.unit}`} />
+          <Row label="Hecho" value={`${fmtQty(front.done)} de ${fmtQty(front.quantity)} ${front.unit}`} />
           <Row label="Precio unitario a destajo" value={`${money(front.unit_price)}/${front.unit}`} />
+          <Row label="Rendimiento" value={`${fmtQty(front.rate_per_person_day)} ${front.unit}/persona/día`} />
           {!front.completed && !front.blocked_reason && <Row label="A este ritmo terminas en" value={`${daysLeft} días`} />}
           {!front.completed && !front.blocked_reason && <Row label="Lo de hoy vale" value={money(today * front.unit_price)} />}
         </View>
 
         {!front.blocked_reason && !front.completed && (
-          <TouchableOpacity
-            style={[styles.primaryButton, styles.sheetButton, (today <= 0 || saving) && { opacity: 0.4 }]}
-            onPress={onSave}
-            disabled={today <= 0 || saving}
-          >
-            <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
-            <Text style={styles.primaryButtonText}>Guardar avance</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={[styles.primaryButton, styles.sheetButton, (today <= 0 || saving) && { opacity: 0.4 }]}
+              onPress={onSave}
+              disabled={today <= 0 || saving}
+            >
+              <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
+              <Text style={styles.primaryButtonText}>Guardar avance</Text>
+            </TouchableOpacity>
+            {stopping ? (
+              <View style={styles.sheetCard}>
+                <Text style={styles.sheetLabel}>¿Por qué se detuvo?</Text>
+                <View style={styles.chipRow}>
+                  {STOP_REASONS.map(r => (
+                    <TouchableOpacity key={r} style={styles.chip} onPress={() => onBlock(r)} disabled={saving}>
+                      <Text style={styles.chipText}>{r}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity style={[styles.laterButton, { alignSelf: 'center' }]} onPress={() => setStopping(true)}>
+                <Text style={styles.laterText}>Se detuvo este frente</Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
   );
 }
 
-function QuoteSheet({ catalog, site, onSent }: { catalog: QuoteConcept[]; site: LaborSite | null; onSent: () => void }) {
-  const [index, setIndex] = useState(0);
-  const concept = catalog[index];
-  const [volume, setVolume] = useState(180);
-  const [people, setPeople] = useState(4);
-  const [price, setPrice] = useState(concept.default_unit_price);
-  const [sending, setSending] = useState(false);
-  const builder = site?.builder_name ?? 'la constructora';
+// Conceptos del catálogo de la obra que todavía no son frente (con buscador).
+function ConceptPicker({ siteId, exclude, selected, onSelect }: {
+  siteId: string;
+  exclude: string[];
+  selected: Concept | null;
+  onSelect: (c: Concept | null) => void;
+}) {
+  const [concepts, setConcepts] = useState<Concept[] | null>(null);
+  const [query, setQuery] = useState('');
 
-  const days = Math.ceil(volume / (concept.rate_per_person_day * people));
-  const payroll = days * people * AVG_DAILY_WAGE * (1 + PAYROLL_TAX);
-  const amount = volume * price;
-  const profit = amount - payroll;
-  const diff = (price - concept.market_unit_price) / concept.market_unit_price;
-  const inRange = Math.abs(diff) <= 0.1;
+  useEffect(() => {
+    ChiefOfLaborService.getSiteConcepts(siteId)
+      .then(setConcepts)
+      .catch(() => setConcepts([]));
+  }, [siteId]);
 
-  const pick = (i: number) => {
-    setIndex(i);
-    setPrice(catalog[i].default_unit_price);
+  if (concepts === null) return <ActivityIndicator color={COLORS.primary} />;
+  const q = query.trim().toLowerCase();
+  const available = concepts.filter(
+    c => !exclude.includes(c.item_id) && (!q || c.description.toLowerCase().includes(q) || (c.item_code ?? '').toLowerCase().includes(q)),
+  );
+
+  if (selected) {
+    return (
+      <View style={styles.sheetCard}>
+        <Text style={styles.sheetEyebrow}>{selected.item_code ?? 'Concepto del catálogo'}</Text>
+        <Text style={styles.sheetLabel}>{selected.description}</Text>
+        <Text style={styles.metaText}>
+          {selected.quantity !== null ? `${fmtQty(selected.quantity)} ${selected.unit} en el catálogo de la obra` : selected.unit}
+        </Text>
+        <TouchableOpacity style={styles.laterButton} onPress={() => onSelect(null)}>
+          <Text style={styles.laterText}>Cambiar concepto</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (concepts.length === 0) {
+    return (
+      <Text style={styles.metaText}>
+        Esta obra no tiene catálogo de conceptos en BuildI (o la constructora no lo ha compartido). Escribe el concepto abajo.
+      </Text>
+    );
+  }
+
+  return (
+    <View style={styles.sheetCard}>
+      <TextInput style={styles.searchInput} placeholder="Buscar concepto o clave" placeholderTextColor="#9CA3AF" value={query} onChangeText={setQuery} />
+      {available.slice(0, 30).map((c, i) => (
+        <TouchableOpacity key={c.item_id} style={[styles.conceptRow, i > 0 && styles.rowBorder]} onPress={() => onSelect(c)}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.conceptTitle} numberOfLines={2}>{c.description}</Text>
+            <Text style={styles.metaText}>
+              {[c.item_code, c.quantity !== null ? `${fmtQty(c.quantity)} ${c.unit}` : c.unit].filter(Boolean).join(' · ')}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+        </TouchableOpacity>
+      ))}
+      {available.length === 0 && <Text style={styles.metaText}>Ningún concepto con ese texto.</Text>}
+    </View>
+  );
+}
+
+// Nuevo frente desde el catálogo de la obra (o escrito a mano si no hay catálogo).
+function NewFrontForm({ site, fronts, workers, onSaved }: {
+  site: LaborSite;
+  fronts: Front[];
+  workers: Worker[];
+  onSaved: (message?: string) => void;
+}) {
+  const [concept, setConcept] = useState<Concept | null>(null);
+  const [description, setDescription] = useState('');
+  const [unit, setUnit] = useState('m²');
+  const [quantity, setQuantity] = useState('');
+  const [price, setPrice] = useState('');
+  const [rate, setRate] = useState('');
+  const [people, setPeople] = useState(2);
+  const [height, setHeight] = useState('');
+  const [members, setMembers] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pick = (c: Concept | null) => {
+    setConcept(c);
+    if (c) {
+      setDescription(c.description);
+      setUnit(c.unit || 'm²');
+      setQuantity(c.quantity !== null ? String(c.quantity) : '');
+    }
   };
 
+  const qty = parseAmount(quantity);
+  const unitPrice = parseAmount(price);
+  const ratePerDay = parseAmount(rate);
+  const ready = description.trim().length > 2 && unit.trim().length > 0 && qty !== null && unitPrice !== null && ratePerDay !== null;
+
+  const save = async () => {
+    if (!ready) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await ChiefOfLaborService.createFront({
+        siteId: site.id,
+        catalogItemId: concept?.item_id ?? null,
+        itemCode: concept?.item_code ?? null,
+        description,
+        unit,
+        quantity: qty!,
+        unitPrice: unitPrice!,
+        peopleNeeded: people,
+        ratePerPersonDay: ratePerDay!,
+        atHeightNote: height,
+        memberIds: members,
+      });
+      onSaved(`${description.trim()}: ${fmtQty(qty!)} ${unit} a ${money(unitPrice!)}.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <Text style={sheetStyles.eyebrow}>{site.name}</Text>
+      <Text style={sheetStyles.title}>Nuevo frente</Text>
+      <Text style={sheetStyles.label}>Concepto del catálogo de la obra</Text>
+      <ConceptPicker siteId={site.id} exclude={fronts.map(f => f.catalog_item_id).filter((x): x is string => !!x)} selected={concept} onSelect={pick} />
+      {!concept && (
+        <>
+          <LaborField label="O escríbelo" value={description} onChangeText={setDescription} placeholder="Ej. Muro de block 15 cm" />
+          <LaborField label="Unidad" value={unit} onChangeText={setUnit} placeholder="m², m, pza…" />
+        </>
+      )}
+      <LaborField label={`Volumen para tu cuadrilla (${unit})`} value={quantity} onChangeText={setQuantity} placeholder="Ej. 420" keyboardType="decimal-pad" />
+      <LaborField label={`Tu precio a destajo ($/${unit})`} value={price} onChangeText={setPrice} placeholder="Lo que te paga la constructora" keyboardType="decimal-pad" />
+      <LaborField
+        label={`Rendimiento (${unit} por persona al día)`}
+        value={rate}
+        onChangeText={setRate}
+        placeholder="Ej. 9"
+        keyboardType="decimal-pad"
+        hint="Con esto la app calcula cuánto deberían avanzar al día y cuándo terminan."
+      />
+      <Text style={sheetStyles.label}>Personas que necesita</Text>
+      <Stepper value={people} onChange={setPeople} step={1} min={1} max={30} suffix={people === 1 ? 'persona' : 'personas'} />
+      {workers.length > 0 && (
+        <>
+          <Text style={sheetStyles.label}>Quién trabaja en él</Text>
+          <MultiChips options={workers.map(w => ({ value: w.id, label: w.full_name, muted: !isPresent(w) }))} values={members} onChange={setMembers} />
+        </>
+      )}
+      <LaborField
+        label="¿Es en altura? ¿Dónde? (opcional)"
+        value={height}
+        onChangeText={setHeight}
+        placeholder="Ej. el nivel 3"
+        hint="Si es a más de 1.8 m, la app te recomienda el curso de alturas para quien no lo tenga."
+      />
+      {error && <Text style={sheetStyles.error}>{error}</Text>}
+      <SheetButton label="Crear frente" icon="add-circle" onPress={save} busy={saving} disabled={!ready} />
+    </>
+  );
+}
+
+// Propuesta a destajo para un concepto de la obra. La raya y la utilidad
+// solo las ves tú; la constructora recibe volumen, precio, gente y días.
+function QuoteForm({ site, fronts, contractor, onSent }: {
+  site: LaborSite;
+  fronts: Front[];
+  contractor: Contractor;
+  onSent: (message?: string) => void;
+}) {
+  const [concept, setConcept] = useState<Concept | null>(null);
+  const [description, setDescription] = useState('');
+  const [unit, setUnit] = useState('m²');
+  const [volume, setVolume] = useState('');
+  const [price, setPrice] = useState('');
+  const [rate, setRate] = useState('');
+  const [people, setPeople] = useState(4);
+  const [wage, setWage] = useState(contractor.avg_daily_wage ? String(contractor.avg_daily_wage) : '');
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pick = (c: Concept | null) => {
+    setConcept(c);
+    if (c) {
+      setDescription(c.description);
+      setUnit(c.unit || 'm²');
+      setVolume(c.quantity !== null ? String(c.quantity) : '');
+    }
+  };
+
+  const vol = parseAmount(volume);
+  const unitPrice = parseAmount(price);
+  const ratePerDay = parseAmount(rate);
+  const dailyWage = parseAmount(wage);
+  const days = vol && ratePerDay ? Math.ceil(vol / (ratePerDay * people)) : null;
+  const amount = vol && unitPrice ? vol * unitPrice : null;
+  const payroll = days && dailyWage ? days * people * dailyWage * REAL_SALARY_FACTOR : null;
+  const profit = amount !== null && payroll !== null ? amount - payroll : null;
+  const ready = description.trim().length > 2 && !!vol && !!unitPrice && !!days;
+  const builder = site.builder_name ?? 'la constructora';
+
   const send = async () => {
+    if (!ready) return;
     setSending(true);
+    setError(null);
     try {
       await ChiefOfLaborService.sendQuote({
-        siteId: site?.id ?? null,
-        builderName: builder,
-        catalogId: concept.id,
-        volume,
+        siteId: site.id,
+        catalogItemId: concept?.item_id ?? null,
+        description,
+        unit,
+        volume: vol!,
         people,
-        unitPrice: price,
-        estDays: days,
-        estPayroll: payroll,
+        unitPrice: unitPrice!,
+        estDays: days!,
       });
-      Alert.alert('Propuesta enviada', `${concept.description}: ${volume} ${concept.unit} a ${money(price)} para ${builder}.`);
-      onSent();
+      if (dailyWage && dailyWage !== contractor.avg_daily_wage) {
+        await ChiefOfLaborService.updateContractor(contractor.id, { avg_daily_wage: dailyWage }).catch(() => undefined);
+      }
+      onSent(`${description.trim()}: ${fmtQty(vol!)} ${unit} a ${money(unitPrice!)} para ${builder}.`);
     } catch (e) {
-      Alert.alert('No se pudo enviar', e instanceof Error ? e.message : 'Intenta de nuevo.');
-    } finally {
+      setError(e instanceof Error ? e.message : 'No se pudo enviar.');
       setSending(false);
     }
   };
 
   return (
-    <View style={styles.sheet}>
-      <View style={styles.grab} />
-      <ScrollView contentContainerStyle={styles.sheetContent}>
-        <Text style={styles.sheetEyebrow}>Propuesta para {builder}</Text>
-        <Text style={styles.sheetTitle}>Cotizar concepto</Text>
+    <>
+      <Text style={sheetStyles.eyebrow}>Propuesta para {builder} · {site.name}</Text>
+      <Text style={sheetStyles.title}>Cotizar concepto</Text>
+      <ConceptPicker siteId={site.id} exclude={fronts.map(f => f.catalog_item_id).filter((x): x is string => !!x)} selected={concept} onSelect={pick} />
+      {!concept && (
+        <>
+          <LaborField label="Concepto" value={description} onChangeText={setDescription} placeholder="Ej. Aplanado fino en muros" />
+          <LaborField label="Unidad" value={unit} onChangeText={setUnit} placeholder="m², m, pza…" />
+        </>
+      )}
+      <LaborField label={`Volumen (${unit})`} value={volume} onChangeText={setVolume} placeholder="Ej. 840" keyboardType="decimal-pad" />
+      <LaborField label={`Tu precio unitario ($/${unit})`} value={price} onChangeText={setPrice} placeholder="Ej. 95" keyboardType="decimal-pad" />
+      <LaborField label={`Rendimiento (${unit} por persona al día)`} value={rate} onChangeText={setRate} placeholder="Ej. 16" keyboardType="decimal-pad" />
+      <Text style={sheetStyles.label}>Personas en el frente</Text>
+      <Stepper value={people} onChange={setPeople} step={1} min={1} max={30} suffix="" />
+      <LaborField
+        label="Raya promedio por persona al día"
+        value={wage}
+        onChangeText={setWage}
+        placeholder="Lo que pagas al día"
+        keyboardType="decimal-pad"
+        hint="Solo la ves tú. Se guarda para tus siguientes cotizaciones."
+      />
 
-        <View style={styles.chipRow}>
-          {catalog.map((c, i) => (
-            <TouchableOpacity key={c.id} style={[styles.chip, i === index && styles.chipActive]} onPress={() => pick(i)}>
-              <Text style={[styles.chipText, i === index && styles.chipTextActive]}>{c.description}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={styles.sheetCard}>
-          <Text style={styles.sheetLabel}>Volumen</Text>
-          <Stepper value={volume} onChange={setVolume} step={10} min={10} max={2000} suffix={concept.unit} />
-          <Text style={styles.sheetLabel}>Personas en el frente</Text>
-          <Stepper value={people} onChange={setPeople} step={1} min={1} max={12} suffix="" />
-          <Text style={styles.sheetLabel}>Tu precio unitario</Text>
-          <Stepper value={price} onChange={setPrice} step={5} min={5} max={5000} suffix={`$/${concept.unit}`} />
-        </View>
-
-        <View style={[styles.notice, { backgroundColor: inRange ? COLORS.successSoft : COLORS.warningSoft }]}>
-          <Text style={[styles.noticeText, { color: inRange ? '#047857' : COLORS.warningText }]}>
-            Promedio en la zona: {money(concept.market_unit_price)}/{concept.unit}.{' '}
-            {inRange
-              ? 'Estás en rango.'
-              : diff > 0
-                ? `Estás ${Math.round(diff * 100)}% arriba: puede que te ganen la obra.`
-                : `Estás ${Math.round(-diff * 100)}% abajo: estás dejando dinero.`}
+      <View style={styles.sheetCard}>
+        <Row label="Duración" value={days ? `${days} días con ${people}` : '—'} />
+        <Row label="Importe" value={amount !== null ? money(amount) : '—'} />
+        <Row label={`Raya con IMSS y prestaciones (×${REAL_SALARY_FACTOR})`} value={payroll !== null ? `−${money(payroll)}` : '—'} />
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>Tu utilidad</Text>
+          <Text style={[styles.totalValue, { color: profit === null ? COLORS.muted : profit > 0 ? COLORS.success : COLORS.error }]}>
+            {profit !== null ? money(profit) : '—'}
           </Text>
         </View>
-
-        <View style={styles.sheetCard}>
-          <Row label="Rendimiento" value={`${concept.rate_per_person_day} ${concept.unit}/persona/día`} />
-          <Row label="Duración" value={`${days} días con ${people}`} />
-          <Row label="Importe" value={money(amount)} />
-          <Row label="Raya + IMSS" value={`−${money(payroll)}`} />
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Tu utilidad</Text>
-            <Text style={[styles.totalValue, { color: profit > 0 ? COLORS.success : COLORS.error }]}>{money(profit)}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity style={[styles.primaryButton, styles.sheetButton, sending && { opacity: 0.5 }]} onPress={send} disabled={sending}>
-          <Ionicons name="send" size={20} color="#FFFFFF" />
-          <Text style={styles.primaryButtonText}>Enviar propuesta</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+      </View>
+      {error && <Text style={sheetStyles.error}>{error}</Text>}
+      <SheetButton label="Enviar propuesta" icon="send" onPress={send} busy={sending} disabled={!ready} />
+    </>
   );
 }
 
@@ -654,9 +955,11 @@ const styles = StyleSheet.create({
   avatarText: { color: '#FFFFFF', fontSize: 9, fontWeight: 'bold' },
   detailItem: { flexDirection: 'row', alignItems: 'center' },
   detailText: { fontSize: 14, color: COLORS.body, marginLeft: 8, flex: 1 },
-  primaryButton: { backgroundColor: COLORS.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, margin: 20, borderRadius: 12, gap: 8 },
+  primaryButton: { backgroundColor: COLORS.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, margin: 20, marginBottom: 0, borderRadius: 12, gap: 8 },
   sheetButton: { margin: 0 },
   primaryButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  outlineButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, margin: 20, marginTop: 12, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: COLORS.primaryLight, backgroundColor: COLORS.card },
+  outlineButtonText: { color: COLORS.primary, fontSize: 15, fontWeight: '600' },
   scrim: { flex: 1, backgroundColor: 'rgba(17,24,39,0.4)', justifyContent: 'flex-end' },
   scrimTap: { flex: 1 },
   sheet: { maxHeight: '88%', backgroundColor: COLORS.background, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
@@ -671,7 +974,7 @@ const styles = StyleSheet.create({
   recActions: { flexDirection: 'row', gap: 8, marginTop: 10 },
   actionButton: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: COLORS.primarySoft, gap: 4 },
   actionText: { fontSize: 12, color: COLORS.primary, fontWeight: '500' },
-  laterButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: COLORS.divider },
+  laterButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: COLORS.divider, alignSelf: 'flex-start' },
   laterText: { fontSize: 12, color: COLORS.muted, fontWeight: '500' },
   compare: { flexDirection: 'row', gap: 12 },
   compareBox: { flex: 1, backgroundColor: COLORS.card, borderRadius: 12, padding: 16, alignItems: 'center', ...cardShadow },
@@ -696,7 +999,11 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
   rowLabel: { fontSize: 14, color: COLORS.muted, flex: 1 },
   rowValue: { fontSize: 14, fontWeight: '600', color: COLORS.text },
+  rowBorder: { borderTopWidth: 1, borderTopColor: COLORS.divider },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10, marginTop: 2 },
   totalLabel: { fontSize: 16, fontWeight: '600', color: COLORS.text },
   totalValue: { fontSize: 24, fontWeight: 'bold' },
+  searchInput: { height: 44, borderRadius: 10, backgroundColor: COLORS.background, paddingHorizontal: 12, fontSize: 15, color: COLORS.text },
+  conceptRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
+  conceptTitle: { fontSize: 15, fontWeight: '600', color: COLORS.text },
 });
