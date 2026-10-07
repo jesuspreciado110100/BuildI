@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal,
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import {
+  BadgeScanLog,
   ChiefOfLaborService,
   Contractor,
   Course,
@@ -14,6 +15,7 @@ import {
   WorkerLevel,
   badgeVerifyUrl,
   formatDate,
+  formatDayTime,
   isExpiringSoon,
 } from '@/app/services/ChiefOfLaborService';
 import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
@@ -32,6 +34,7 @@ interface CrewData {
   courses: Course[];
   enrollments: Enrollment[];
   actions: RecommendationAction[];
+  lastScans: Record<string, BadgeScanLog>;
 }
 
 interface Recommendation {
@@ -80,16 +83,17 @@ function recommendationsFor(w: Worker, data: CrewData): Recommendation[] {
 }
 
 async function loadCrewData(): Promise<CrewData> {
-  const [contractor, crews, workers, courses, enrollments, actions] = await Promise.all([
+  const [contractor, crews, workers, courses, enrollments, actions, lastScans] = await Promise.all([
     ChiefOfLaborService.getContractor(),
     ChiefOfLaborService.getCrews(),
     ChiefOfLaborService.getWorkers(),
     ChiefOfLaborService.getCourses(),
     ChiefOfLaborService.getEnrollments(),
     ChiefOfLaborService.getRecommendationActions(),
+    ChiefOfLaborService.getLastScans(),
   ]);
   if (!contractor) throw new Error('No hay contratista.');
-  return { contractor, crews, workers, courses, enrollments, actions };
+  return { contractor, crews, workers, courses, enrollments, actions, lastScans };
 }
 
 export default function CrewManager() {
@@ -350,7 +354,17 @@ function BadgeSheet({ worker, data, reload, onClose }: { worker: Worker; data: C
               <QRCode value={verifyUrl} size={132} color="#111827" backgroundColor="#FFFFFF" />
             </View>
             <Text style={styles.badgeCode}>{worker.verify_code}</Text>
-            <Text style={styles.badgeHint}>El residente o la constructora lo escanea para ver sus constancias vigentes.</Text>
+            <Text style={styles.badgeHint}>El residente lo escanea desde la app de constructor para ver sus constancias y registrar su entrada.</Text>
+            {data.lastScans[worker.id] && (
+              <View style={styles.lastScan}>
+                <Ionicons name={data.lastScans[worker.id].checked_in ? 'log-in' : 'eye'} size={16} color="#047857" />
+                <Text style={styles.lastScanText}>
+                  {data.lastScans[worker.id].checked_in
+                    ? `Entrada registrada ${formatDayTime(data.lastScans[worker.id].checked_in_at ?? data.lastScans[worker.id].scanned_at)} · ${data.lastScans[worker.id].site_name ?? ''}`
+                    : `Verificado en obra ${formatDayTime(data.lastScans[worker.id].scanned_at)}`}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -732,6 +746,21 @@ const styles = StyleSheet.create({
     color: '#111827',
     letterSpacing: 1,
     marginTop: 6,
+  },
+  lastScan: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#D1FAE5',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 4,
+  },
+  lastScanText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#047857',
   },
   badgeHint: {
     fontSize: 12,

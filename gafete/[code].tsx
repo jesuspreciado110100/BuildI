@@ -2,23 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { BadgeVerification, ChiefOfLaborService, parseBadgeCode } from '@/app/services/ChiefOfLaborService';
-import { BadgeVerificationCard } from '@/app/components/BadgeVerificationCard';
+import { BadgeScan, ChiefOfLaborService, parseBadgeCode } from '@/app/services/ChiefOfLaborService';
+import { BadgeScanResult } from '@/app/components/BadgeScanResult';
 
 // Destino del QR del gafete (construction-operations-management://gafete/BLD-…).
-// Si el residente lo escanea con la cámara del teléfono, abre la app aquí.
+// Si el residente lo escanea con la cámara del teléfono, abre la app aquí:
+// verifica el gafete y permite registrar la entrada a la obra.
 
 export default function GafeteDeepLink() {
   const params = useLocalSearchParams<{ code: string }>();
   const code = parseBadgeCode(String(params.code ?? ''));
-  const [state, setState] = useState<{ loading: boolean; data?: BadgeVerification | null; error?: string }>({ loading: true });
+  const [state, setState] = useState<{ loading: boolean; data?: BadgeScan | null; error?: string }>({ loading: true });
 
   useEffect(() => {
     if (!code) {
       setState({ loading: false, error: 'Este enlace no es de un gafete BuildI.' });
       return;
     }
-    ChiefOfLaborService.verifyBadge(code)
+    ChiefOfLaborService.scanBadge(code)
       .then(data => setState({ loading: false, data }))
       .catch(e => setState({ loading: false, error: e instanceof Error ? e.message : 'No se pudo verificar.' }));
   }, [code]);
@@ -41,7 +42,7 @@ export default function GafeteDeepLink() {
             <Text style={styles.errorText}>{state.error}</Text>
           </View>
         )}
-        {!state.loading && !state.error && code && <BadgeVerificationCard code={code} result={state.data ?? null} />}
+        {!state.loading && !state.error && code && <BadgeScanResult code={code} scan={state.data ?? null} />}
       </ScrollView>
     </View>
   );

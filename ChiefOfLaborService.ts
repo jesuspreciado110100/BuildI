@@ -150,6 +150,31 @@ export interface BadgeVerification {
   }[];
 }
 
+/** Resultado de escanear un gafete desde la app de constructor. */
+export interface BadgeScan extends BadgeVerification {
+  scan_id: string;
+  code: string;
+  heights_ok: boolean;
+  expired_count: number;
+  checked_in_today: boolean;
+  sites: { id: string; name: string; builder_name: string }[];
+}
+
+export interface BadgeScanLog {
+  id: string;
+  worker_id: string;
+  worker_name: string;
+  worker_trade: string;
+  contractor_name: string;
+  site_name: string | null;
+  checked_in: boolean;
+  imss_registered: boolean;
+  heights_ok: boolean;
+  expired_count: number;
+  scanned_at: string;
+  checked_in_at: string | null;
+}
+
 export interface RecommendationAction {
   worker_id: string;
   rec_key: string;
@@ -356,6 +381,57 @@ export class ChiefOfLaborService {
     return (data as BadgeVerification | null) ?? null;
   }
 
+  /** Escanea un gafete: verifica, deja registro y trae las obras para registrar la entrada. */
+  static async scanBadge(code: string): Promise<BadgeScan | null> {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw new Error('Inicia sesión en BuildI para verificar gafetes.');
+    const data = check(await supabase.rpc('labor_scan_badge', { p_code: code }));
+    return (data as BadgeScan | null) ?? null;
+  }
+
+  /** Registra la entrada del trabajador a la obra; llena el pase de lista del contratista. */
+  static async checkIn(scanId: string, siteId: string): Promise<{ site_name: string; checked_in_at: string }> {
+    return check(await supabase.rpc('labor_check_in', { p_scan_id: scanId, p_site_id: siteId })) as {
+      site_name: string;
+      checked_in_at: string;
+    };
+  }
+
+  /** Escaneos que hizo hoy el usuario (residente o supervisor). */
+  static async getMyScansToday(): Promise<BadgeScanLog[]> {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return [];
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    return check(
+      await supabase
+        .from('labor_badge_scans')
+        .select('*')
+        .eq('scanned_by', auth.user.id)
+        .gte('scanned_at', start.toISOString())
+        .order('scanned_at', { ascending: false }),
+    ) as BadgeScanLog[];
+  }
+
+  /** Última verificación en obra de cada trabajador del contratista. */
+  static async getLastScans(): Promise<Record<string, BadgeScanLog>> {
+    const contractor = await this.getContractor();
+    if (!contractor) return {};
+    const rows = check(
+      await supabase
+        .from('labor_badge_scans')
+        .select('*')
+        .eq('contractor_id', contractor.id)
+        .order('scanned_at', { ascending: false })
+        .limit(500),
+    ) as BadgeScanLog[];
+    const last: Record<string, BadgeScanLog> = {};
+    rows.forEach(r => {
+      if (!last[r.worker_id]) last[r.worker_id] = r;
+    });
+    return last;
+  }
+
   static async requestBenefit(benefitId: string): Promise<void> {
     const contractor = await this.getContractor();
     if (!contractor) throw new Error('No hay contratista.');
@@ -379,6 +455,20 @@ export function formatDate(iso: string | null): string {
   if (!iso) return '';
   const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
   return `${d} ${MONTHS[m - 1]} ${y}`;
+}
+
+/** "7:02" en hora local. */
+export function formatTime(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+/** "hoy 7:02" o "3 oct 2026 · 7:02". */
+export function formatDayTime(iso: string): string {
+  const d = new Date(iso);
+  const sameDay = d.toDateString() === new Date().toDateString();
+  const local = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return `${sameDay ? 'hoy' : formatDate(local)} · ${formatTime(iso)}`;
 }
 
 /** Credencial que conviene renovar en los próximos 30 días. */

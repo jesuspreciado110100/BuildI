@@ -16,10 +16,13 @@ npx expo install react-native-qrcode-svg react-native-svg expo-camera
 
 ## 2. Aplicar la migración
 
-Archivo: `supabase/migrations/20261007120000_chief_of_labor.sql`
+Archivos, en este orden:
+
+1. `supabase/migrations/20261007120000_chief_of_labor.sql`
+2. `supabase/migrations/20261007140000_badge_scans.sql` (escaneos y registro de entrada)
 
 - Con Supabase CLI: `supabase db push`
-- O cópialo completo en **SQL Editor** de tu proyecto en Supabase y ejecútalo.
+- O cópialos completos en **SQL Editor** de tu proyecto en Supabase y ejecútalos.
 
 Se puede ejecutar más de una vez sin errores. Crea:
 
@@ -36,6 +39,9 @@ Se puede ejecutar más de una vez sin errores. Crea:
 | `labor_record_progress()` | Guarda el avance del día y marca el frente terminado si se completa |
 | `labor_verify_badge(code)` | Lo que ve el residente al escanear el gafete desde la app de constructor |
 | `labor_seed_demo()` | Crea "Mano de Obra Pérez" de ejemplo para el usuario que la llama |
+| `labor_badge_scans` | Cada escaneo de gafete: quién lo escaneó, qué vio y si registró la entrada |
+| `labor_scan_badge(code)` | Verifica, deja registro y devuelve las obras del contratista |
+| `labor_check_in(scan, obra)` | Registra la entrada a la obra y marca presente en el pase de lista |
 
 **Seguridad (RLS):** cada contratista solo ve y modifica lo suyo; los catálogos los lee cualquier usuario con sesión. Ninguna función se puede llamar sin sesión. `labor_verify_badge` solo devuelve nombre, oficio, nivel, IMSS, negocio y constancias (sin teléfono ni correo).
 
@@ -49,7 +55,7 @@ En este repo todo está en la raíz; en tu proyecto van donde ya los importa el 
 |---|---|---|
 | `ChiefOfLaborService.ts` | `app/services/` | `@/app/services/ChiefOfLaborService` |
 | `LaborDataState.tsx` | `app/components/` | `@/app/components/LaborDataState` |
-| `BadgeVerificationCard.tsx`, `GafeteScannerModal.tsx` | `app/components/` | `@/app/components/…` y `../components/…` |
+| `BadgeVerificationCard.tsx`, `BadgeScanResult.tsx`, `GafeteScannerModal.tsx` | `app/components/` | `@/app/components/…` y `../components/…` |
 | `chief-of-labor/*.tsx` | `app/chief-of-labor/` | rutas de expo-router |
 | `builder/workforce.tsx` | `app/builder/` | pestaña de mano de obra del constructor |
 | `gafete/[code].tsx` | `app/gafete/` | destino del enlace del QR |
@@ -70,6 +76,12 @@ El QR codifica `construction-operations-management://gafete/BLD-…` (el esquema
 - **Con la cámara del teléfono:** el enlace abre BuildI en `gafete/[code]` y muestra lo mismo.
 
 Muestra si el gafete es válido, IMSS, si puede trabajar en alturas (DC-3 NOM-009) y cada constancia con folio y si está vigente, por renovar o vencida.
+
+**Registro de entrada:** después de escanear, el residente elige la obra y toca **Registrar entrada**. El trabajador queda presente en el pase de lista del contratista (Frentes lo cuenta como presente). Solo se puede registrar en obras de ese contratista y hasta 2 horas después de escanear. Sin IMSS o sin DC-3 de alturas, la app lo avisa como recomendación; no bloquea.
+
+**Historial:** debajo del lector, "Escaneos de hoy" con cada persona, hora, obra y pendientes (sin IMSS, sin alturas, constancias vencidas).
+
+**Lado del contratista:** en el gafete de su trabajador ve "Entrada registrada hoy · 7:02 · Torre Alameda" o "Verificado en obra". Cada contratista solo ve los escaneos de su gente; cada residente, los suyos.
 
 ## Pendiente
 
