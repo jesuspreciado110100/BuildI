@@ -8,44 +8,23 @@ import {
   Modal,
   Animated,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  ChiefOfLaborService,
+  Enrollment,
+  Front,
+  LaborSite,
+  QuoteConcept,
+  Worker,
+} from '@/app/services/ChiefOfLaborService';
+import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
 
 // Frentes a destajo: cada frente es un concepto con precio unitario
-// (volumen × precio) que la cuadrilla ejecuta para la constructora. Usa la
-// misma forma que WorkConcept / JobBoardPost (item_code, unit, quantity,
-// unit_price_mxn) más el avance diario. Datos de ejemplo.
-
-interface WorkFront {
-  id: string;
-  item_code: string;
-  description: string;
-  unit: string;
-  quantity: number;
-  done: number;
-  week: number;
-  unit_price_mxn: number;
-  crew: string[];
-  needed: number;
-  rate_per_person_day: number;
-  atHeight?: string;
-  blocked?: string;
-  completed?: boolean;
-}
-
-interface Site {
-  id: string;
-  name: string;
-  builder: string;
-}
-
-interface CatalogConcept {
-  description: string;
-  unit: string;
-  unit_price_mxn: number;
-  rate_per_person_day: number;
-  market_price_mxn: number;
-}
+// (volumen × precio) que la cuadrilla ejecuta para la constructora.
+// Datos en Supabase: labor_sites, labor_fronts_summary, labor_front_members,
+// labor_front_progress, labor_quote_catalog y labor_quotes.
 
 const COLORS = {
   background: '#F9FAFB',
@@ -67,62 +46,39 @@ const COLORS = {
   errorSoft: '#FEE2E2',
 };
 
-// heights: tiene la DC-3 de trabajo en alturas (NOM-009).
-const WORKERS: Record<string, { name: string; color: string; present: boolean; heights: boolean }> = {
-  JL: { name: 'Juan López', color: '#2563EB', present: true, heights: true },
-  MA: { name: 'Miguel Ángel', color: '#7C3AED', present: true, heights: true },
-  IC: { name: 'Iván Cruz', color: '#DB2777', present: false, heights: false },
-  EG: { name: 'Esteban García', color: '#059669', present: true, heights: false },
-  CV: { name: 'Carlos Vega', color: '#0F766E', present: true, heights: true },
-  PS: { name: 'Pedro Sánchez', color: '#DC2626', present: true, heights: false },
-  JD: { name: 'Jorge Domínguez', color: '#65A30D', present: true, heights: true },
-  LR: { name: 'Luis Ramos', color: '#D97706', present: true, heights: true },
-  HT: { name: 'Hugo Treviño', color: '#4338CA', present: true, heights: false },
-  BM: { name: 'Beto Morales', color: '#C2410C', present: true, heights: true },
-  TR: { name: 'Toño Ramírez', color: '#0E7490', present: true, heights: false },
-};
-
-const SITES: Site[] = [
-  { id: 'alameda', name: 'Torre Alameda', builder: 'Constructora Torres' },
-  { id: 'depto6b', name: 'Depto 6B', builder: 'Constructora Torres' },
-];
-
-const INITIAL_FRONTS: Record<string, WorkFront[]> = {
-  alameda: [
-    { id: 'f1', item_code: 'ALB-015', description: 'Muro de block 15 cm', unit: 'm²', quantity: 420, done: 286, week: 120, unit_price_mxn: 185, crew: ['JL', 'MA', 'IC', 'EG'], needed: 4, rate_per_person_day: 9, atHeight: 'el nivel 3' },
-    { id: 'f2', item_code: 'ALB-030', description: 'Aplanado fino en muros', unit: 'm²', quantity: 840, done: 410, week: 260, unit_price_mxn: 95, crew: ['CV', 'PS', 'JD'], needed: 3, rate_per_person_day: 16, atHeight: 'andamios a 2.5 m' },
-    { id: 'f3', item_code: 'TAB-010', description: 'Tablaroca muro divisorio', unit: 'm²', quantity: 260, done: 150, week: 120, unit_price_mxn: 160, crew: ['LR', 'HT'], needed: 2, rate_per_person_day: 12 },
-    { id: 'f4', item_code: 'PIS-060', description: 'Piso porcelanato 60×60', unit: 'm²', quantity: 380, done: 0, week: 0, unit_price_mxn: 210, crew: ['BM', 'TR'], needed: 2, rate_per_person_day: 10, blocked: 'Falta porcelanato: llega el jueves' },
-    { id: 'f5', item_code: 'CIM-008', description: 'Firme de concreto 8 cm', unit: 'm²', quantity: 120, done: 120, week: 60, unit_price_mxn: 140, crew: [], needed: 0, rate_per_person_day: 20, completed: true },
-  ],
-  depto6b: [
-    { id: 'g1', item_code: 'DEM-001', description: 'Demolición de muro de cocina', unit: 'm²', quantity: 18, done: 18, week: 18, unit_price_mxn: 120, crew: [], needed: 0, rate_per_person_day: 8, completed: true },
-    { id: 'g2', item_code: 'PIN-002', description: 'Pintura vinílica 2 manos', unit: 'm²', quantity: 160, done: 40, week: 40, unit_price_mxn: 38, crew: ['JD'], needed: 1, rate_per_person_day: 45 },
-  ],
-};
-
-const CATALOG: CatalogConcept[] = [
-  { description: 'Muro de block 15 cm', unit: 'm²', unit_price_mxn: 185, rate_per_person_day: 9, market_price_mxn: 172 },
-  { description: 'Aplanado fino', unit: 'm²', unit_price_mxn: 95, rate_per_person_day: 16, market_price_mxn: 98 },
-  { description: 'Tablaroca muro', unit: 'm²', unit_price_mxn: 160, rate_per_person_day: 12, market_price_mxn: 151 },
-  { description: 'Piso porcelanato', unit: 'm²', unit_price_mxn: 210, rate_per_person_day: 10, market_price_mxn: 225 },
-  { description: 'Pintura vinílica 2 manos', unit: 'm²', unit_price_mxn: 38, rate_per_person_day: 45, market_price_mxn: 36 },
-  { description: 'Salida eléctrica', unit: 'pza', unit_price_mxn: 350, rate_per_person_day: 6, market_price_mxn: 380 },
-];
-
+const HEIGHT_COURSE = 'alturas';
 const DELAY_REASONS = ['Faltó material', 'Faltó gente', 'Lluvia', 'Cambio del residente'];
 const AVG_DAILY_WAGE = 560;
 const PAYROLL_TAX = 0.12;
 
+interface FrontsData {
+  sites: LaborSite[];
+  frontsBySite: Record<string, Front[]>;
+  workers: Record<string, Worker>;
+  enrollments: Enrollment[];
+  catalog: QuoteConcept[];
+}
+
+async function loadFronts(): Promise<FrontsData> {
+  const [sites, workers, enrollments, catalog] = await Promise.all([
+    ChiefOfLaborService.getSites(),
+    ChiefOfLaborService.getWorkers(),
+    ChiefOfLaborService.getEnrollments(),
+    ChiefOfLaborService.getQuoteCatalog(),
+  ]);
+  const fronts = await Promise.all(sites.map(s => ChiefOfLaborService.getFronts(s.id)));
+  return {
+    sites,
+    frontsBySite: Object.fromEntries(sites.map((s, i) => [s.id, fronts[i]])),
+    workers: Object.fromEntries(workers.map(w => [w.id, w])),
+    enrollments,
+    catalog,
+  };
+}
+
 const money = (n: number) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-const presentCount = (front: WorkFront) => front.crew.filter(id => WORKERS[id]?.present).length;
-// Recomendación (no bloqueo): quién trabaja en altura sin la DC-3 de alturas.
-const missingHeightCert = (front: WorkFront) =>
-  front.atHeight && !front.completed ? front.crew.filter(id => !WORKERS[id]?.heights) : [];
-const namesList = (ids: string[]) => {
-  const names = ids.map(id => WORKERS[id].name);
-  return names.length > 1 ? `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}` : names[0];
-};
+const isPresent = (w?: Worker) => w?.attendance === 'present' || w?.attendance === 'late';
+const hasHeightCert = (w?: Worker) => !!w?.credentials.some(c => c.course_id === HEIGHT_COURSE);
 
 function ProgressBar({ done, week, total }: { done: number; week: number; total: number }) {
   const before = Math.max(0, done - week) / total;
@@ -165,89 +121,120 @@ function Stepper({ value, onChange, step, min, max, suffix }: {
   );
 }
 
-function statusOf(front: WorkFront) {
+function statusOf(front: Front) {
   if (front.completed) return { label: 'TERMINADO', color: COLORS.success };
-  if (front.blocked) return { label: 'DETENIDO', color: COLORS.error };
+  if (front.blocked_reason) return { label: 'DETENIDO', color: COLORS.error };
   return { label: 'EN CURSO', color: COLORS.primary };
 }
 
 export default function WorkFronts() {
-  const [siteId, setSiteId] = useState(SITES[0].id);
-  const [fronts, setFronts] = useState(INITIAL_FRONTS);
-  const [selected, setSelected] = useState<WorkFront | null>(null);
+  const { state, reload } = useLaborData(loadFronts);
+  return (
+    <LaborDataGate title="Frentes a destajo" state={state} reload={reload}>
+      {data => <FrontsScreen data={data} reload={reload} />}
+    </LaborDataGate>
+  );
+}
+
+function FrontsScreen({ data, reload }: { data: FrontsData; reload: (silent?: boolean) => Promise<void> }) {
+  const [siteId, setSiteId] = useState(data.sites[0]?.id ?? '');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [today, setToday] = useState(0);
   const [reason, setReason] = useState<string | null>(null);
   const [quoteOpen, setQuoteOpen] = useState(false);
-  const [enrolled, setEnrolled] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const list = fronts[siteId];
-  const site = SITES.find(s => s.id === siteId)!;
+  const list = data.frontsBySite[siteId] ?? [];
+  const site = data.sites.find(s => s.id === siteId);
+  const selected = list.find(f => f.id === selectedId) ?? null;
+  const W = data.workers;
+
+  const presentCount = (front: Front) => front.member_ids.filter(id => isPresent(W[id])).length;
+  const enrolledInHeights = (id: string) => data.enrollments.some(e => e.worker_id === id && e.course_id === HEIGHT_COURSE);
+  // Recomendación (no bloqueo): quién trabaja en altura sin la DC-3 de alturas.
+  const missingHeightCert = (front: Front) =>
+    front.at_height_note && !front.completed
+      ? front.member_ids.filter(id => W[id] && !hasHeightCert(W[id]) && !enrolledInHeights(id))
+      : [];
+  const namesList = (ids: string[]) => {
+    const names = ids.map(id => W[id]?.full_name ?? '');
+    return names.length > 1 ? `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}` : names[0];
+  };
 
   const totals = useMemo(() => {
-    const contract = list.reduce((a, f) => a + f.quantity * f.unit_price_mxn, 0);
-    const executed = list.reduce((a, f) => a + f.done * f.unit_price_mxn, 0);
-    const week = list.reduce((a, f) => a + f.week * f.unit_price_mxn, 0);
+    const contract = list.reduce((a, f) => a + f.quantity * f.unit_price, 0);
+    const executed = list.reduce((a, f) => a + f.done * f.unit_price, 0);
+    const week = list.reduce((a, f) => a + f.week * f.unit_price, 0);
     return { contract, pct: contract ? Math.round((executed / contract) * 100) : 0, week };
   }, [list]);
 
-  const openFront = (front: WorkFront) => {
-    setSelected(front);
+  const openFront = (front: Front) => {
+    setSelectedId(front.id);
     setReason(null);
-    setToday(front.blocked || front.completed ? 0 : Math.min(24, front.quantity - front.done));
+    setToday(front.blocked_reason || front.completed ? 0 : Math.min(24, front.quantity - front.done));
+  };
+
+  const run = async (work: () => Promise<void>, done?: string) => {
+    setSaving(true);
+    try {
+      await work();
+      await reload(true);
+      if (done) Alert.alert('Listo', done);
+    } catch (e) {
+      Alert.alert('No se pudo guardar', e instanceof Error ? e.message : 'Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const saveProgress = () => {
     if (!selected || today <= 0) return;
-    setFronts(prev => ({
-      ...prev,
-      [siteId]: prev[siteId].map(f =>
-        f.id === selected.id
-          ? { ...f, done: Math.min(f.quantity, f.done + today), week: f.week + today, completed: f.done + today >= f.quantity }
-          : f,
-      ),
-    }));
-    setSelected(null);
+    const front = selected;
+    const qty = today;
+    setSelectedId(null);
+    run(() => ChiefOfLaborService.recordProgress(front.id, qty, reason));
   };
 
-  const moveCrewFromBlocked = (blocked: WorkFront) => {
-    const target = list.find(f => !f.blocked && !f.completed && presentCount(f) < f.needed);
+  const moveCrewFromBlocked = (blocked: Front) => {
+    const target = list.find(f => !f.blocked_reason && !f.completed && presentCount(f) < f.people_needed);
     if (!target) {
       Alert.alert('Sin frentes cortos', 'Todos los frentes tienen la gente que necesitan.');
       return;
     }
-    const moving = blocked.crew.filter(id => WORKERS[id]?.present).slice(0, target.needed - presentCount(target));
-    setFronts(prev => ({
-      ...prev,
-      [siteId]: prev[siteId].map(f => {
-        if (f.id === blocked.id) return { ...f, crew: f.crew.filter(id => !moving.includes(id)) };
-        if (f.id === target.id) return { ...f, crew: [...f.crew, ...moving] };
-        return f;
-      }),
-    }));
-    setSelected(null);
-    const noCert = target.atHeight ? moving.filter(id => !WORKERS[id].heights) : [];
-    Alert.alert(
-      'Gente movida',
+    const moving = blocked.member_ids.filter(id => isPresent(W[id])).slice(0, target.people_needed - presentCount(target));
+    if (!moving.length) {
+      Alert.alert('Sin gente disponible', 'Nadie de este frente llegó hoy.');
+      return;
+    }
+    const noCert = target.at_height_note ? moving.filter(id => !hasHeightCert(W[id])) : [];
+    setSelectedId(null);
+    run(
+      () => ChiefOfLaborService.moveMembers(blocked.id, target.id, moving),
       `${namesList(moving)} pasa a ${target.description}.` +
-        (noCert.length ? ` Recomendación: ${namesList(noCert)} no tiene la DC-3 de alturas y ese frente es en ${target.atHeight}.` : ''),
+        (noCert.length ? ` Recomendación: ${namesList(noCert)} no tiene la DC-3 de alturas y ese frente es en ${target.at_height_note}.` : ''),
     );
   };
 
-  const enroll = (ids: string[]) => {
-    setEnrolled(prev => [...prev, ...ids]);
-    Alert.alert('Inscritos', `${namesList(ids)} al curso de trabajo en alturas del sábado.`);
+  const enroll = (ids: string[]) =>
+    run(() => ChiefOfLaborService.enroll(HEIGHT_COURSE, ids), `${namesList(ids)} al curso de trabajo en alturas del sábado.`);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await reload(true);
+    setRefreshing(false);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <View style={styles.header}>
           <Text style={styles.title}>Frentes a destajo</Text>
-          <Text style={styles.subtitle}>Mano de Obra Pérez · {site.builder}</Text>
+          {site ? <Text style={styles.subtitle}>{site.builder_name}</Text> : null}
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.siteRow}>
-          {SITES.map(s => (
+          {data.sites.map(s => (
             <TouchableOpacity
               key={s.id}
               style={[styles.siteChip, s.id === siteId && styles.siteChipActive]}
@@ -274,16 +261,17 @@ export default function WorkFronts() {
         </View>
 
         <View style={styles.list}>
+          {list.length === 0 && <Text style={styles.metaText}>Esta obra todavía no tiene frentes.</Text>}
           {list.map(front => {
-            const short = !front.blocked && !front.completed && presentCount(front) < front.needed;
-            const noCert = missingHeightCert(front).filter(id => !enrolled.includes(id));
+            const short = !front.blocked_reason && !front.completed && presentCount(front) < front.people_needed;
+            const noCert = missingHeightCert(front);
             const status = statusOf(front);
             return (
               <TouchableOpacity key={front.id} style={styles.card} onPress={() => openFront(front)} activeOpacity={0.8}>
                 <View style={styles.cardHeader}>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.cardTitle}>{front.description}</Text>
-                    <Text style={styles.cardSubtitle}>{money(front.unit_price_mxn)}/{front.unit} · {front.item_code}</Text>
+                    <Text style={styles.cardSubtitle}>{money(front.unit_price)}/{front.unit} · {front.item_code}</Text>
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: status.color }]}>
                     <Text style={styles.statusText}>{status.label}</Text>
@@ -294,24 +282,24 @@ export default function WorkFronts() {
                   <Text style={styles.metaText}>{front.done} de {front.quantity} {front.unit}</Text>
                   <Text style={[styles.metaText, { color: COLORS.primary }]}>+{front.week} esta semana</Text>
                   <View style={styles.crew}>
-                    {front.crew.map((id, i) => (
+                    {front.member_ids.filter(id => W[id]).map((id, i) => (
                       <View
                         key={id}
                         style={[
                           styles.avatar,
-                          { backgroundColor: WORKERS[id].color, marginLeft: i ? -6 : 0 },
-                          !WORKERS[id].present && styles.avatarAbsent,
+                          { backgroundColor: W[id].color, marginLeft: i ? -6 : 0 },
+                          !isPresent(W[id]) && styles.avatarAbsent,
                         ]}
                       >
-                        <Text style={styles.avatarText}>{id}</Text>
+                        <Text style={styles.avatarText}>{W[id].code}</Text>
                       </View>
                     ))}
                   </View>
                 </View>
-                {front.blocked && (
+                {front.blocked_reason && (
                   <View style={styles.detailItem}>
                     <Ionicons name="alert-circle" size={16} color={COLORS.error} />
-                    <Text style={[styles.detailText, { color: COLORS.error }]}>{front.blocked}</Text>
+                    <Text style={[styles.detailText, { color: COLORS.error }]}>{front.blocked_reason}</Text>
                   </View>
                 )}
                 {front.completed && (
@@ -324,7 +312,7 @@ export default function WorkFronts() {
                   <View style={styles.detailItem}>
                     <Ionicons name="people" size={16} color={COLORS.warning} />
                     <Text style={[styles.detailText, { color: COLORS.warningText }]}>
-                      Hay {presentCount(front)} de {front.needed} personas hoy
+                      Hay {presentCount(front)} de {front.people_needed} personas hoy
                     </Text>
                   </View>
                 )}
@@ -347,18 +335,21 @@ export default function WorkFronts() {
         </TouchableOpacity>
       </ScrollView>
 
-      <Modal visible={!!selected} transparent animationType="slide" onRequestClose={() => setSelected(null)}>
+      <Modal visible={!!selected} transparent animationType="slide" onRequestClose={() => setSelectedId(null)}>
         <View style={styles.scrim}>
-          <TouchableOpacity style={styles.scrimTap} onPress={() => setSelected(null)} accessibilityLabel="Cerrar" />
-          {selected && (
+          <TouchableOpacity style={styles.scrimTap} onPress={() => setSelectedId(null)} accessibilityLabel="Cerrar" />
+          {selected && site && (
             <FrontSheet
               front={selected}
               siteName={site.name}
+              people={Math.max(1, presentCount(selected))}
               today={today}
               setToday={setToday}
               reason={reason}
               setReason={setReason}
-              noCert={missingHeightCert(selected).filter(id => !enrolled.includes(id))}
+              noCert={missingHeightCert(selected)}
+              namesList={namesList}
+              saving={saving}
               onEnroll={enroll}
               onSave={saveProgress}
               onMoveCrew={() => moveCrewFromBlocked(selected)}
@@ -370,29 +361,37 @@ export default function WorkFronts() {
       <Modal visible={quoteOpen} transparent animationType="slide" onRequestClose={() => setQuoteOpen(false)}>
         <View style={styles.scrim}>
           <TouchableOpacity style={styles.scrimTap} onPress={() => setQuoteOpen(false)} accessibilityLabel="Cerrar" />
-          <QuoteSheet builder={site.builder} onSend={() => setQuoteOpen(false)} />
+          {data.catalog.length > 0 && (
+            <QuoteSheet
+              catalog={data.catalog}
+              site={site ?? null}
+              onSent={() => setQuoteOpen(false)}
+            />
+          )}
         </View>
       </Modal>
     </View>
   );
 }
 
-function FrontSheet({ front, siteName, today, setToday, reason, setReason, noCert, onEnroll, onSave, onMoveCrew }: {
-  front: WorkFront;
+function FrontSheet({ front, siteName, people, today, setToday, reason, setReason, noCert, namesList, saving, onEnroll, onSave, onMoveCrew }: {
+  front: Front;
   siteName: string;
+  people: number;
   today: number;
   setToday: (v: number) => void;
   reason: string | null;
   setReason: (r: string) => void;
   noCert: string[];
+  namesList: (ids: string[]) => string;
+  saving: boolean;
   onEnroll: (ids: string[]) => void;
   onSave: () => void;
   onMoveCrew: () => void;
 }) {
   const [dismissed, setDismissed] = useState(false);
-  const people = Math.max(1, presentCount(front));
   const expected = front.rate_per_person_day * people;
-  const remaining = front.quantity - front.done;
+  const remaining = Math.max(0, front.quantity - front.done);
   const daysLeft = Math.ceil(remaining / expected);
   const onPace = today >= expected * 0.9;
 
@@ -411,10 +410,10 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, noCer
             <View style={{ flex: 1 }}>
               <Text style={styles.recTitle}>Recomendación de seguridad</Text>
               <Text style={styles.recText}>
-                Este frente es en {front.atHeight}. {namesList(noCert)} no {noCert.length === 1 ? 'tiene' : 'tienen'} la DC-3 de trabajo en alturas (NOM-009). Te recomendamos inscribirlos o pasarlos a un frente a nivel de piso.
+                Este frente es en {front.at_height_note}. {namesList(noCert)} no {noCert.length === 1 ? 'tiene' : 'tienen'} la DC-3 de trabajo en alturas (NOM-009). Te recomendamos inscribirlos o pasarlos a un frente a nivel de piso.
               </Text>
               <View style={styles.recActions}>
-                <TouchableOpacity style={styles.actionButton} onPress={() => onEnroll(noCert)}>
+                <TouchableOpacity style={[styles.actionButton, saving && { opacity: 0.5 }]} disabled={saving} onPress={() => onEnroll(noCert)}>
                   <Text style={styles.actionText}>Inscribir al curso</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.laterButton} onPress={() => setDismissed(true)}>
@@ -425,10 +424,10 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, noCer
           </View>
         )}
 
-        {front.blocked ? (
+        {front.blocked_reason ? (
           <View style={[styles.notice, { backgroundColor: COLORS.errorSoft }]}>
             <Text style={[styles.noticeText, { color: '#B91C1C' }]}>
-              {front.blocked}. Mientras, la cuadrilla puede pasar a otro frente.
+              {front.blocked_reason}. Mientras, la cuadrilla puede pasar a otro frente.
             </Text>
             <TouchableOpacity style={styles.actionButton} onPress={onMoveCrew}>
               <Ionicons name="swap-horizontal" size={16} color={COLORS.primary} />
@@ -488,16 +487,16 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, noCer
 
         <View style={styles.sheetCard}>
           <Row label="Hecho" value={`${front.done} de ${front.quantity} ${front.unit}`} />
-          <Row label="Precio unitario a destajo" value={`${money(front.unit_price_mxn)}/${front.unit}`} />
-          {!front.completed && !front.blocked && <Row label="A este ritmo terminas en" value={`${daysLeft} días`} />}
-          {!front.completed && !front.blocked && <Row label="Lo de hoy vale" value={money(today * front.unit_price_mxn)} />}
+          <Row label="Precio unitario a destajo" value={`${money(front.unit_price)}/${front.unit}`} />
+          {!front.completed && !front.blocked_reason && <Row label="A este ritmo terminas en" value={`${daysLeft} días`} />}
+          {!front.completed && !front.blocked_reason && <Row label="Lo de hoy vale" value={money(today * front.unit_price)} />}
         </View>
 
-        {!front.blocked && !front.completed && (
+        {!front.blocked_reason && !front.completed && (
           <TouchableOpacity
-            style={[styles.primaryButton, styles.sheetButton, today <= 0 && { opacity: 0.4 }]}
+            style={[styles.primaryButton, styles.sheetButton, (today <= 0 || saving) && { opacity: 0.4 }]}
             onPress={onSave}
-            disabled={today <= 0}
+            disabled={today <= 0 || saving}
           >
             <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>Guardar avance</Text>
@@ -508,28 +507,47 @@ function FrontSheet({ front, siteName, today, setToday, reason, setReason, noCer
   );
 }
 
-function QuoteSheet({ builder, onSend }: { builder: string; onSend: () => void }) {
+function QuoteSheet({ catalog, site, onSent }: { catalog: QuoteConcept[]; site: LaborSite | null; onSent: () => void }) {
   const [index, setIndex] = useState(0);
-  const concept = CATALOG[index];
+  const concept = catalog[index];
   const [volume, setVolume] = useState(180);
   const [people, setPeople] = useState(4);
-  const [price, setPrice] = useState(concept.unit_price_mxn);
+  const [price, setPrice] = useState(concept.default_unit_price);
+  const [sending, setSending] = useState(false);
+  const builder = site?.builder_name ?? 'la constructora';
 
   const days = Math.ceil(volume / (concept.rate_per_person_day * people));
   const payroll = days * people * AVG_DAILY_WAGE * (1 + PAYROLL_TAX);
   const amount = volume * price;
   const profit = amount - payroll;
-  const diff = (price - concept.market_price_mxn) / concept.market_price_mxn;
+  const diff = (price - concept.market_unit_price) / concept.market_unit_price;
   const inRange = Math.abs(diff) <= 0.1;
 
   const pick = (i: number) => {
     setIndex(i);
-    setPrice(CATALOG[i].unit_price_mxn);
+    setPrice(catalog[i].default_unit_price);
   };
 
-  const send = () => {
-    Alert.alert('Propuesta enviada', `${concept.description}: ${volume} ${concept.unit} a ${money(price)} para ${builder}.`);
-    onSend();
+  const send = async () => {
+    setSending(true);
+    try {
+      await ChiefOfLaborService.sendQuote({
+        siteId: site?.id ?? null,
+        builderName: builder,
+        catalogId: concept.id,
+        volume,
+        people,
+        unitPrice: price,
+        estDays: days,
+        estPayroll: payroll,
+      });
+      Alert.alert('Propuesta enviada', `${concept.description}: ${volume} ${concept.unit} a ${money(price)} para ${builder}.`);
+      onSent();
+    } catch (e) {
+      Alert.alert('No se pudo enviar', e instanceof Error ? e.message : 'Intenta de nuevo.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -540,8 +558,8 @@ function QuoteSheet({ builder, onSend }: { builder: string; onSend: () => void }
         <Text style={styles.sheetTitle}>Cotizar concepto</Text>
 
         <View style={styles.chipRow}>
-          {CATALOG.map((c, i) => (
-            <TouchableOpacity key={c.description} style={[styles.chip, i === index && styles.chipActive]} onPress={() => pick(i)}>
+          {catalog.map((c, i) => (
+            <TouchableOpacity key={c.id} style={[styles.chip, i === index && styles.chipActive]} onPress={() => pick(i)}>
               <Text style={[styles.chipText, i === index && styles.chipTextActive]}>{c.description}</Text>
             </TouchableOpacity>
           ))}
@@ -558,7 +576,7 @@ function QuoteSheet({ builder, onSend }: { builder: string; onSend: () => void }
 
         <View style={[styles.notice, { backgroundColor: inRange ? COLORS.successSoft : COLORS.warningSoft }]}>
           <Text style={[styles.noticeText, { color: inRange ? '#047857' : COLORS.warningText }]}>
-            Promedio en la zona: {money(concept.market_price_mxn)}/{concept.unit}.{' '}
+            Promedio en la zona: {money(concept.market_unit_price)}/{concept.unit}.{' '}
             {inRange
               ? 'Estás en rango.'
               : diff > 0
@@ -578,7 +596,7 @@ function QuoteSheet({ builder, onSend }: { builder: string; onSend: () => void }
           </View>
         </View>
 
-        <TouchableOpacity style={[styles.primaryButton, styles.sheetButton]} onPress={send}>
+        <TouchableOpacity style={[styles.primaryButton, styles.sheetButton, sending && { opacity: 0.5 }]} onPress={send} disabled={sending}>
           <Ionicons name="send" size={20} color="#FFFFFF" />
           <Text style={styles.primaryButtonText}>Enviar propuesta</Text>
         </TouchableOpacity>

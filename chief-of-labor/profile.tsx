@@ -8,65 +8,54 @@ import {
   Modal,
   Animated,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  Benefit,
+  ChiefOfLaborService,
+  ComplianceDoc,
+  Contractor,
+  ContractorMetrics,
+  Course as CourseRow_,
+  CredentialType,
+  ProLevel,
+  docStatus,
+  formatDate,
+} from '@/app/services/ChiefOfLaborService';
+import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
 
 // Perfil del contratista de mano de obra: nivel BuildI Pro calculado con su
 // desempeño, beneficios que se desbloquean por nivel, expediente de
 // cumplimiento (REPSE, IMSS, Infonavit, SAT) y cursos con su tipo de
-// constancia. Todos los montos, comisiones y personas son de ejemplo.
+// constancia. Datos en Supabase: labor_contractors, labor_contractor_metrics,
+// labor_compliance_docs, labor_benefits, labor_courses, labor_credentials y
+// labor_enrollments.
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
-type LevelKey = 'bronce' | 'plata' | 'oro';
-type DocStatus = 'vigente' | 'por_vencer' | 'vencido';
-type Credential = 'buildi' | 'dc3' | 'conocer';
 
 interface Level {
-  key: LevelKey;
+  key: ProLevel;
   name: string;
   min: number;
   color: string;
 }
 
-interface ProMetrics {
-  onTimeRate: number;
-  adjustedShare: number;
-  builderRating: number;
-  monthsOnBuildI: number;
-}
-
-interface ComplianceDoc {
-  id: string;
-  name: string;
-  detail: string;
-  status: DocStatus;
-  expires: string;
-}
-
-interface Benefit {
-  id: string;
-  title: string;
-  summary: string;
-  icon: IconName;
-  minLevel: LevelKey;
-  byLevel?: Record<LevelKey, string>;
-  partner?: string;
-  how: string[];
-}
-
-interface Course {
-  id: string;
-  title: string;
-  credential: Credential;
-  audience: 'cuadrilla' | 'tu';
-  hours: string;
-  modality: string;
-  price: number;
-  discountByLevel: Record<LevelKey, number>;
+interface Course extends CourseRow_ {
   certified: number;
   enrolled: number;
-  requiredFor?: string;
-  progress?: number;
+  progress: number | null;
+}
+
+interface ProfileData {
+  contractor: Contractor;
+  metrics: ContractorMetrics;
+  docs: ComplianceDoc[];
+  benefits: Benefit[];
+  courses: Course[];
+  crewSize: number;
+  crews: number;
+  sites: number;
 }
 
 const COLORS = {
@@ -96,113 +85,7 @@ const LEVELS: Level[] = [
   { key: 'oro', name: 'Oro', min: 80, color: '#D97706' },
 ];
 
-const CREW_SIZE = 24;
-
-const METRICS: ProMetrics = {
-  onTimeRate: 0.92,
-  adjustedShare: 0.018,
-  builderRating: 4.7,
-  monthsOnBuildI: 14,
-};
-
-const INITIAL_DOCS: ComplianceDoc[] = [
-  { id: 'repse', name: 'Registro REPSE', detail: 'STPS · obras especializadas', status: 'vigente', expires: 'Vence mar 2028' },
-  { id: 'imss', name: 'Opinión de cumplimiento IMSS', detail: 'La constructora la pide cada mes', status: 'vencido', expires: 'Venció el 30 sep' },
-  { id: 'infonavit', name: 'Opinión de cumplimiento Infonavit', detail: 'La constructora la pide cada mes', status: 'vigente', expires: 'Vence 31 oct' },
-  { id: 'sat', name: 'Opinión de cumplimiento SAT (32-D)', detail: 'Positiva', status: 'por_vencer', expires: 'Vence 12 oct' },
-  { id: 'contrato', name: 'Contrato de destajo · Torre Alameda', detail: 'Firmado por ambas partes', status: 'vigente', expires: 'Hasta fin de obra' },
-];
-
-const BENEFITS: Benefit[] = [
-  {
-    id: 'cobro',
-    title: 'Cobro en 48 h',
-    summary: 'Cobra la estimación firmada sin esperar a la constructora.',
-    icon: 'flash',
-    minLevel: 'bronce',
-    byLevel: { bronce: 'Comisión 2.5%', plata: 'Comisión 1.8%', oro: 'Comisión 1.2%' },
-    partner: 'Con un aliado financiero',
-    how: [
-      'El residente firma la estimación en la app.',
-      'El dinero de la constructora ya está en resguardo en BuildI.',
-      'Te lo adelantamos en 48 h y descontamos la comisión de tu nivel.',
-    ],
-  },
-  {
-    id: 'herramienta',
-    title: 'Descuento en herramienta y equipo de protección',
-    summary: 'Precio de volumen con proveedores BuildI.',
-    icon: 'construct',
-    minLevel: 'bronce',
-    byLevel: { bronce: '5% de descuento', plata: '8% de descuento', oro: '12% de descuento' },
-    partner: 'Proveedores BuildI',
-    how: ['Compra desde la app o en sucursal mostrando tu gafete BuildI.', 'Te llega a la obra o al taller.'],
-  },
-  {
-    id: 'cursos',
-    title: 'Cursos BuildI gratis',
-    summary: 'Seguridad, cotizar a destajo y finanzas de tu cuadrilla.',
-    icon: 'school',
-    minLevel: 'bronce',
-    how: ['Clases cortas en video que se descargan para verlas sin internet.', 'Al aprobar, la constancia queda en el gafete de cada persona.'],
-  },
-  {
-    id: 'seguro',
-    title: 'Seguro de accidentes para tu cuadrilla',
-    summary: 'Cubre a tu gente mientras está en obra.',
-    icon: 'medkit',
-    minLevel: 'plata',
-    byLevel: { bronce: 'Con costo por persona', plata: 'Incluido hasta 15 personas', oro: 'Incluido para toda tu gente' },
-    partner: 'Con una aseguradora aliada',
-    how: ['Se activa con el pase de lista de cada día.', 'Si hay un accidente, lo reportas desde la app con foto.'],
-  },
-  {
-    id: 'adelanto',
-    title: 'Adelanto de raya para tu gente',
-    summary: 'Tus trabajadores cobran parte de lo ya trabajado antes del sábado, sin que tú pongas el dinero.',
-    icon: 'cash',
-    minLevel: 'plata',
-    partner: 'Con un aliado financiero',
-    how: ['Solo sobre días ya trabajados y registrados.', 'Se descuenta solo de la raya del sábado.'],
-  },
-  {
-    id: 'destacado',
-    title: 'Perfil destacado',
-    summary: 'Apareces primero cuando una constructora busca mano de obra.',
-    icon: 'star',
-    minLevel: 'plata',
-    how: ['Tu ficha muestra tus números verificados: entregas, ajustes y calificación.'],
-  },
-  {
-    id: 'raya',
-    title: 'Raya garantizada',
-    summary: 'Con la estimación firmada, la raya del sábado sale aunque la constructora no haya pagado.',
-    icon: 'shield-checkmark',
-    minLevel: 'oro',
-    partner: 'Con un aliado financiero',
-    how: ['Aplica a estimaciones firmadas por el residente.', 'BuildI cobra después a la constructora.'],
-  },
-  {
-    id: 'credito',
-    title: 'Crédito para equipo',
-    summary: 'Revolvedora, andamios o herramienta, pagando con tus estimaciones.',
-    icon: 'card',
-    minLevel: 'oro',
-    byLevel: { bronce: 'No disponible', plata: 'No disponible', oro: 'Hasta $150,000' },
-    partner: 'Con un aliado financiero',
-    how: ['Se aprueba con tu historial en BuildI, sin buró.', 'Se paga con un porcentaje de cada estimación.'],
-  },
-  {
-    id: 'prioridad',
-    title: 'Prioridad en obras grandes',
-    summary: 'Te avisamos primero de las obras que necesitan tu especialidad.',
-    icon: 'trophy',
-    minLevel: 'oro',
-    how: ['Cuando un frente tuyo va al 80%, te mostramos las siguientes obras cerca.'],
-  },
-];
-
-const CREDENTIALS: Record<Credential, { label: string; color: string; bg: string; issuer: string; steps: string[] }> = {
+const CREDENTIALS: Record<CredentialType, { label: string; color: string; bg: string; issuer: string; steps: string[] }> = {
   buildi: {
     label: 'Constancia BuildI',
     color: COLORS.primary,
@@ -241,16 +124,6 @@ const CREDENTIALS: Record<Credential, { label: string; color: string; bg: string
   },
 };
 
-const INITIAL_COURSES: Course[] = [
-  { id: 'seguridad', title: 'Seguridad básica en obra', credential: 'buildi', audience: 'cuadrilla', hours: '2 h', modality: 'En la app · sin internet', price: 0, discountByLevel: { bronce: 1, plata: 1, oro: 1 }, certified: 18, enrolled: 0 },
-  { id: 'alturas', title: 'Trabajo en alturas (NOM-009)', credential: 'dc3', audience: 'cuadrilla', hours: '8 h', modality: 'Presencial · sábado', price: 950, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 9, enrolled: 0, requiredFor: 'Recomendado para trabajar a más de 1.8 m' },
-  { id: 'construccion', title: 'Seguridad en obras de construcción (NOM-031)', credential: 'dc3', audience: 'cuadrilla', hours: '8 h', modality: 'Presencial · sábado', price: 900, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 6, enrolled: 0 },
-  { id: 'epp', title: 'Uso de equipo de protección (NOM-017)', credential: 'dc3', audience: 'cuadrilla', hours: '4 h', modality: 'Presencial en obra', price: 600, discountByLevel: { bronce: 0, plata: 0.5, oro: 1 }, certified: 14, enrolled: 0 },
-  { id: 'albanil', title: 'Certificación de albañil', credential: 'conocer', audience: 'cuadrilla', hours: 'Evaluación en obra', modality: 'Con evaluador acreditado', price: 2800, discountByLevel: { bronce: 0, plata: 0.25, oro: 0.5 }, certified: 2, enrolled: 0 },
-  { id: 'cotizar', title: 'Cómo cotizar a destajo', credential: 'buildi', audience: 'tu', hours: '3 h', modality: 'En la app', price: 0, discountByLevel: { bronce: 1, plata: 1, oro: 1 }, certified: 0, enrolled: 1, progress: 0.6 },
-  { id: 'finanzas', title: 'Finanzas de tu cuadrilla: raya, IMSS e impuestos', credential: 'buildi', audience: 'tu', hours: '3 h', modality: 'En la app', price: 0, discountByLevel: { bronce: 1, plata: 1, oro: 1 }, certified: 0, enrolled: 0, progress: 0 },
-];
-
 const MENU_ITEMS: { title: string; icon: IconName; color: string }[] = [
   { title: 'Datos de la cuenta', icon: 'settings-outline', color: '#6B7280' },
   { title: 'Notificaciones', icon: 'notifications-outline', color: '#6B7280' },
@@ -262,17 +135,18 @@ const MENU_ITEMS: { title: string; icon: IconName; color: string }[] = [
 
 const money = (n: number) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-const levelIndex = (key: LevelKey) => LEVELS.findIndex(l => l.key === key);
+const levelIndex = (key: ProLevel) => LEVELS.findIndex(l => l.key === key);
+const benefitIcon = (name: string) => name as IconName;
 
 // Puntaje BuildI Pro (0–100). Cinco factores con su peso máximo.
-function scoreFactors(m: ProMetrics, docs: ComplianceDoc[]) {
-  const ok = docs.filter(d => d.status !== 'vencido').length;
+function scoreFactors(m: ContractorMetrics, docs: ComplianceDoc[]) {
+  const ok = docs.filter(d => docStatus(d.expires_on) !== 'vencido').length;
   return [
-    { label: 'Entregas a tiempo', value: `${Math.round(m.onTimeRate * 100)}%`, points: 30 * clamp01(m.onTimeRate), max: 30 },
-    { label: 'Volumen ajustado por el residente', value: `${(m.adjustedShare * 100).toFixed(1)}%`, points: 20 * clamp01(1 - m.adjustedShare / 0.05), max: 20 },
-    { label: 'Calificación de constructoras', value: `★ ${m.builderRating.toFixed(1)}`, points: 20 * clamp01((m.builderRating - 3) / 2), max: 20 },
+    { label: 'Entregas a tiempo', value: `${Math.round(m.on_time_rate * 100)}%`, points: 30 * clamp01(m.on_time_rate), max: 30 },
+    { label: 'Volumen ajustado por el residente', value: `${(m.adjusted_share * 100).toFixed(1)}%`, points: 20 * clamp01(1 - m.adjusted_share / 0.05), max: 20 },
+    { label: 'Calificación de constructoras', value: `★ ${m.builder_rating.toFixed(1)}`, points: 20 * clamp01((m.builder_rating - 3) / 2), max: 20 },
     { label: 'Papeles al día', value: `${ok} de ${docs.length}`, points: 20 * (docs.length ? ok / docs.length : 0), max: 20 },
-    { label: 'Antigüedad en BuildI', value: `${m.monthsOnBuildI} meses`, points: 10 * clamp01(m.monthsOnBuildI / 24), max: 10 },
+    { label: 'Antigüedad en BuildI', value: `${m.months_on_buildi} meses`, points: 10 * clamp01(m.months_on_buildi / 24), max: 10 },
   ];
 }
 
@@ -280,22 +154,74 @@ function levelFor(score: number): Level {
   return [...LEVELS].reverse().find(l => score >= l.min) ?? LEVELS[0];
 }
 
-function coursePrice(course: Course, level: LevelKey) {
-  return course.price * (1 - course.discountByLevel[level]);
+function coursePrice(course: Course, level: ProLevel) {
+  return course.price * (1 - (course.discount_by_level?.[level] ?? 0));
+}
+
+function docExpiresLabel(d: ComplianceDoc) {
+  const status = docStatus(d.expires_on);
+  if (!d.expires_on) return 'No vence';
+  return status === 'vencido' ? `Venció el ${formatDate(d.expires_on)}` : `Vence ${formatDate(d.expires_on)}`;
+}
+
+async function loadProfile(): Promise<ProfileData> {
+  const [contractor, metrics, docs, benefits, courseRows, workers, enrollments, crews, sites] = await Promise.all([
+    ChiefOfLaborService.getContractor(),
+    ChiefOfLaborService.getMetrics(),
+    ChiefOfLaborService.getComplianceDocs(),
+    ChiefOfLaborService.getBenefits(),
+    ChiefOfLaborService.getCourses(),
+    ChiefOfLaborService.getWorkers(),
+    ChiefOfLaborService.getEnrollments(),
+    ChiefOfLaborService.getCrews(),
+    ChiefOfLaborService.getSites(),
+  ]);
+  if (!contractor) throw new Error('No hay contratista.');
+  const courses: Course[] = courseRows.map(c => {
+    const active = enrollments.filter(e => e.course_id === c.id && e.status !== 'completed');
+    const own = enrollments.find(e => e.course_id === c.id && !e.worker_id && c.audience === 'contractor');
+    return {
+      ...c,
+      certified: workers.filter(w => w.credentials.some(cr => cr.course_id === c.id)).length,
+      enrolled: active.reduce((a, e) => a + (e.worker_id ? 1 : e.seats), 0),
+      progress: c.audience === 'contractor' ? own?.progress ?? 0 : null,
+    };
+  });
+  return {
+    contractor,
+    metrics: metrics ?? { on_time_rate: 0, adjusted_share: 0, builder_rating: 0, months_on_buildi: 0 },
+    docs,
+    benefits,
+    courses,
+    crewSize: workers.length,
+    crews: crews.length,
+    sites: sites.length,
+  };
 }
 
 export default function ChiefOfLaborProfile() {
-  const [docs, setDocs] = useState(INITIAL_DOCS);
-  const [courses, setCourses] = useState(INITIAL_COURSES);
-  const [benefit, setBenefit] = useState<Benefit | null>(null);
-  const [course, setCourse] = useState<Course | null>(null);
-  const [showScore, setShowScore] = useState(false);
+  const { state, reload } = useLaborData(loadProfile);
+  return (
+    <LaborDataGate title="Perfil" state={state} reload={reload}>
+      {data => <ProfileScreen data={data} reload={reload} />}
+    </LaborDataGate>
+  );
+}
 
-  const factors = useMemo(() => scoreFactors(METRICS, docs), [docs]);
+function ProfileScreen({ data, reload }: { data: ProfileData; reload: (silent?: boolean) => Promise<void> }) {
+  const { contractor, docs, courses, benefits, crewSize } = data;
+  const [benefitId, setBenefitId] = useState<string | null>(null);
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [showScore, setShowScore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const benefit = benefits.find(b => b.id === benefitId) ?? null;
+  const course = courses.find(c => c.id === courseId) ?? null;
+
+  const factors = useMemo(() => scoreFactors(data.metrics, docs), [data.metrics, docs]);
   const score = factors.reduce((a, f) => a + f.points, 0);
   const level = levelFor(score);
   const next = LEVELS[levelIndex(level.key) + 1];
-  const expired = docs.filter(d => d.status === 'vencido');
+  const expired = docs.filter(d => docStatus(d.expires_on) === 'vencido');
 
   const pop = useRef(new Animated.Value(1)).current;
   const prevLevel = useRef(level.key);
@@ -310,22 +236,45 @@ export default function ChiefOfLaborProfile() {
     prevLevel.current = level.key;
   }, [level.key, level.name, pop]);
 
-  const renewDoc = (id: string) => {
-    setDocs(prev => prev.map(d => (d.id === id ? { ...d, status: 'vigente', expires: 'Vence 31 oct' } : d)));
+  const run = async (work: () => Promise<void>, done?: [string, string]) => {
+    try {
+      await work();
+      await reload(true);
+      if (done) Alert.alert(done[0], done[1]);
+    } catch (e) {
+      Alert.alert('No se pudo guardar', e instanceof Error ? e.message : 'Intenta de nuevo.');
+    }
   };
+
+  const renewDoc = (id: string) => run(() => ChiefOfLaborService.renewComplianceDoc(id));
 
   const enroll = (id: string, people: number) => {
-    setCourses(prev => prev.map(c => (c.id === id ? { ...c, enrolled: c.enrolled + people } : c)));
-    setCourse(null);
+    const c = courses.find(x => x.id === id);
+    setCourseId(null);
+    run(() => ChiefOfLaborService.enroll(id, [], people), [
+      'Inscritos',
+      `${people} ${people === 1 ? 'persona' : 'personas'} en "${c?.title ?? ''}". Les llega la fecha por WhatsApp.`,
+    ]);
   };
 
-  const crewCourses = courses.filter(c => c.audience === 'cuadrilla');
-  const myCourses = courses.filter(c => c.audience === 'tu');
-  const activeBenefits = BENEFITS.filter(b => levelIndex(b.minLevel) <= levelIndex(level.key)).length;
+  const requestBenefit = (b: Benefit) => {
+    setBenefitId(null);
+    run(() => ChiefOfLaborService.requestBenefit(b.id), [b.title, 'Solicitud enviada. Te avisamos por WhatsApp cuando esté aplicado.']);
+  };
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await reload(true);
+    setRefreshing(false);
+  };
+
+  const crewCourses = courses.filter(c => c.audience === 'crew');
+  const myCourses = courses.filter(c => c.audience === 'contractor');
+  const activeBenefits = benefits.filter(b => levelIndex(b.min_level) <= levelIndex(level.key)).length;
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <View style={styles.header}>
           <View style={styles.profileImageContainer}>
             <View style={styles.profileImage}>
@@ -335,22 +284,22 @@ export default function ChiefOfLaborProfile() {
               <Ionicons name="camera" size={16} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.name}>Ramiro Pérez</Text>
+          <Text style={styles.name}>{contractor.display_name}</Text>
           <Text style={styles.title}>Contratista de mano de obra</Text>
-          <Text style={styles.company}>Mano de Obra Pérez · Guadalajara</Text>
+          <Text style={styles.company}>{contractor.business_name}{contractor.city ? ` · ${contractor.city}` : ''}</Text>
         </View>
 
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>3</Text>
+            <Text style={styles.statValue}>{data.crews}</Text>
             <Text style={styles.statLabel}>Cuadrillas</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{CREW_SIZE}</Text>
+            <Text style={styles.statValue}>{crewSize}</Text>
             <Text style={styles.statLabel}>Trabajadores</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>2</Text>
+            <Text style={styles.statValue}>{data.sites}</Text>
             <Text style={styles.statLabel}>Obras activas</Text>
           </View>
         </View>
@@ -387,19 +336,19 @@ export default function ChiefOfLaborProfile() {
         </View>
 
         <View style={styles.section}>
-          <SectionTitle title="Tus beneficios" note={`${activeBenefits} de ${BENEFITS.length} activos`} />
-          {BENEFITS.map(b => {
-            const unlocked = levelIndex(b.minLevel) <= levelIndex(level.key);
-            const minName = LEVELS[levelIndex(b.minLevel)].name;
+          <SectionTitle title="Tus beneficios" note={`${activeBenefits} de ${benefits.length} activos`} />
+          {benefits.map(b => {
+            const unlocked = levelIndex(b.min_level) <= levelIndex(level.key);
+            const minName = LEVELS[levelIndex(b.min_level)].name;
             return (
-              <TouchableOpacity key={b.id} style={styles.achievementCard} onPress={() => setBenefit(b)} activeOpacity={0.8}>
+              <TouchableOpacity key={b.id} style={styles.achievementCard} onPress={() => setBenefitId(b.id)} activeOpacity={0.8}>
                 <View style={[styles.achievementIcon, !unlocked && { backgroundColor: COLORS.divider }]}>
-                  <Ionicons name={unlocked ? b.icon : 'lock-closed'} size={22} color={unlocked ? COLORS.warning : '#9CA3AF'} />
+                  <Ionicons name={unlocked ? benefitIcon(b.icon) : 'lock-closed'} size={22} color={unlocked ? COLORS.warning : '#9CA3AF'} />
                 </View>
                 <View style={styles.achievementInfo}>
                   <Text style={[styles.achievementTitle, !unlocked && { color: COLORS.muted }]}>{b.title}</Text>
                   <Text style={styles.achievementYear} numberOfLines={2}>
-                    {unlocked ? b.byLevel?.[level.key] ?? b.summary : `Se desbloquea en ${minName}`}
+                    {unlocked ? b.by_level?.[level.key] ?? b.summary : `Se desbloquea en ${minName}`}
                   </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
@@ -411,29 +360,32 @@ export default function ChiefOfLaborProfile() {
         <View style={styles.section}>
           <SectionTitle title="Expediente de cumplimiento" note="lo ven las constructoras" />
           <View style={styles.infoCard}>
-            {docs.map((d, i) => (
-              <View key={d.id} style={[styles.docRow, i > 0 && styles.rowBorder]}>
-                <Ionicons
-                  name={d.status === 'vigente' ? 'checkmark-circle' : d.status === 'por_vencer' ? 'time' : 'alert-circle'}
-                  size={22}
-                  color={d.status === 'vigente' ? COLORS.success : d.status === 'por_vencer' ? COLORS.warning : COLORS.error}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.docName}>{d.name}</Text>
-                  <Text style={styles.docDetail}>{d.detail} · {d.expires}</Text>
+            {docs.map((d, i) => {
+              const status = docStatus(d.expires_on);
+              return (
+                <View key={d.id} style={[styles.docRow, i > 0 && styles.rowBorder]}>
+                  <Ionicons
+                    name={status === 'vigente' ? 'checkmark-circle' : status === 'por_vencer' ? 'time' : 'alert-circle'}
+                    size={22}
+                    color={status === 'vigente' ? COLORS.success : status === 'por_vencer' ? COLORS.warning : COLORS.error}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.docName}>{d.name}</Text>
+                    <Text style={styles.docDetail}>{d.detail ? `${d.detail} · ` : ''}{docExpiresLabel(d)}</Text>
+                  </View>
+                  {status !== 'vigente' && (
+                    <TouchableOpacity
+                      style={[styles.actionButton, status === 'vencido' && { backgroundColor: COLORS.errorSoft }]}
+                      onPress={() => renewDoc(d.id)}
+                    >
+                      <Text style={[styles.actionText, status === 'vencido' && { color: COLORS.errorText }]}>
+                        {status === 'vencido' ? 'Renovar' : 'Actualizar'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
-                {d.status !== 'vigente' && (
-                  <TouchableOpacity
-                    style={[styles.actionButton, d.status === 'vencido' && { backgroundColor: COLORS.errorSoft }]}
-                    onPress={() => renewDoc(d.id)}
-                  >
-                    <Text style={[styles.actionText, d.status === 'vencido' && { color: COLORS.errorText }]}>
-                      {d.status === 'vencido' ? 'Renovar' : 'Actualizar'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
+              );
+            })}
             <TouchableOpacity
               style={styles.outlineButton}
               onPress={() => Alert.alert('Expediente compartido', 'La constructora recibe un enlace con tus documentos vigentes.')}
@@ -445,26 +397,28 @@ export default function ChiefOfLaborProfile() {
         </View>
 
         <View style={styles.section}>
-          <SectionTitle title="Cursos para tu cuadrilla" note={`${CREW_SIZE} personas`} />
+          <SectionTitle title="Cursos para tu cuadrilla" note={`${crewSize} personas`} />
           {crewCourses.map(c => (
-            <CourseRow key={c.id} course={c} level={level.key} onPress={() => setCourse(c)} />
+            <CourseRow key={c.id} course={c} crewSize={crewSize} level={level.key} onPress={() => setCourseId(c.id)} />
           ))}
         </View>
 
         <View style={styles.section}>
           <SectionTitle title="Cursos para ti" note="negocio" />
           {myCourses.map(c => (
-            <CourseRow key={c.id} course={c} level={level.key} onPress={() => setCourse(c)} />
+            <CourseRow key={c.id} course={c} crewSize={crewSize} level={level.key} onPress={() => setCourseId(c.id)} />
           ))}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Información profesional</Text>
           <View style={styles.infoCard}>
-            <InfoRow icon="briefcase" text="Experiencia: 12 años" />
-            <InfoRow icon="ribbon" text="REPSE vigente · obras especializadas" />
-            <InfoRow icon="mail" text="ramiro.perez@ejemplo.com" />
-            <InfoRow icon="call" text="+52 33 0000 0000" last />
+            {contractor.years_experience ? <InfoRow icon="briefcase" text={`Experiencia: ${contractor.years_experience} años`} /> : null}
+            {docs.some(d => d.kind === 'repse' && docStatus(d.expires_on) !== 'vencido') ? (
+              <InfoRow icon="ribbon" text="REPSE vigente · obras especializadas" />
+            ) : null}
+            {contractor.email ? <InfoRow icon="mail" text={contractor.email} /> : null}
+            {contractor.phone ? <InfoRow icon="call" text={contractor.phone} last /> : null}
           </View>
         </View>
 
@@ -511,12 +465,12 @@ export default function ChiefOfLaborProfile() {
         <Text style={styles.sheetNote}>El nivel se recalcula cada semana con tus estimaciones firmadas, las calificaciones de las constructoras y tu expediente.</Text>
       </Sheet>
 
-      <Sheet visible={!!benefit} onClose={() => setBenefit(null)}>
-        {benefit && <BenefitDetail benefit={benefit} level={level} />}
+      <Sheet visible={!!benefit} onClose={() => setBenefitId(null)}>
+        {benefit && <BenefitDetail benefit={benefit} level={level} onUse={() => requestBenefit(benefit)} />}
       </Sheet>
 
-      <Sheet visible={!!course} onClose={() => setCourse(null)}>
-        {course && <CourseDetail course={course} level={level.key} onEnroll={enroll} />}
+      <Sheet visible={!!course} onClose={() => setCourseId(null)}>
+        {course && <CourseDetail course={course} crewSize={crewSize} level={level.key} onEnroll={enroll} />}
       </Sheet>
     </View>
   );
@@ -563,11 +517,11 @@ function LevelBar({ score }: { score: number }) {
   );
 }
 
-function CourseRow({ course, level, onPress }: { course: Course; level: LevelKey; onPress: () => void }) {
-  const cred = CREDENTIALS[course.credential];
+function CourseRow({ course, crewSize, level, onPress }: { course: Course; crewSize: number; level: ProLevel; onPress: () => void }) {
+  const cred = CREDENTIALS[course.credential_type];
   const price = coursePrice(course, level);
-  const mine = course.audience === 'tu';
-  const pct = mine ? course.progress ?? 0 : course.certified / CREW_SIZE;
+  const mine = course.audience === 'contractor';
+  const pct = mine ? course.progress ?? 0 : crewSize ? course.certified / crewSize : 0;
   return (
     <TouchableOpacity style={styles.courseCard} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.courseTop}>
@@ -577,16 +531,16 @@ function CourseRow({ course, level, onPress }: { course: Course; level: LevelKey
         <Text style={styles.coursePrice}>{price === 0 ? 'Gratis' : money(price)}</Text>
       </View>
       <Text style={styles.courseTitle}>{course.title}</Text>
-      <Text style={styles.courseMeta}>{course.hours} · {course.modality}</Text>
-      {course.requiredFor && <Text style={styles.courseRequired}>{course.requiredFor}</Text>}
+      <Text style={styles.courseMeta}>{course.hours_label} · {course.modality}</Text>
+      {course.recommended_for && <Text style={styles.courseRequired}>{course.recommended_for}</Text>}
       <View style={styles.progressRow}>
         <View style={[styles.progressTrack, { flex: 1 }]}>
-          <View style={[styles.progressFill, { width: `${pct * 100}%` as const }]} />
+          <View style={[styles.progressFill, { width: `${Math.min(1, pct) * 100}%` as const }]} />
         </View>
         <Text style={styles.courseMeta}>
           {mine
             ? `${Math.round(pct * 100)}%`
-            : `${course.certified} de ${CREW_SIZE}${course.enrolled ? ` · ${course.enrolled} inscritos` : ''}`}
+            : `${course.certified} de ${crewSize}${course.enrolled ? ` · ${course.enrolled} inscritos` : ''}`}
         </Text>
       </View>
     </TouchableOpacity>
@@ -608,35 +562,37 @@ function Steps({ steps }: { steps: string[] }) {
   );
 }
 
-function BenefitDetail({ benefit, level }: { benefit: Benefit; level: Level }) {
-  const unlocked = levelIndex(benefit.minLevel) <= levelIndex(level.key);
+function BenefitDetail({ benefit, level, onUse }: { benefit: Benefit; level: Level; onUse: () => void }) {
+  const unlocked = levelIndex(benefit.min_level) <= levelIndex(level.key);
   return (
     <>
       <Text style={styles.sheetEyebrow}>
-        {unlocked ? `Activo en tu nivel ${level.name}` : `Se desbloquea en ${LEVELS[levelIndex(benefit.minLevel)].name}`}
+        {unlocked ? `Activo en tu nivel ${level.name}` : `Se desbloquea en ${LEVELS[levelIndex(benefit.min_level)].name}`}
       </Text>
       <Text style={styles.sheetTitle}>{benefit.title}</Text>
       <Text style={styles.sheetText}>{benefit.summary}</Text>
-      {benefit.byLevel && (
+      {benefit.by_level && (
         <View style={styles.infoCard}>
           {LEVELS.map((l, i) => (
             <View key={l.key} style={[styles.levelRow, i > 0 && styles.rowBorder]}>
               <View style={[styles.levelDot, { backgroundColor: l.color }]} />
               <Text style={[styles.levelRowName, l.key === level.key && { color: COLORS.primary }]}>{l.name}</Text>
               <Text style={[styles.levelRowMin, l.key === level.key && { color: COLORS.text, fontWeight: '600' }]}>
-                {benefit.byLevel?.[l.key]}
+                {benefit.by_level?.[l.key]}
               </Text>
             </View>
           ))}
         </View>
       )}
-      <View style={styles.infoCard}>
-        <Text style={styles.cardLabel}>Cómo funciona</Text>
-        <Steps steps={benefit.how} />
-      </View>
+      {benefit.how.length > 0 && (
+        <View style={styles.infoCard}>
+          <Text style={styles.cardLabel}>Cómo funciona</Text>
+          <Steps steps={benefit.how} />
+        </View>
+      )}
       {benefit.partner && <Text style={styles.sheetNote}>{benefit.partner}. BuildI lo ofrece; el aliado lo otorga.</Text>}
       {unlocked ? (
-        <TouchableOpacity style={styles.primaryButton} onPress={() => Alert.alert(benefit.title, 'Listo. Te avisamos por WhatsApp cuando esté aplicado.')}>
+        <TouchableOpacity style={styles.primaryButton} onPress={onUse}>
           <Text style={styles.primaryButtonText}>Usar beneficio</Text>
         </TouchableOpacity>
       ) : (
@@ -648,13 +604,13 @@ function BenefitDetail({ benefit, level }: { benefit: Benefit; level: Level }) {
   );
 }
 
-function CourseDetail({ course, level, onEnroll }: { course: Course; level: LevelKey; onEnroll: (id: string, people: number) => void }) {
-  const cred = CREDENTIALS[course.credential];
-  const missing = Math.max(0, CREW_SIZE - course.certified - course.enrolled);
-  const mine = course.audience === 'tu';
+function CourseDetail({ course, crewSize, level, onEnroll }: { course: Course; crewSize: number; level: ProLevel; onEnroll: (id: string, people: number) => void }) {
+  const cred = CREDENTIALS[course.credential_type];
+  const missing = Math.max(0, crewSize - course.certified - course.enrolled);
+  const mine = course.audience === 'contractor';
   const [people, setPeople] = useState(Math.min(missing, 6) || 1);
   const unit = coursePrice(course, level);
-  const discount = course.discountByLevel[level];
+  const discount = course.discount_by_level?.[level] ?? 0;
 
   return (
     <>
@@ -662,11 +618,11 @@ function CourseDetail({ course, level, onEnroll }: { course: Course; level: Leve
         <Text style={[styles.badgeText, { color: cred.color }]}>{cred.label}</Text>
       </View>
       <Text style={styles.sheetTitle}>{course.title}</Text>
-      <Text style={styles.sheetText}>{course.hours} · {course.modality}</Text>
-      {course.requiredFor && (
+      <Text style={styles.sheetText}>{course.hours_label} · {course.modality}</Text>
+      {course.recommended_for && (
         <View style={[styles.notice, { backgroundColor: COLORS.warningSoft }]}>
           <Text style={[styles.noticeText, { color: COLORS.warningText }]}>
-            {course.requiredFor}. Si alguien no la tiene, la app te lo recomienda antes de mandarlo a un frente en altura; tú decides.
+            {course.recommended_for}. Si alguien no la tiene, la app te lo recomienda antes de mandarlo a un frente en altura; tú decides.
           </Text>
         </View>
       )}
@@ -710,13 +666,7 @@ function CourseDetail({ course, level, onEnroll }: { course: Course; level: Leve
               <Text style={[styles.priceValue, { fontSize: 18 }]}>{unit * people === 0 ? 'Gratis' : money(unit * people)}</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => {
-              onEnroll(course.id, people);
-              Alert.alert('Inscritos', `${people} ${people === 1 ? 'persona' : 'personas'} en "${course.title}". Les llega la fecha por WhatsApp.`);
-            }}
-          >
+          <TouchableOpacity style={styles.primaryButton} onPress={() => onEnroll(course.id, people)}>
             <Text style={styles.primaryButtonText}>Inscribir</Text>
           </TouchableOpacity>
         </>
