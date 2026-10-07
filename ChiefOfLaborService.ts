@@ -134,6 +134,22 @@ export interface Benefit {
   how: string[];
 }
 
+export interface BadgeVerification {
+  name: string;
+  trade: string;
+  level: WorkerLevel;
+  imss_registered: boolean;
+  contractor: string;
+  credentials: {
+    title: string;
+    type: CredentialType;
+    issuer: string;
+    folio: string;
+    issued_on: string;
+    renew_on: string | null;
+  }[];
+}
+
 export interface RecommendationAction {
   worker_id: string;
   rec_key: string;
@@ -332,6 +348,14 @@ export class ChiefOfLaborService {
     return check(await supabase.from('labor_benefits').select('*').order('sort')) as Benefit[];
   }
 
+  /** Lo que ve el residente al escanear un gafete. null = código no encontrado. */
+  static async verifyBadge(code: string): Promise<BadgeVerification | null> {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw new Error('Inicia sesión en BuildI para verificar gafetes.');
+    const data = check(await supabase.rpc('labor_verify_badge', { p_code: code }));
+    return (data as BadgeVerification | null) ?? null;
+  }
+
   static async requestBenefit(benefitId: string): Promise<void> {
     const contractor = await this.getContractor();
     if (!contractor) throw new Error('No hay contratista.');
@@ -364,8 +388,27 @@ export function isExpiringSoon(renewOn: string | null): boolean {
   return days <= 30;
 }
 
-/** Enlace que se codifica en el QR del gafete. */
-export const BADGE_VERIFY_BASE_URL =
-  process.env.EXPO_PUBLIC_BADGE_VERIFY_URL ?? 'construction-operations-management://gafete/';
+/**
+ * Enlace que se codifica en el QR del gafete. Abre la app en la ruta
+ * gafete/[code]; el residente también lo puede leer con "Escanear gafete"
+ * en la app de constructor. Solo usuarios con sesión pueden verificar.
+ */
+export const BADGE_VERIFY_BASE_URL = 'construction-operations-management://gafete/';
 
 export const badgeVerifyUrl = (verifyCode: string) => `${BADGE_VERIFY_BASE_URL}${encodeURIComponent(verifyCode)}`;
+
+/** Saca el código BLD-… de lo que leyó la cámara (enlace completo o código solo). */
+export function parseBadgeCode(scanned: string): string | null {
+  const text = decodeURIComponent(scanned.trim());
+  const match = text.match(/BLD-[A-Z0-9]{4,}/i);
+  return match ? match[0].toUpperCase() : null;
+}
+
+export type CredentialState = 'vigente' | 'por_renovar' | 'vencida';
+
+export function credentialState(renewOn: string | null): CredentialState {
+  if (!renewOn) return 'vigente';
+  const days = (new Date(renewOn + 'T00:00:00').getTime() - Date.now()) / 86400000;
+  if (days < 0) return 'vencida';
+  return days <= 30 ? 'por_renovar' : 'vigente';
+}

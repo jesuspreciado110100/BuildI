@@ -2,8 +2,8 @@
 -- Tablas para Frentes, Cuadrillas/Gafetes y Perfil (nivel, beneficios,
 -- expediente de cumplimiento y cursos). Todas con RLS: cada contratista ve
 -- solo lo suyo. Los catálogos (cursos, beneficios, conceptos) los lee
--- cualquier usuario autenticado. El gafete se verifica sin sesión con
--- labor_verify_badge(code).
+-- cualquier usuario autenticado. El residente verifica gafetes desde la app
+-- de constructor con labor_verify_badge(code).
 
 create extension if not exists pgcrypto;
 
@@ -388,7 +388,8 @@ begin
    where f.id = p_front_id;
 end $$;
 
--- Verificación pública del gafete (lo que ve quien escanea el QR).
+-- Verificación del gafete: lo que ve el residente al escanear el QR desde la
+-- app de constructor. Solo para usuarios con sesión.
 create or replace function public.labor_verify_badge(p_code text)
 returns jsonb
 language sql
@@ -414,7 +415,11 @@ as $$
   where w.verify_code = p_code and w.active
 $$;
 
-grant execute on function public.labor_verify_badge(text) to anon, authenticated;
+-- Postgres da EXECUTE a PUBLIC por defecto: se quita y se da solo a authenticated.
+revoke all on function public.labor_verify_badge(text) from public, anon;
+revoke all on function public.labor_record_progress(uuid, numeric, text) from public, anon;
+revoke all on function public.labor_my_contractor_id() from public, anon;
+grant execute on function public.labor_verify_badge(text) to authenticated;
 grant execute on function public.labor_record_progress(uuid, numeric, text) to authenticated;
 grant execute on function public.labor_my_contractor_id() to authenticated;
 
@@ -633,4 +638,5 @@ begin
   return v_c;
 end $$;
 
+revoke all on function public.labor_seed_demo() from public, anon;
 grant execute on function public.labor_seed_demo() to authenticated;

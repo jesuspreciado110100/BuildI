@@ -7,8 +7,10 @@ Frentes, Cuadrillas (con gafete) y Perfil leen y escriben en Supabase. No hay da
 En tu proyecto local (este repo no tiene `package.json`):
 
 ```bash
-npx expo install react-native-qrcode-svg react-native-svg
+npx expo install react-native-qrcode-svg react-native-svg expo-camera
 ```
+
+`app.json` ya trae el plugin de `expo-camera` con el texto del permiso de cámara. Instala los paquetes antes de correr la app; si no, Expo no encuentra el plugin.
 
 `@supabase/supabase-js` ya lo usa `lib/supabase.ts`.
 
@@ -32,10 +34,12 @@ Se puede ejecutar más de una vez sin errores. Crea:
 | `labor_compliance_docs` | Expediente de cumplimiento (REPSE, IMSS, Infonavit, SAT, contrato) |
 | `labor_benefits`, `labor_benefit_requests` | Beneficios por nivel y solicitudes |
 | `labor_record_progress()` | Guarda el avance del día y marca el frente terminado si se completa |
-| `labor_verify_badge(code)` | Lo que ve quien escanea el QR del gafete, sin iniciar sesión |
+| `labor_verify_badge(code)` | Lo que ve el residente al escanear el gafete desde la app de constructor |
 | `labor_seed_demo()` | Crea "Mano de Obra Pérez" de ejemplo para el usuario que la llama |
 
-**Seguridad (RLS):** cada contratista solo ve y modifica lo suyo; los catálogos los lee cualquier usuario con sesión; `labor_verify_badge` es lo único público y solo devuelve nombre, oficio, nivel, IMSS, negocio y constancias (sin teléfono ni correo).
+**Seguridad (RLS):** cada contratista solo ve y modifica lo suyo; los catálogos los lee cualquier usuario con sesión. Ninguna función se puede llamar sin sesión. `labor_verify_badge` solo devuelve nombre, oficio, nivel, IMSS, negocio y constancias (sin teléfono ni correo).
+
+Si ya habías corrido una versión anterior de esta migración, vuelve a correrla: quita el acceso sin sesión a las funciones.
 
 ## 3. Dónde van los archivos
 
@@ -45,7 +49,10 @@ En este repo todo está en la raíz; en tu proyecto van donde ya los importa el 
 |---|---|---|
 | `ChiefOfLaborService.ts` | `app/services/` | `@/app/services/ChiefOfLaborService` |
 | `LaborDataState.tsx` | `app/components/` | `@/app/components/LaborDataState` |
+| `BadgeVerificationCard.tsx`, `GafeteScannerModal.tsx` | `app/components/` | `@/app/components/…` y `../components/…` |
 | `chief-of-labor/*.tsx` | `app/chief-of-labor/` | rutas de expo-router |
+| `builder/workforce.tsx` | `app/builder/` | pestaña de mano de obra del constructor |
+| `gafete/[code].tsx` | `app/gafete/` | destino del enlace del QR |
 
 El servicio usa `@/app/lib/supabase`, igual que `LaborSupabaseService.ts`.
 
@@ -57,11 +64,12 @@ El servicio usa `@/app/lib/supabase`, igual que `LaborSupabaseService.ts`.
 
 ## 5. QR del gafete
 
-El QR codifica `EXPO_PUBLIC_BADGE_VERIFY_URL` + el código del trabajador. Por defecto usa el esquema de la app (`construction-operations-management://gafete/BLD-…`), que solo abre la app. Para que cualquiera lo escanee con la cámara, publica una página web que llame a `labor_verify_badge(code)` y pon su dirección en `.env`:
+El QR codifica `construction-operations-management://gafete/BLD-…` (el esquema de la app). No hace falta página web: el residente o supervisor lo verifica con la app de constructor, con sesión iniciada.
 
-```
-EXPO_PUBLIC_BADGE_VERIFY_URL=https://tu-dominio/verificar/
-```
+- **Desde la app:** pestaña de mano de obra del constructor → botón **Escanear gafete**. Lee el QR con la cámara o se escribe el código a mano.
+- **Con la cámara del teléfono:** el enlace abre BuildI en `gafete/[code]` y muestra lo mismo.
+
+Muestra si el gafete es válido, IMSS, si puede trabajar en alturas (DC-3 NOM-009) y cada constancia con folio y si está vigente, por renovar o vencida.
 
 ## Pendiente
 
