@@ -33,6 +33,13 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "BuildI usa la cámara para escanear los gafetes de los trabajadores en obra.",
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {

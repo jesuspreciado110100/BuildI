@@ -1,0 +1,612 @@
+<title>BuildI Inicio Cliente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --plaster: #e4e8e1;
+  --paper: #fbfaf6;
+  --ink: #2b2a26;
+  --ink-2: #5e6259;
+  --line: rgba(43,42,38,.13);
+  --sage: #4f7d61;
+  --sage-2: #dfe9e2;
+  --clay: #b0561f;
+  --clay-2: #f6e3d6;
+  --brass: #c9a24a;
+  --blue: #3c6e9e;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--plaster); color: var(--ink); font: 15px/1.55 var(--sans); padding-inline: 20px; padding-block: 36px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow b { background: var(--sage); color: #fff; padding: 3px 7px; font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 74px)/.98 var(--serif); letter-spacing: -.025em; margin: 14px 0 16px; text-wrap: balance; max-width: 16ch; }
+h1 em { font-style: italic; font-weight: 400; color: var(--sage); }
+h2 { font: 700 clamp(30px, 4vw, 46px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+.lede { font-size: 18px; max-width: 58ch; margin: 0 0 14px; }
+.sub { color: var(--ink-2); max-width: 62ch; margin: 0 0 20px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.tabsx { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; }
+.tx { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tx button { border: 1px solid var(--ink); background: var(--paper); padding: 7px 10px; font: 600 13px var(--sans); text-align: left; border-radius: 10px; display: flex; gap: 8px; align-items: center; }
+.tx button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tx b { font: 700 17px/1.2 var(--serif); display: block; margin-bottom: 2px; }
+.tx p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* phone */
+.phone { width: 384px; max-width: 100%; border-radius: 50px; background: #121412; padding: 11px; box-shadow: 0 40px 80px rgba(43,42,38,.3), inset 0 0 0 2px #3a3d38; justify-self: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.screen { border-radius: 40px; overflow: hidden; overflow: clip; position: relative; background: #f6f2ea; height: 790px; }
+.island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #000; border-radius: 20px; z-index: 40; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 12px 100px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: vin .4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes vin { from { opacity: 0; transform: translateY(8px); } }
+.greet small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; }
+.greet h3 { font: 700 27px/1.05 var(--serif); letter-spacing: -.015em; margin: 4px 0 0; }
+.greet h3 em { font-style: italic; font-weight: 400; color: var(--sage); }
+.pc { background: #fffdf9; border-radius: 22px; padding: 12px; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; margin-bottom: 8px; }
+.hd b { color: var(--ink); font-weight: 500; }
+.hd button { border: 0; background: none; font: 600 11.5px var(--sans); color: var(--sage); text-transform: none; letter-spacing: 0; padding: 0; }
+.hscroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* inicio */
+.intent { flex: none; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px 12px; width: 118px; text-align: left; display: grid; gap: 4px; }
+.intent .ic { font-size: 22px; }
+.intent b { font-size: 12.5px; line-height: 1.2; }
+.intent small { font: 500 10px var(--mono); color: #7a746a; }
+.intent[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.intent[aria-pressed="true"] small { color: #c7c2b8; }
+.ideas { columns: 2; column-gap: 8px; }
+.idea { break-inside: avoid; margin-bottom: 8px; background: #fffdf9; border-radius: 18px; overflow: hidden; border: 0; padding: 0; width: 100%; text-align: left; display: block; position: relative; }
+.idea .img { display: block; width: 100%; }
+.idea .t { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.idea .t b { font: 600 13.5px/1.2 var(--serif); }
+.idea .t small { font: 500 10px var(--mono); color: #7a746a; }
+.idea .save { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,253,249,.9); display: grid; place-items: center; font-size: 13px; border: 0; }
+.idea .save.on { background: var(--clay); color: #fff; }
+.tagx { position: absolute; top: 8px; left: 8px; font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: rgba(43,42,38,.75); color: #fff; padding: 3px 6px; border-radius: 6px; }
+.ba { position: relative; height: 170px; border-radius: 14px; overflow: hidden; touch-action: none; cursor: ew-resize; user-select: none; }
+.ba canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .top { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 3px solid #fff; }
+.ba .top canvas { width: var(--w); }
+.ba .lb { position: absolute; top: 8px; font: 500 9.5px var(--mono); background: rgba(0,0,0,.6); color: #fff; padding: 2px 6px; border-radius: 4px; z-index: 2; }
+.est { display: grid; gap: 8px; }
+.est .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 12.5px; }
+.seg { display: flex; background: #ece5d8; border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 4px; border-radius: 8px; font: 600 11.5px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+input[type=range] { accent-color: var(--sage); width: 100%; }
+.est .res { background: var(--sage-2); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.est .res b { font: 700 22px var(--serif); color: var(--sage); }
+.est .res small { font-size: 11.5px; color: var(--ink-2); display: block; }
+.cta { border: 0; background: var(--ink); color: #fff; border-radius: 14px; padding: 12px; font: 700 14px var(--sans); width: 100%; }
+.cta.sage { background: var(--sage); }
+.cta.ghost { background: none; color: var(--ink); border: 1px solid var(--ink); }
+
+/* obras */
+.proj { background: #fffdf9; border-radius: 22px; padding: 0; overflow: hidden; border: 0; width: 100%; text-align: left; display: grid; }
+.proj .img { height: 92px; position: relative; }
+.proj .img span { position: absolute; left: 10px; bottom: 8px; font: 500 9.5px var(--mono); background: rgba(255,253,249,.92); padding: 3px 7px; border-radius: 6px; }
+.proj .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.proj b { font: 700 17px/1.15 var(--serif); }
+.proj small { font-size: 12px; color: #7a746a; }
+.stg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.stg i { height: 6px; border-radius: 4px; background: #ece5d8; display: block; }
+.stg i.d { background: var(--sage); } .stg i.n { background: var(--clay); }
+.stg-l { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; font: 500 8.5px var(--mono); color: #9a958b; text-transform: uppercase; }
+.stg-l span.n { color: var(--clay); }
+.next { display: flex; justify-content: space-between; align-items: center; background: var(--clay-2); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; }
+.next b { font: 600 12.5px var(--sans); }
+.next em { font-style: normal; font: 500 11px var(--mono); color: var(--clay); }
+.newp { border: 1.5px dashed #b9b2a4; background: none; border-radius: 22px; padding: 14px; display: grid; gap: 2px; text-align: left; }
+.newp b { font: 700 15px var(--serif); }
+.newp small { font-size: 12px; color: #7a746a; }
+.back { border: 0; background: none; font: 600 13px var(--sans); color: var(--sage); padding: 0; justify-self: start; }
+.kpi2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpi2 div { background: #fffdf9; border-radius: 16px; padding: 9px 10px; }
+.kpi2 b { display: block; font: 700 21px/1 var(--serif); }
+.kpi2 small { font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #7a746a; }
+.appr { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; position: relative; }
+.appr:first-of-type { border-top: 0; }
+.appr .sw { width: 44px; height: 44px; border-radius: 10px; }
+.appr b { font-size: 13px; display: block; }
+.appr small { font-size: 11.5px; color: #7a746a; }
+.appr .acts { grid-column: 2; display: flex; gap: 6px; }
+.appr .acts button { border: 1px solid var(--ink); background: none; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.appr .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.appr .done { grid-column: 2; font: 500 11px var(--mono); color: var(--sage); }
+.dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dg { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 2px; font-size: 11.5px; border: 0; text-align: left; }
+.dg i { font-style: normal; font-size: 17px; }
+.dg b { font-size: 12px; }
+.dg small { font: 500 9.5px var(--mono); color: #7a746a; }
+.feed { display: grid; gap: 8px; }
+.fi { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+.fi .ph { width: 54px; height: 44px; border-radius: 8px; }
+.fi b { font-size: 13px; display: block; }
+.fi small { font-size: 11px; color: #7a746a; }
+
+/* hogar */
+.props { display: flex; gap: 6px; }
+.prop { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 14px; padding: 8px 10px; text-align: left; display: grid; gap: 1px; }
+.prop b { font-size: 12.5px; }
+.prop small { font: 500 9.5px var(--mono); color: #7a746a; }
+.prop[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.health { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
+.ring { position: relative; width: 104px; height: 104px; }
+.ring svg { width: 104px; height: 104px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .v { stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,1.3,.5,1); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; text-align: center; }
+.ring .in b { font: 700 30px/1 var(--serif); }
+.ring .in small { font: 500 8.5px var(--mono); color: #7a746a; }
+.hl { display: grid; gap: 5px; font-size: 12.5px; }
+.hl div { display: flex; justify-content: space-between; gap: 6px; }
+.hl b { font-family: var(--mono); font-weight: 500; font-size: 12px; }
+.task { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.task:first-of-type { border-top: 0; }
+.task .d { width: 40px; height: 44px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; align-content: center; text-align: center; }
+.task .d b { font: 700 16px/1 var(--serif); }
+.task .d small { font: 500 8px var(--mono); text-transform: uppercase; color: #7a746a; }
+.task b.t { font-size: 13px; display: block; }
+.task small.s { font-size: 11.5px; color: #7a746a; }
+.task button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.task button.done { background: var(--sage-2); color: var(--sage); }
+.task.urgent .d { background: var(--clay-2); }
+.task.urgent .d b { color: var(--clay); }
+.use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.use div { background: #f6f2ea; border-radius: 14px; padding: 8px 9px; display: grid; gap: 2px; }
+.use b { font: 700 17px/1 var(--serif); }
+.use small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; letter-spacing: .05em; }
+.use svg { width: 100%; height: 26px; }
+.use em { font-style: normal; font: 500 10px var(--mono); }
+.alertx { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--clay-2); border-radius: 16px; padding: 10px 12px; font-size: 12.5px; }
+.alertx i { font-style: normal; font-size: 20px; }
+.alertx b { display: block; font-size: 13px; }
+.svc { flex: none; width: 112px; border: 0; background: #fffdf9; border-radius: 16px; padding: 10px; display: grid; gap: 3px; text-align: left; }
+.svc i { font-style: normal; font-size: 20px; }
+.svc b { font-size: 12.5px; line-height: 1.2; }
+.svc small { font: 500 10px var(--mono); color: var(--sage); }
+.war { display: grid; gap: 7px; }
+.war div { display: grid; gap: 3px; font-size: 12.5px; }
+.war .l { display: flex; justify-content: space-between; }
+.war .l em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.bar { height: 6px; border-radius: 6px; background: #ece5d8; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; background: var(--sage); }
+.keycard { border-radius: 18px; padding: 14px 16px; background: linear-gradient(150deg, #2e3a33, #1b221e 60%, #3a2f1a); color: #f3ead4; display: flex; justify-content: space-between; align-items: center; }
+.keycard b { font: 700 17px/1.1 var(--serif); display: block; }
+.keycard small { font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #c3ccc5; }
+.keycard .chip { width: 34px; height: 25px; border-radius: 4px; background: linear-gradient(135deg, #f3dc9a, #c9a24a 50%, #a88234); }
+
+/* perfil */
+.me { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.me .av { width: 62px; height: 62px; border-radius: 50%; background: var(--sage); color: #fff; display: grid; place-items: center; font: 700 22px var(--serif); }
+.me b { font: 700 21px var(--serif); display: block; }
+.me small { font-size: 12.5px; color: #7a746a; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.style-tags span { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--sage-2); color: var(--sage); }
+.mrow { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13.5px; }
+.mrow:first-of-type { border-top: 0; }
+.mrow i { font-style: normal; font-size: 17px; }
+.mrow small { font: 500 11px var(--mono); color: #7a746a; }
+.mrow b { font-weight: 600; display: block; }
+.mrow span.s { font-size: 11.5px; color: #7a746a; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 82%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh .img { height: 150px; border-radius: 16px; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.facts div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.facts b { display: block; font: 700 16px/1.1 var(--serif); }
+.facts small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; }
+.steps { display: grid; gap: 4px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 12.5px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--sage-2); color: var(--sage); display: grid; place-items: center; font: 600 11px var(--mono); }
+
+/* tab bar */
+.tabs { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; border-radius: 26px; background: rgba(255,253,249,.74); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(43,42,38,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+.tabs button { border: 0; background: none; padding: 7px 0 6px; display: grid; justify-items: center; gap: 2px; font: 600 10.5px var(--sans); color: #7a746a; position: relative; z-index: 1; transition: color .3s; }
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-selected="true"] { color: var(--ink); }
+.tabs .ind { position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 21px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .55s cubic-bezier(.3,1.4,.5,1), width .55s; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 15px; height: 15px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9px/15px var(--mono); padding: 0 3px; }
+.toast { position: absolute; left: 50%; top: 48px; transform: translate(-50%, -170%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; z-index: 50; transition: transform .45s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translate(-50%, 0); }
+
+/* journey */
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .journey { grid-template-columns: 1fr; } }
+.jst { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c); }
+.jst .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--ink-2); display: flex; justify-content: space-between; }
+.jst .n span { color: var(--c); }
+.jst b { font: 700 20px/1.1 var(--serif); }
+.jst p.q { margin: 0; font: italic 400 14px/1.35 var(--serif); color: var(--ink-2); }
+.jst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.jst li { display: grid; grid-template-columns: 12px 1fr; gap: 6px; }
+.jst li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-top: 7px; }
+.jst .where { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 6px; }
+.loop { display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); border-radius: 4px; padding: 16px 18px; margin-top: 12px; }
+.loop i { font-style: normal; font-size: 26px; }
+.loop b { font: 700 18px var(--serif); display: block; }
+.loop span { font-size: 13.5px; color: #c7c2b8; }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.biz div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.biz b { font: 700 17px/1.2 var(--serif); }
+.biz p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+<style>
+.subtabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.subtabs::-webkit-scrollbar { display: none; }
+.subtabs button { flex: none; border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 6px 12px; font: 600 12.5px var(--sans); }
+.subtabs button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pill { font: 500 9.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--sage-2); color: var(--sage); } .pill.new { background: var(--clay-2); color: var(--clay); }
+.wizcard { border: 0; width: 100%; text-align: left; border-radius: 22px; padding: 14px 16px; background: linear-gradient(140deg, #2b2a26, #3d4a40); color: #fff; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+.wizcard b { font: 700 19px/1.15 var(--serif); }
+.wizcard small { font-size: 12.5px; color: #cfd6cf; grid-column: 1; }
+.wizcard span.go { grid-row: 1 / 3; grid-column: 2; width: 44px; height: 44px; border-radius: 50%; background: var(--brass); display: grid; place-items: center; font-size: 20px; color: var(--ink); }
+.fit { background: var(--sage-2); border-radius: 18px; padding: 12px; display: grid; gap: 8px; }
+.fit .hd { margin: 0; }
+.fitrow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.fitrow::-webkit-scrollbar { display: none; }
+.fitc { flex: none; width: 150px; background: #fffdf9; border-radius: 16px; overflow: hidden; border: 0; padding: 0; text-align: left; }
+.fitc canvas { width: 100%; height: 86px; display: block; }
+.fitc span { display: block; padding: 7px 9px 9px; font-size: 11.5px; }
+.fitc b { display: block; font: 600 13px/1.2 var(--serif); }
+.fitc em { font-style: normal; font: 500 10px var(--mono); color: var(--sage); }
+.season { background: #f6e3d6; border-radius: 18px; padding: 12px; display: grid; grid-template-columns: 1fr 90px; gap: 10px; align-items: center; }
+.season b { font: 700 16px/1.2 var(--serif); display: block; }
+.season small { font-size: 12px; color: #6d4a33; }
+.season canvas { width: 90px; height: 70px; border-radius: 12px; }
+.spaces { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.space { border: 0; background: #fffdf9; border-radius: 14px; padding: 8px 4px; display: grid; justify-items: center; gap: 2px; font-size: 11px; }
+.space i { font-style: normal; font-size: 20px; }
+.space small { font: 500 9px var(--mono); color: #7a746a; }
+.space[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.space[aria-pressed="true"] small { color: #c7c2b8; }
+.kinds { display: flex; gap: 5px; flex-wrap: wrap; }
+.kinds button { border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.kinds button[aria-pressed="true"] { background: var(--sage); color: #fff; border-color: var(--sage); }
+.case { background: #fffdf9; border-radius: 22px; overflow: hidden; display: grid; }
+.case .ba { height: 180px; border-radius: 0; }
+.case .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.case b.n { font: 700 17px/1.15 var(--serif); }
+.case .facts3 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.case .facts3 div { background: #f6f2ea; border-radius: 10px; padding: 6px 7px; }
+.case .facts3 b { display: block; font: 700 13px/1.1 var(--serif); }
+.case .facts3 small { font: 500 8.5px var(--mono); text-transform: uppercase; color: #7a746a; }
+.quote { font: italic 400 13.5px/1.35 var(--serif); color: var(--ink-2); margin: 0; }
+.quote small { display: block; font: 500 10.5px var(--mono); font-style: normal; color: #9a958b; margin-top: 3px; }
+.board { background: #fffdf9; border-radius: 22px; padding: 10px; display: grid; gap: 8px; }
+.board .mos { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 70px 70px; gap: 4px; border-radius: 14px; overflow: hidden; }
+.board .mos canvas { width: 100%; height: 100%; display: block; }
+.board .mos canvas:first-child { grid-row: span 2; }
+.board .top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; padding: 0 2px; }
+.board b { font: 700 16px var(--serif); }
+.board small { font-size: 11.5px; color: #7a746a; }
+.board .sum { display: flex; justify-content: space-between; background: #f6f2ea; border-radius: 12px; padding: 7px 10px; font-size: 12px; }
+.board .sum b { font: 600 12.5px var(--mono); }
+.board .acts { display: flex; gap: 6px; }
+.board .acts button { flex: 1; border: 1px solid var(--ink); background: none; border-radius: 12px; padding: 9px; font: 600 12.5px var(--sans); }
+.board .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 88%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh h4 { margin: 0; font: 700 23px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.sh .hero { height: 170px; border-radius: 18px; display: block; width: 100%; }
+.fitcheck { display: grid; gap: 5px; background: var(--sage-2); border-radius: 14px; padding: 10px 12px; font-size: 12.5px; }
+.fitcheck div { display: grid; grid-template-columns: 18px 1fr; gap: 6px; }
+.fitcheck b.h { font: 700 14px var(--serif); }
+.lvl { display: grid; gap: 6px; }
+.lvlr { display: flex; justify-content: space-between; align-items: baseline; }
+.lvlr b { font: 700 24px var(--serif); color: var(--sage); }
+.lvlr small { font-size: 12px; color: #7a746a; }
+.shop { display: grid; gap: 0; }
+.shop div { display: grid; grid-template-columns: 38px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; font-size: 12.5px; }
+.shop div:first-child { border-top: 0; }
+.shop i { width: 38px; height: 38px; border-radius: 10px; display: block; }
+.shop b { display: block; font-size: 13px; }
+.shop small { color: #7a746a; font-size: 11px; }
+.shop em { font-style: normal; font: 500 12px var(--mono); }
+.btns2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* wizard */
+.wz-prog { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.wz-prog i { height: 5px; border-radius: 3px; background: #ddd5c6; display: block; transition: background .3s; }
+.wz-prog i.on { background: var(--sage); }
+.sh .wz-q { font: 700 22px/1.15 var(--serif); margin: 4px 0 0; color: var(--ink); }
+.wz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.wz-opt { border: 1.5px solid var(--line); background: #fffdf9; border-radius: 16px; padding: 12px 10px; text-align: left; display: grid; gap: 3px; transition: transform .2s; }
+.wz-opt i { font-style: normal; font-size: 22px; }
+.wz-opt b { font-size: 13.5px; }
+.wz-opt small { font-size: 11.5px; color: #7a746a; line-height: 1.3; }
+.wz-opt[aria-pressed="true"] { border-color: var(--sage); background: var(--sage-2); transform: scale(.98); }
+.wz-opt.wide { grid-column: span 2; }
+.upl { border: 1.5px dashed #b9b2a4; border-radius: 16px; padding: 14px; text-align: center; font-size: 13px; color: #5e6259; background: #fffdf9; }
+.ai { background: #fffdf9; border-radius: 16px; padding: 12px; display: grid; gap: 6px; }
+.ai .scan { height: 120px; border-radius: 12px; position: relative; overflow: hidden; }
+.ai .scan canvas { width: 100%; height: 100%; display: block; }
+.ai .scan::after { content: ""; position: absolute; left: 0; right: 0; height: 3px; background: var(--sage); box-shadow: 0 0 12px var(--sage); animation: scanl 1.4s linear infinite; }
+@keyframes scanl { from { top: 0; } to { top: 100%; } }
+.ai .scan.done::after { display: none; }
+.ai .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.ai .tags span { font-size: 11.5px; background: #f6f2ea; border-radius: 6px; padding: 3px 7px; animation: tin .4s both; }
+@keyframes tin { from { opacity: 0; transform: translateY(4px); } }
+.opt3 { display: grid; gap: 8px; }
+.o3 { background: #fffdf9; border-radius: 18px; padding: 12px; display: grid; grid-template-columns: 70px 1fr; gap: 10px; align-items: center; border: 1.5px solid transparent; }
+.o3.best { border-color: var(--sage); }
+.o3 canvas { width: 70px; height: 70px; border-radius: 12px; }
+.o3 b { font: 700 15px/1.2 var(--serif); display: block; }
+.o3 small { font-size: 11.5px; color: #7a746a; display: block; }
+.o3 em { font-style: normal; font: 600 12px var(--mono); color: var(--sage); }
+.o3 .tagb { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--sage); }
+.princ { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; margin-top: 18px; }
+.princ div { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.princ i { font: 700 18px/1 var(--serif); color: var(--sage); font-style: normal; }
+.princ b { display: block; font: 700 16px/1.2 var(--serif); }
+.princ p { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.try { margin-top: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; font-size: 13.5px; max-width: 580px; }
+.try b.h { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); display: block; margin-bottom: 4px; }
+.funnel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+@media (max-width: 860px) { .funnel { grid-template-columns: 1fr 1fr; } }
+.funnel div { padding: 14px 14px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; align-content: start; }
+.funnel .n { font: 500 11px var(--mono); color: var(--clay); letter-spacing: .08em; }
+.funnel b { font: 700 17px/1.2 var(--serif); }
+.funnel p { margin: 0; font-size: 13px; color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><b>Sección a fondo · Inicio</b> BuildI · app del cliente</div>
+      <h1>Inicio: <em>de "no sé qué hacer" a "quiero esto"</em></h1>
+      <p class="lede">Inicio es la puerta de entrada. No es un catálogo: es donde la duda sobre tu espacio se vuelve una idea concreta, con medidas, costo, tiempo y alguien que la puede hacer.</p>
+      <p class="sub">Cuatro secciones y un asistente. Todo sabe cómo es tu casa (sale de Mi hogar), así que las ideas no son genéricas: son las que caben en tu cocina de 12 m². Los datos son de ejemplo.</p>
+      <div class="princ">
+        <div><i>✦</i><div><b>"¿No sabes por dónde empezar?": el asistente</b><p>Cuatro preguntas (qué espacio, qué te molesta, cuánto quieres invertir, qué estilo te gusta) y una foto opcional. Termina con tres opciones concretas con precio y un botón para pedir visita.</p></div></div>
+        <div><i>1</i><div><b>Para ti: ideas que caben en tu casa</b><p>"En tu cocina de 12 m² caben estas ideas", sugerencias de temporada y lo que guardaste.</p></div></div>
+        <div><i>2</i><div><b>Explorar: por espacio y por tipo</b><p>Cocina, baño, sala, recámara, exterior, fachada, home office. Y por tipo: interiorismo, muebles, soluciones constructivas, exterior.</p></div></div>
+        <div><i>3</i><div><b>Antes y después: obras reales con números reales</b><p>Proyectos terminados por BuildI con costo, tiempo, calificación y lo que dijo el cliente. Es la mejor prueba de que se puede.</p></div></div>
+        <div><i>4</i><div><b>Mis tableros: tus ideas, agrupadas</b><p>Guardas ideas en tableros por espacio. Cada tablero suma su costo estimado y se convierte en proyecto con un toque.</p></div></div>
+        <div><i>⌂</i><div><b>Cada idea trae "compra el look"</b><p>Los muebles y materiales de la idea, con precio de proveedores BuildI. Puedes pedir solo los muebles, o la obra completa.</p></div></div>
+      </div>
+      <div class="try"><b class="h">Prueba esto</b>Toca <b>"¿No sabes por dónde empezar?"</b> y contesta las 4 preguntas, con la foto incluida. Luego abre una idea de "Caben en tu cocina" y mueve el nivel de acabados. Termina en <b>Mis tableros</b> convirtiendo un tablero en proyecto.</div>
+    </div>
+
+    <div class="phone">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="toast" id="toast"></div>
+        <div class="scroll" id="scroll"></div>
+        <div class="scrim" id="scrim"></div>
+        <div class="sheet" id="sheet"><div class="grab"></div><div class="sh" id="sh"></div></div>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="App del cliente">
+          <div class="ind" id="ind"></div>
+          <button role="tab" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9 1.3 5.8L12 16l-4.9 3 1.3-5.8L4 9.3l5.8-.7z"/></svg>Inicio</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/><path d="M2 21h20"/></svg>Mis obras<span class="badge" id="tbBadge" style="display:none">1</span></button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Mi hogar</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Lo que Inicio hace por el negocio</h2>
+    <p class="sub">Cada toque en Inicio es una señal de lo que el cliente quiere. Al constructor le llega un prospecto con contexto, no un "¿cuánto cuesta una cocina?".</p>
+    <div class="funnel">
+      <div><span class="n">01 · INSPIRA</span><b>Ve ideas que caben en su casa</b><p>Personalizadas con las medidas de su expediente.</p></div>
+      <div><span class="n">02 · GUARDA</span><b>Arma tableros</b><p>BuildI aprende su estilo y su presupuesto real.</p></div>
+      <div><span class="n">03 · ESTIMA</span><b>Ve costo y tiempo</b><p>Sin pedir cotización ni dar su teléfono.</p></div>
+      <div><span class="n">04 · PIDE</span><b>Visita técnica o solo muebles</b><p>El prospecto llega con fotos, medidas, estilo y rango.</p></div>
+      <div><span class="n">05 · PROYECTO</span><b>Aparece en Mis obras</b><p>Y empieza el ciclo hasta Mi hogar.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const setup = c => { const w = c.clientWidth, h = c.clientHeight, d = devicePixelRatio || 1; c.width = w * d; c.height = h * d; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, w, h]; };
+  let toastT; const toast = s => { const t = $('toast'); t.textContent = s; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); };
+  const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+function room(c, kind) {
+    const [x, W, H] = setup(c);
+    const P = { cocina: ['#e9e2d4', '#c79a64', '#4f7d61'], sala: ['#efe8dc', '#b98b5a', '#9fb7a6'], terraza: ['#cfe3f3', '#a08a6c', '#6b8f5e'], bano: ['#e3e9ea', '#d9d4ca', '#3c6e9e'], home: ['#ece6dc', '#7a5a3c', '#b0561f'], recamara: ['#e3ebe0', '#b98b5a', '#c9a24a'], fachada: ['#bcd5ee', '#9aa1a4', '#4f7d61'], closet: ['#f1ece2', '#a0764f', '#2b2a26'], obra: ['#dcebf6', '#b9ad97', '#9aa1a4'] }[kind] || ['#efe8dc', '#b98b5a', '#4f7d61'];
+    x.fillStyle = P[0]; x.fillRect(0, 0, W, H); x.fillStyle = P[1]; x.fillRect(0, H * .72, W, H);
+    if (kind === 'cocina') { x.fillStyle = '#f5f2ec'; x.fillRect(W * .08, H * .45, W * .84, H * .27); x.fillStyle = P[2]; x.fillRect(W * .08, H * .5, W * .84, H * .22); x.fillStyle = '#3a3a3a'; x.fillRect(W * .06, H * .45, W * .88, 5); x.fillStyle = P[2]; x.fillRect(W * .1, H * .12, W * .45, H * .18); x.fillStyle = '#ffd9a0'; [.25, .5, .75].forEach(k => { x.beginPath(); x.arc(W * k, H * .3, 6, 0, 7); x.fill(); }); }
+    else if (kind === 'sala' || kind === 'recamara') { x.fillStyle = '#9fc4e6'; x.fillRect(W * .3, H * .1, W * .4, H * .4); x.strokeStyle = '#2b2a26'; x.lineWidth = 3; x.strokeRect(W * .3, H * .1, W * .4, H * .4); x.fillStyle = P[2]; if (kind === 'sala') { x.fillRect(W * .15, H * .55, W * .7, H * .14); x.fillRect(W * .13, H * .62, W * .74, H * .14); } else { x.fillStyle = '#fff'; x.fillRect(W * .2, H * .58, W * .6, H * .18); x.fillStyle = P[2]; x.fillRect(W * .2, H * .64, W * .6, H * .14); } x.fillStyle = '#6b8f5e'; x.beginPath(); x.arc(W * .1, H * .6, W * .06, 0, 7); x.fill(); }
+    else if (kind === 'terraza') { x.fillStyle = '#7a5a3c'; for (let i = 0; i < 6; i++) x.fillRect(W * (.1 + i * .16), H * .1, W * .03, H * .62); x.fillRect(W * .05, H * .1, W * .9, H * .05); x.fillStyle = '#f3ead4'; x.fillRect(W * .25, H * .55, W * .5, H * .12); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .85, H * .5, W * .09, 0, 7); x.fill(); }
+    else if (kind === 'bano') { x.fillStyle = '#fff'; x.fillRect(W * .55, H * .2, W * .3, H * .52); x.strokeStyle = 'rgba(0,0,0,.08)'; for (let i = 0; i < W; i += 14) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H * .72); x.stroke(); } x.fillStyle = P[2]; x.fillRect(W * .12, H * .48, W * .3, H * .24); x.fillStyle = '#e8e8e8'; x.beginPath(); x.ellipse(W * .27, H * .48, W * .12, H * .05, 0, 0, 7); x.fill(); }
+    else if (kind === 'home') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .5, W * .8, H * .06); x.fillRect(W * .15, H * .56, W * .04, H * .16); x.fillRect(W * .8, H * .56, W * .04, H * .16); x.fillStyle = '#2b2a26'; x.fillRect(W * .35, H * .3, W * .28, H * .18); x.fillStyle = '#9fc4e6'; x.fillRect(W * .37, H * .32, W * .24, H * .14); x.fillStyle = P[2]; x.fillRect(W * .7, H * .15, W * .2, H * .3); }
+    else if (kind === 'fachada') { x.fillStyle = '#f3ede2'; x.fillRect(W * .15, H * .25, W * .7, H * .47); x.fillStyle = '#2b2a26'; x.beginPath(); x.moveTo(W * .1, H * .27); x.lineTo(W * .5, H * .05); x.lineTo(W * .9, H * .27); x.fill(); x.fillStyle = '#9fc4e6'; x.fillRect(W * .25, H * .35, W * .18, H * .15); x.fillRect(W * .57, H * .35, W * .18, H * .15); x.fillStyle = '#7a5a3c'; x.fillRect(W * .44, H * .52, W * .12, H * .2); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .08, H * .66, W * .07, 0, 7); x.fill(); }
+    else if (kind === 'closet') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .08, W * .8, H * .64); x.fillStyle = '#f1ece2'; for (let i = 0; i < 3; i++) x.fillRect(W * (.13 + i * .26), H * .12, W * .22, H * .56); x.fillStyle = '#b0561f'; x.fillRect(W * .15, H * .2, W * .18, H * .1); x.fillStyle = '#4f7d61'; x.fillRect(W * .42, H * .18, W * .18, H * .3); }
+    else if (kind === 'obra') { x.fillStyle = '#9aa1a4'; for (let f = 0; f < 3; f++) { x.fillRect(W * .2, H * (.62 - f * .18), W * .6, 6); for (let k = 0; k <= 4; k++) x.fillRect(W * (.2 + k * .15) - 2, H * (.62 - f * .18) + 6, 4, H * .12); } x.strokeStyle = '#ff5f0f'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .88, H * .72); x.lineTo(W * .88, H * .05); x.lineTo(W * .4, H * .05); x.stroke(); }
+  }
+
+  
+  function before(c) { const [x, w, h] = setup(c); x.fillStyle = '#d8d2c4'; x.fillRect(0, 0, w, h); x.fillStyle = '#8f8a80'; x.fillRect(0, h * .72, w, h); x.fillStyle = '#a69a85'; x.fillRect(w * .05, h * .48, w * .9, h * .24); x.fillStyle = '#7a6f5c'; x.fillRect(w * .05, h * .1, w * .9, h * .2); x.fillStyle = '#b9b2a4'; x.fillRect(w * .62, h * .05, w * .06, h * .67); x.fillStyle = 'rgba(0,0,0,.2)'; x.fillRect(0, 0, w, h); }
+
+  /* ---------- data ---------- */
+  // [kind, title, space, type, h, lo, hi, weeks, desc, fits]
+  const IDEAS = [
+    ['cocina', 'Cocina abierta con isla', 'Cocina', 'Constructivo', 150, 220000, 340000, '5–7 sem', 'Abrir el muro hacia la sala para una cocina integrada con isla.', true],
+    ['cocina', 'Gabinetes nuevos sin obra', 'Cocina', 'Muebles', 110, 68000, 120000, '2 sem', 'Cambiar frentes y cubierta sin tocar instalaciones.', true],
+    ['closet', 'Clóset de piso a techo', 'Recámara', 'Muebles', 120, 32000, 58000, '3 sem', 'Carpintería a medida con luz interior.', false],
+    ['terraza', 'Pérgola en azotea', 'Exterior', 'Exterior', 130, 95000, 160000, '4 sem', 'Pérgola de madera, piso deck y riego por goteo.', false],
+    ['home', 'Home office en recámara de visitas', 'Home office', 'Interiorismo', 100, 38000, 70000, '2 sem', 'Escritorio flotante, librero e iluminación de trabajo.', false],
+    ['bano', 'Baño con regadera de piso', 'Baño', 'Constructivo', 120, 85000, 140000, '3 sem', 'Regadera sin cancel, piso continuo y nicho iluminado.', false],
+    ['sala', 'Sala con muro de madera', 'Sala', 'Interiorismo', 140, 45000, 90000, '2 sem', 'Lambrín, luz indirecta cálida y cortinas de piso a techo.', false],
+    ['fachada', 'Renovar fachada y entrada', 'Fachada', 'Exterior', 120, 120000, 210000, '4 sem', 'Aplanado, celosía de madera y luz exterior.', false],
+    ['cocina', 'Cocina con desayunador', 'Cocina', 'Interiorismo', 125, 140000, 210000, '4 sem', 'Barra a lo largo de la ventana para dos bancos.', true],
+    ['recamara', 'Recámara para un bebé', 'Recámara', 'Interiorismo', 110, 30000, 55000, '2 sem', 'Pintura sin olor, piso suave y cortinas blackout.', false]
+  ];
+  const SPACES = [['🍳', 'Cocina'], ['🛁', 'Baño'], ['🛋', 'Sala'], ['🛏', 'Recámara'], ['🌿', 'Exterior'], ['🏠', 'Fachada'], ['💻', 'Home office'], ['✦', 'Todo']];
+  const KINDS = ['Interiorismo', 'Muebles', 'Constructivo', 'Exterior'];
+  const SHOP = { cocina: [['#4f7d61', 'Gabinetes laca salvia', 'Carpintería Castillo · a medida', 64000], ['#3a3a3a', 'Cubierta cuarzo negro 3.2 m', 'Mármoles GDL', 38000], ['#c9a24a', '3 lámparas colgantes', 'Iluminación del Valle', 7800], ['#b98b5a', '2 bancos de roble', 'Muebles Arboleda', 5400]], default: [['#b98b5a', 'Madera tratada', 'Maderas Tapalpa', 24000], ['#9fb7a6', 'Textiles y cortinas', 'Telas Providencia', 9800], ['#c9a24a', 'Iluminación', 'Iluminación del Valle', 6400]] };
+  const CASES = [
+    { n: 'Cocina abierta · Chapalita', sub: 'Familia Navarro · 2025', facts: [['$268k', 'Costo'], ['6 sem', 'Tiempo'], ['12 m²', 'Espacio'], ['★ 4.9', 'Calif.']], q: '"Pensamos que iba a ser un caos vivir durante la obra. Nos avisaron cada día qué iban a hacer."', who: 'Laura N.' },
+    { n: 'Baño de visitas · Providencia', sub: 'Familia Ruiz · 2025', facts: [['$96k', 'Costo'], ['3 sem', 'Tiempo'], ['4.5 m²', 'Espacio'], ['★ 4.8', 'Calif.']], q: '"Lo que más me gustó fue elegir los acabados viendo mi propio baño en la app."', who: 'Jorge R.' }
+  ];
+  const state = { sub: 0, space: 7, kinds: new Set(), saved: new Set([0, 3, 4]), boards: [{ n: 'Cocina soñada', ids: [0, 8, 1] }, { n: 'Azotea', ids: [3] }, { n: 'Para el bebé', ids: [9, 2] }], made: new Set() };
+
+  /* ---------- views ---------- */
+  const SUBS = ['Para ti', 'Explorar', 'Antes y después', 'Mis tableros'];
+  const subtabs = () => `<div class="subtabs">${SUBS.map((s, i) => `<button type="button" data-sub="${i}" aria-pressed="${i === state.sub}">${s}${i === 3 ? ' · ' + state.boards.length : ''}</button>`).join('')}</div>`;
+  const ideaCard = (d, i) => `<button type="button" class="idea" data-idea="${i}"><canvas class="img" data-room="${d[0]}" style="height:${d[4]}px"></canvas><span class="tagx">${d[3]}</span><span class="save ${state.saved.has(i) ? 'on' : ''}" data-save="${i}" role="button" aria-label="Guardar">♥</span><span class="t"><b>${d[1]}</b><small>desde ${money(d[5] / 1000)}k · ${d[7]}</small></span></button>`;
+  function paraTi() {
+    const fits = IDEAS.map((d, i) => [d, i]).filter(([d]) => d[9]);
+    return `<button type="button" class="wizcard" data-wiz="1"><b>¿No sabes por dónde empezar?</b><span class="go">✦</span><small>4 preguntas y una foto. Te damos 3 opciones con precio.</small></button>
+      <div class="fit"><div class="hd"><span>Caben en tu cocina</span><b>12.4 m² · Casa Providencia</b></div><div class="fitrow">${fits.map(([d, i]) => `<button type="button" class="fitc" data-idea="${i}"><canvas data-room="${d[0]}"></canvas><span><b>${d[1]}</b><em>✓ cabe · ${money(d[5] / 1000)}k+</em></span></button>`).join('')}</div></div>
+      <div class="season"><div><span class="pill new">Temporada</span><b style="margin-top:4px">Antes de las posadas: tu terraza lista</b><small>Las obras exteriores que empiezan en octubre terminan antes de diciembre.</small></div><canvas data-room="terraza"></canvas></div>
+      <div class="hd" style="margin:2px 2px -4px"><span>Para tu estilo cálido y natural</span><b>${state.saved.size} guardadas</b></div>
+      <div class="ideas">${IDEAS.map((d, i) => [d, i]).filter(([d]) => !d[9]).slice(0, 6).map(([d, i]) => ideaCard(d, i)).join('')}</div>`;
+  }
+  function explorar() {
+    const sp = SPACES[state.space][1];
+    const list = IDEAS.map((d, i) => [d, i]).filter(([d]) => (sp === 'Todo' || d[2] === sp) && (!state.kinds.size || state.kinds.has(d[3])));
+    return `<div class="spaces">${SPACES.map((s, i) => `<button type="button" class="space" data-space="${i}" aria-pressed="${i === state.space}"><i>${s[0]}</i>${s[1]}<small>${s[1] === 'Todo' ? IDEAS.length : IDEAS.filter(d => d[2] === s[1]).length}</small></button>`).join('')}</div>
+      <div class="kinds">${KINDS.map(k => `<button type="button" data-kind="${k}" aria-pressed="${state.kinds.has(k)}">${k}</button>`).join('')}</div>
+      ${list.length ? `<div class="ideas">${list.map(([d, i]) => ideaCard(d, i)).join('')}</div>` : '<div class="pc" style="font-size:13px;color:#7a746a">No hay ideas con esos filtros todavía. Quita un filtro.</div>'}`;
+  }
+  function antesDespues() {
+    return CASES.map((c, k) => `<div class="case"><div class="ba" data-ba="${k}"><canvas class="baA"></canvas><div class="top"><canvas class="baB"></canvas></div><span class="lb" style="left:8px">ANTES</span><span class="lb" style="right:8px">DESPUÉS</span></div>
+      <div class="t"><b class="n">${c.n}</b><small style="font-size:12px;color:#7a746a">${c.sub} · hecho con BuildI</small><div class="facts3">${c.facts.map(f => `<div><b>${f[0]}</b><small>${f[1]}</small></div>`).join('')}</div><p class="quote">${c.q}<small>— ${c.who}</small></p><button class="cta ghost" type="button" data-similar="${k}">Quiero algo así</button></div></div>`).join('');
+  }
+  function tableros() {
+    return state.boards.map((b, k) => { const ids = b.ids, lo = ids.reduce((a, i) => a + IDEAS[i][5], 0), hi = ids.reduce((a, i) => a + IDEAS[i][6], 0); const made = state.made.has(k);
+      return `<div class="board"><div class="mos">${[0, 1, 2].map(j => `<canvas data-room="${IDEAS[ids[j % ids.length]][0]}"></canvas>`).join('')}</div><div class="top"><b>${b.n}</b><small>${ids.length} ideas</small></div>
+      <div class="sum"><span>Si hicieras todo</span><b>${money(lo / 1000)}k–${money(hi / 1000)}k</b></div>
+      <div class="acts">${made ? '<button type="button" class="ok" data-goobras="1">✓ En Mis obras · ver</button>' : `<button type="button" data-share="${k}">Compartir</button><button type="button" class="ok" data-make="${k}">Convertir en proyecto</button>`}</div></div>`; }).join('') +
+      `<button type="button" class="newp" data-newboard="1"><b>+ Tablero nuevo</b><small>Agrupa ideas por espacio o por sueño</small></button>`;
+  }
+
+  /* ---------- render ---------- */
+  const scroll = $('scroll');
+  function bindBA(el, k) {
+    const a = el.querySelector('.baA'), b = el.querySelector('.baB'), top = el.querySelector('.top');
+    const [ax, w, h] = setup(a); top.style.setProperty('--w', w + 'px'); b.style.width = w + 'px'; b.style.height = h + 'px';
+    before(b); room(a, k ? 'bano' : 'cocina');
+    let d = false; const set = q => { q = Math.max(.05, Math.min(.95, q)); top.style.width = q * 100 + '%'; };
+    el.onpointerdown = e => { d = true; el.setPointerCapture(e.pointerId); set((e.clientX - el.getBoundingClientRect().left) / el.clientWidth); };
+    el.onpointermove = e => { if (d) set((e.clientX - el.getBoundingClientRect().left) / el.clientWidth); };
+    el.onpointerup = () => d = false; set(.5);
+  }
+  function render(keep) {
+    const st = scroll.scrollTop;
+    scroll.innerHTML = `<div class="view"><div class="greet"><small><span>Buenos días, Mariana</span><span>${state.saved.size} guardadas</span></small><h3>¿Qué quieres hacer <em>con tu espacio?</em></h3></div>${subtabs()}${[paraTi, explorar, antesDespues, tableros][state.sub]()}</div>`;
+    if (keep) { scroll.scrollTop = st; scroll.querySelector('.view').style.animation = 'none'; } else scroll.scrollTop = 0;
+    scroll.querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room));
+    scroll.querySelectorAll('[data-ba]').forEach(el => bindBA(el, +el.dataset.ba));
+  }
+
+  /* ---------- idea sheet ---------- */
+  const openSheet = html => { $('sh').innerHTML = html; $('sheet').classList.add('on'); $('scrim').classList.add('on'); $('sh').scrollTop = 0; $('sh').querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room)); };
+  const closeSheet = () => { $('sheet').classList.remove('on'); $('scrim').classList.remove('on'); };
+  $('scrim').onclick = closeSheet;
+  let lvl = 1;
+  function ideaSheet(i) {
+    const d = IDEAS[i], shop = SHOP[d[0]] || SHOP.default, f = [.85, 1, 1.4][lvl];
+    openSheet(`<canvas class="hero" data-room="${d[0]}"></canvas><span style="font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#7a746a">${d[2]} · ${d[3]}</span><h4>${d[1]}</h4><p>${d[8]}</p>
+      ${d[9] ? `<div class="fitcheck"><b class="h">En tu cocina de 12.4 m²</b><div><span>✓</span><span>Cabe una isla de 2.4 × 0.9 m con 1.1 m de paso</span></div><div><span>✓</span><span>La toma de agua queda a 1.8 m: no hay que mover drenaje</span></div><div><span>!</span><span>El muro hacia la sala hay que revisarlo: puede ser de carga</span></div></div>` : `<div class="fitcheck" style="background:#ece5d8"><b class="h">¿Cabe en tu casa?</b><span>Pide la visita técnica y lo revisamos con tus medidas.</span></div>`}
+      <div class="pc lvl"><div class="hd"><span>Nivel de acabados</span></div><div class="seg" id="lvlSeg">${['Básico', 'Medio', 'Premium'].map((l, k) => `<button type="button" data-lvl="${k}" aria-pressed="${k === lvl}">${l}</button>`).join('')}</div>
+        <div class="lvlr"><b>${money(d[5] * f)}–${money(d[6] * f)}</b><small>${d[7]}</small></div><small style="font-size:12px;color:#5e6259">${['Laminados, herrajes estándar, iluminación básica.', 'Lo que ves en la imagen: laca, cuarzo, luz cálida.', 'Madera sólida, piedra natural, herrajes con cierre suave.'][lvl]}</small></div>
+      <div class="pc"><div class="hd"><span>Compra el look</span><b>proveedores BuildI</b></div><div class="shop">${shop.map(s => `<div><i style="background:${s[0]}"></i><span><b>${s[1]}</b><small>${s[2]}</small></span><em>${money(s[3] * f)}</em></div>`).join('')}</div></div>
+      <div class="btns2"><button class="cta ghost" type="button" data-onlyshop="${i}">Solo los muebles</button><button class="cta sage" type="button" data-doit="${i}">Hazlo con BuildI</button></div>
+      <button class="cta ghost" type="button" data-save="${i}" style="border-color:#cfc8ba">${state.saved.has(i) ? '♥ Guardada en tablero' : '♡ Guardar en un tablero'}</button>`);
+    $('sh').dataset.idea = i;
+  }
+
+  /* ---------- wizard ---------- */
+  const Q = [
+    ['¿Qué espacio quieres cambiar?', [['🍳', 'Cocina', ''], ['🛁', 'Baño', ''], ['🛋', 'Sala', ''], ['🛏', 'Recámara', ''], ['🌿', 'Exterior', ''], ['🤷', 'No sé, toda la casa', '']]],
+    ['¿Qué es lo que más te molesta hoy?', [['🌑', 'Es oscuro', 'Falta luz natural'], ['📦', 'No me cabe nada', 'Falta guardado'], ['🧱', 'Está cerrado', 'Quiero integrarlo'], ['🕰', 'Se ve viejo', 'Acabados gastados']]],
+    ['¿Cuánto quieres invertir?', [['$', 'Menos de $80k', 'Cambios rápidos'], ['$$', '$80k–$200k', 'Remodelación'], ['$$$', '$200k–$400k', 'Obra completa'], ['?', 'No sé todavía', 'Ayúdame a decidir']]],
+    ['¿Qué estilo te gusta?', [['🌿', 'Cálido y natural', 'Madera, verde, luz cálida'], ['⬜', 'Minimalista', 'Blanco, líneas limpias'], ['🏺', 'Mexicano contemporáneo', 'Barro, piedra, color'], ['🖤', 'Industrial', 'Concreto, negro, metal']]]
+  ];
+  let wz = { step: 0, ans: [] };
+  function wizRender() {
+    if (wz.step < 4) { const q = Q[wz.step];
+      openSheet(`<div class="wz-prog">${[0, 1, 2, 3].map(k => `<i class="${k <= wz.step ? 'on' : ''}"></i>`).join('')}</div><span style="font:500 10.5px var(--mono);color:#7a746a">PREGUNTA ${wz.step + 1} DE 4</span><p class="wz-q">${q[0]}</p>
+        <div class="wz-opts">${q[1].map((o, k) => `<button type="button" class="wz-opt ${q[1].length === 6 && k === 5 ? '' : ''}" data-ans="${k}" aria-pressed="${wz.ans[wz.step] === k}"><i>${o[0]}</i><b>${o[1]}</b>${o[2] ? `<small>${o[2]}</small>` : ''}</button>`).join('')}</div>
+        ${wz.step > 0 ? '<button class="cta ghost" type="button" data-wback="1">← Atrás</button>' : ''}`);
+      return; }
+    if (wz.step === 4) {
+      openSheet(`<div class="wz-prog">${[0, 1, 2, 3].map(() => '<i class="on"></i>').join('')}</div><p class="wz-q">¿Nos mandas una foto de tu ${Q[0][1][wz.ans[0]][1].toLowerCase()}?</p><p>Con una foto la IA reconoce medidas aproximadas, luz y lo que hay hoy. Es opcional.</p>
+        <button type="button" class="upl" data-photo="1">📷 Tomar o subir foto</button><button class="cta ghost" type="button" data-skip="1">Saltar, ver opciones</button>`);
+      return; }
+    if (wz.step === 5) {
+      openSheet(`<p class="wz-q">Analizando tu ${Q[0][1][wz.ans[0]][1].toLowerCase()}…</p><div class="ai"><div class="scan" id="scanBox"><canvas data-before="1"></canvas></div><div class="tags" id="aiTags"></div></div>`);
+      before($('sh').querySelector('[data-before]'));
+      const tags = ['≈ 12 m²', 'Ventana al norte · poca luz', 'Muro de 3.1 m hacia sala', 'Gabinetes de los 2000', 'Piso cerámico 33×33', 'Techo a 2.5 m'];
+      tags.forEach((t, k) => setTimeout(() => { const el = $('aiTags'); if (el) el.insertAdjacentHTML('beforeend', `<span>${t}</span>`); }, reduce ? 0 : 350 + k * 330));
+      setTimeout(() => { const s = $('scanBox'); if (s) s.classList.add('done'); wz.step = 6; setTimeout(wizRender, reduce ? 0 : 600); }, reduce ? 50 : 2500);
+      return; }
+    const sp = Q[0][1][wz.ans[0]][1], pain = Q[1][1][wz.ans[1]][1].toLowerCase(), budget = wz.ans[2], style = Q[3][1][wz.ans[3]][1];
+    const opts = [['Refrescar', 'gabinetes nuevos, luz cálida y pintura', 58000, 95000, '2 sem', 'cocina', 0], ['Abrir y renovar', 'muro abierto a la sala, isla y acabados nuevos', 220000, 340000, '6 sem', 'cocina', 2], ['Más luz y guardado', 'alacena a techo, cubierta nueva y tragaluz', 140000, 210000, '4 sem', 'sala', 1]];
+    const painI = wz.ans[1]; const best = painI === 2 ? (budget === 0 ? 0 : 1) : painI === 3 ? 0 : (budget === 0 ? 0 : 2);
+    openSheet(`<span class="pill ok">Listo · basado en tu foto</span><p class="wz-q">3 caminos para tu ${sp.toLowerCase()}</p><p>Porque ${pain}, con estilo ${style.toLowerCase()}${budget === 3 ? '' : ' y tu presupuesto'}.</p>
+      <div class="opt3">${opts.map((o, k) => `<div class="o3 ${k === best ? 'best' : ''}"><canvas data-room="${o[5]}"></canvas><div>${k === best ? '<span class="tagb">Recomendado para ti</span>' : ''}<b>${o[0]}</b><small>${o[1]}</small><em>${money(o[2] / 1000)}k–${money(o[3] / 1000)}k · ${o[4]}</em></div></div>`).join('')}</div>
+      <button class="cta sage" type="button" data-visit="1">Pedir visita técnica sin costo</button><button class="cta ghost" type="button" data-wsave="1">Guardar en un tablero</button>`);
+  }
+  $('sh').addEventListener('click', e => {
+    const a = e.target.closest('[data-ans]'); if (a) { wz.ans[wz.step] = +a.dataset.ans; a.setAttribute('aria-pressed', true); setTimeout(() => { wz.step++; wizRender(); }, reduce ? 0 : 220); return; }
+    if (e.target.closest('[data-wback]')) { wz.step--; wizRender(); return; }
+    if (e.target.closest('[data-photo]')) { wz.step = 5; wizRender(); return; }
+    if (e.target.closest('[data-skip]')) { wz.step = 6; wizRender(); return; }
+    if (e.target.closest('[data-visit]')) { closeSheet(); toast('Visita pedida · llega a Mis obras con tus respuestas y foto'); $('tbBadge').style.display = ''; return; }
+    if (e.target.closest('[data-wsave]')) { closeSheet(); state.boards.push({ n: 'Mi ' + Q[0][1][wz.ans[0]][1].toLowerCase(), ids: [1, 8, 0] }); toast('Tablero creado'); state.sub = 3; render(); return; }
+    const lv = e.target.closest('[data-lvl]'); if (lv) { lvl = +lv.dataset.lvl; const st = $('sh').scrollTop; ideaSheet(+$('sh').dataset.idea); $('sh').scrollTop = st; return; }
+    const sv = e.target.closest('[data-save]'); if (sv) { const i = +sv.dataset.save; state.saved.has(i) ? state.saved.delete(i) : state.saved.add(i); sv.textContent = state.saved.has(i) ? '♥ Guardada en tablero' : '♡ Guardar en un tablero'; render(true); return; }
+    if (e.target.closest('[data-onlyshop]')) { closeSheet(); toast('Carrito con 4 piezas · entrega e instalación incluidas'); return; }
+    if (e.target.closest('[data-doit]')) { closeSheet(); toast('Proyecto creado en Mis obras · visita técnica en camino'); $('tbBadge').style.display = ''; return; }
+  });
+
+  /* ---------- events ---------- */
+  scroll.addEventListener('click', e => {
+    const sv = e.target.closest('[data-save]'); if (sv) { e.stopPropagation(); const i = +sv.dataset.save; state.saved.has(i) ? state.saved.delete(i) : state.saved.add(i); render(true); toast(state.saved.has(i) ? 'Guardada · ajustamos tus sugerencias' : 'Quitada'); return; }
+    const sb = e.target.closest('[data-sub]'); if (sb) { state.sub = +sb.dataset.sub; render(); return; }
+    if (e.target.closest('[data-wiz]')) { wz = { step: 0, ans: [] }; wizRender(); return; }
+    const id = e.target.closest('[data-idea]'); if (id) { lvl = 1; ideaSheet(+id.dataset.idea); return; }
+    const sp = e.target.closest('[data-space]'); if (sp) { state.space = +sp.dataset.space; render(true); return; }
+    const kd = e.target.closest('[data-kind]'); if (kd) { const k = kd.dataset.kind; state.kinds.has(k) ? state.kinds.delete(k) : state.kinds.add(k); render(true); return; }
+    if (e.target.closest('[data-similar]')) { wz = { step: 0, ans: [] }; wizRender(); return; }
+    const mk = e.target.closest('[data-make]'); if (mk) { state.made.add(+mk.dataset.make); render(true); $('tbBadge').style.display = ''; toast(`"${state.boards[+mk.dataset.make].n}" ya es un proyecto en Mis obras`); return; }
+    if (e.target.closest('[data-share]')) { toast('Enlace copiado · tu pareja puede comentar el tablero'); return; }
+    if (e.target.closest('[data-goobras]')) { toast('Abriría Mis obras con el proyecto nuevo'); return; }
+    if (e.target.closest('[data-newboard]')) { state.boards.push({ n: 'Tablero nuevo', ids: [6] }); render(true); toast('Tablero creado'); return; }
+  });
+  const tb = [...$('tabs').querySelectorAll('button')]; requestAnimationFrame(() => { const b = tb[0]; $('ind').style.width = b.offsetWidth + 'px'; $('ind').style.transform = `translateX(${b.offsetLeft - 5}px)`; });
+  tb.forEach((t, i) => { if (i !== 0) t.onclick = () => toast('Esa sección tiene su propio prototipo'); });
+  render();
+  addEventListener('resize', () => render(true));
+})();
+</script>

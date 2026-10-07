@@ -1,0 +1,593 @@
+<title>BuildI Inicio Redistribuido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --plaster: #e4e8e1;
+  --paper: #fbfaf6;
+  --ink: #2b2a26;
+  --ink-2: #5e6259;
+  --line: rgba(43,42,38,.13);
+  --sage: #4f7d61;
+  --sage-2: #dfe9e2;
+  --clay: #b0561f;
+  --clay-2: #f6e3d6;
+  --brass: #c9a24a;
+  --blue: #3c6e9e;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--plaster); color: var(--ink); font: 15px/1.55 var(--sans); padding-inline: 20px; padding-block: 36px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow b { background: var(--sage); color: #fff; padding: 3px 7px; font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 74px)/.98 var(--serif); letter-spacing: -.025em; margin: 14px 0 16px; text-wrap: balance; max-width: 16ch; }
+h1 em { font-style: italic; font-weight: 400; color: var(--sage); }
+h2 { font: 700 clamp(30px, 4vw, 46px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+.lede { font-size: 18px; max-width: 58ch; margin: 0 0 14px; }
+.sub { color: var(--ink-2); max-width: 62ch; margin: 0 0 20px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+.tabsx { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; }
+.tx { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tx button { border: 1px solid var(--ink); background: var(--paper); padding: 7px 10px; font: 600 13px var(--sans); text-align: left; border-radius: 10px; display: flex; gap: 8px; align-items: center; }
+.tx button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tx b { font: 700 17px/1.2 var(--serif); display: block; margin-bottom: 2px; }
+.tx p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* phone */
+.phone { width: 384px; max-width: 100%; border-radius: 50px; background: #121412; padding: 11px; box-shadow: 0 40px 80px rgba(43,42,38,.3), inset 0 0 0 2px #3a3d38; justify-self: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.screen { border-radius: 40px; overflow: hidden; overflow: clip; position: relative; background: #f6f2ea; height: 790px; }
+.island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #000; border-radius: 20px; z-index: 40; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 12px 100px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: vin .4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes vin { from { opacity: 0; transform: translateY(8px); } }
+.greet small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; }
+.greet h3 { font: 700 27px/1.05 var(--serif); letter-spacing: -.015em; margin: 4px 0 0; }
+.greet h3 em { font-style: italic; font-weight: 400; color: var(--sage); }
+.pc { background: #fffdf9; border-radius: 22px; padding: 12px; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; margin-bottom: 8px; }
+.hd b { color: var(--ink); font-weight: 500; }
+.hd button { border: 0; background: none; font: 600 11.5px var(--sans); color: var(--sage); text-transform: none; letter-spacing: 0; padding: 0; }
+.hscroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* inicio */
+.intent { flex: none; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px 12px; width: 118px; text-align: left; display: grid; gap: 4px; }
+.intent .ic { font-size: 22px; }
+.intent b { font-size: 12.5px; line-height: 1.2; }
+.intent small { font: 500 10px var(--mono); color: #7a746a; }
+.intent[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.intent[aria-pressed="true"] small { color: #c7c2b8; }
+.ideas { columns: 2; column-gap: 8px; }
+.idea { break-inside: avoid; margin-bottom: 8px; background: #fffdf9; border-radius: 18px; overflow: hidden; border: 0; padding: 0; width: 100%; text-align: left; display: block; position: relative; }
+.idea .img { display: block; width: 100%; }
+.idea .t { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.idea .t b { font: 600 13.5px/1.2 var(--serif); }
+.idea .t small { font: 500 10px var(--mono); color: #7a746a; }
+.idea .save { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,253,249,.9); display: grid; place-items: center; font-size: 13px; border: 0; }
+.idea .save.on { background: var(--clay); color: #fff; }
+.tagx { position: absolute; top: 8px; left: 8px; font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: rgba(43,42,38,.75); color: #fff; padding: 3px 6px; border-radius: 6px; }
+.ba { position: relative; height: 170px; border-radius: 14px; overflow: hidden; touch-action: none; cursor: ew-resize; user-select: none; }
+.ba canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .top { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 3px solid #fff; }
+.ba .top canvas { width: var(--w); }
+.ba .lb { position: absolute; top: 8px; font: 500 9.5px var(--mono); background: rgba(0,0,0,.6); color: #fff; padding: 2px 6px; border-radius: 4px; z-index: 2; }
+.est { display: grid; gap: 8px; }
+.est .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 12.5px; }
+.seg { display: flex; background: #ece5d8; border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 4px; border-radius: 8px; font: 600 11.5px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+input[type=range] { accent-color: var(--sage); width: 100%; }
+.est .res { background: var(--sage-2); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.est .res b { font: 700 22px var(--serif); color: var(--sage); }
+.est .res small { font-size: 11.5px; color: var(--ink-2); display: block; }
+.cta { border: 0; background: var(--ink); color: #fff; border-radius: 14px; padding: 12px; font: 700 14px var(--sans); width: 100%; }
+.cta.sage { background: var(--sage); }
+.cta.ghost { background: none; color: var(--ink); border: 1px solid var(--ink); }
+
+/* obras */
+.proj { background: #fffdf9; border-radius: 22px; padding: 0; overflow: hidden; border: 0; width: 100%; text-align: left; display: grid; }
+.proj .img { height: 92px; position: relative; }
+.proj .img span { position: absolute; left: 10px; bottom: 8px; font: 500 9.5px var(--mono); background: rgba(255,253,249,.92); padding: 3px 7px; border-radius: 6px; }
+.proj .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.proj b { font: 700 17px/1.15 var(--serif); }
+.proj small { font-size: 12px; color: #7a746a; }
+.stg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.stg i { height: 6px; border-radius: 4px; background: #ece5d8; display: block; }
+.stg i.d { background: var(--sage); } .stg i.n { background: var(--clay); }
+.stg-l { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; font: 500 8.5px var(--mono); color: #9a958b; text-transform: uppercase; }
+.stg-l span.n { color: var(--clay); }
+.next { display: flex; justify-content: space-between; align-items: center; background: var(--clay-2); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; }
+.next b { font: 600 12.5px var(--sans); }
+.next em { font-style: normal; font: 500 11px var(--mono); color: var(--clay); }
+.newp { border: 1.5px dashed #b9b2a4; background: none; border-radius: 22px; padding: 14px; display: grid; gap: 2px; text-align: left; }
+.newp b { font: 700 15px var(--serif); }
+.newp small { font-size: 12px; color: #7a746a; }
+.back { border: 0; background: none; font: 600 13px var(--sans); color: var(--sage); padding: 0; justify-self: start; }
+.kpi2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpi2 div { background: #fffdf9; border-radius: 16px; padding: 9px 10px; }
+.kpi2 b { display: block; font: 700 21px/1 var(--serif); }
+.kpi2 small { font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #7a746a; }
+.appr { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; position: relative; }
+.appr:first-of-type { border-top: 0; }
+.appr .sw { width: 44px; height: 44px; border-radius: 10px; }
+.appr b { font-size: 13px; display: block; }
+.appr small { font-size: 11.5px; color: #7a746a; }
+.appr .acts { grid-column: 2; display: flex; gap: 6px; }
+.appr .acts button { border: 1px solid var(--ink); background: none; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.appr .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.appr .done { grid-column: 2; font: 500 11px var(--mono); color: var(--sage); }
+.dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dg { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 2px; font-size: 11.5px; border: 0; text-align: left; }
+.dg i { font-style: normal; font-size: 17px; }
+.dg b { font-size: 12px; }
+.dg small { font: 500 9.5px var(--mono); color: #7a746a; }
+.feed { display: grid; gap: 8px; }
+.fi { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+.fi .ph { width: 54px; height: 44px; border-radius: 8px; }
+.fi b { font-size: 13px; display: block; }
+.fi small { font-size: 11px; color: #7a746a; }
+
+/* hogar */
+.props { display: flex; gap: 6px; }
+.prop { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 14px; padding: 8px 10px; text-align: left; display: grid; gap: 1px; }
+.prop b { font-size: 12.5px; }
+.prop small { font: 500 9.5px var(--mono); color: #7a746a; }
+.prop[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.health { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
+.ring { position: relative; width: 104px; height: 104px; }
+.ring svg { width: 104px; height: 104px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .v { stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,1.3,.5,1); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; text-align: center; }
+.ring .in b { font: 700 30px/1 var(--serif); }
+.ring .in small { font: 500 8.5px var(--mono); color: #7a746a; }
+.hl { display: grid; gap: 5px; font-size: 12.5px; }
+.hl div { display: flex; justify-content: space-between; gap: 6px; }
+.hl b { font-family: var(--mono); font-weight: 500; font-size: 12px; }
+.task { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.task:first-of-type { border-top: 0; }
+.task .d { width: 40px; height: 44px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; align-content: center; text-align: center; }
+.task .d b { font: 700 16px/1 var(--serif); }
+.task .d small { font: 500 8px var(--mono); text-transform: uppercase; color: #7a746a; }
+.task b.t { font-size: 13px; display: block; }
+.task small.s { font-size: 11.5px; color: #7a746a; }
+.task button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.task button.done { background: var(--sage-2); color: var(--sage); }
+.task.urgent .d { background: var(--clay-2); }
+.task.urgent .d b { color: var(--clay); }
+.use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.use div { background: #f6f2ea; border-radius: 14px; padding: 8px 9px; display: grid; gap: 2px; }
+.use b { font: 700 17px/1 var(--serif); }
+.use small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; letter-spacing: .05em; }
+.use svg { width: 100%; height: 26px; }
+.use em { font-style: normal; font: 500 10px var(--mono); }
+.alertx { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--clay-2); border-radius: 16px; padding: 10px 12px; font-size: 12.5px; }
+.alertx i { font-style: normal; font-size: 20px; }
+.alertx b { display: block; font-size: 13px; }
+.svc { flex: none; width: 112px; border: 0; background: #fffdf9; border-radius: 16px; padding: 10px; display: grid; gap: 3px; text-align: left; }
+.svc i { font-style: normal; font-size: 20px; }
+.svc b { font-size: 12.5px; line-height: 1.2; }
+.svc small { font: 500 10px var(--mono); color: var(--sage); }
+.war { display: grid; gap: 7px; }
+.war div { display: grid; gap: 3px; font-size: 12.5px; }
+.war .l { display: flex; justify-content: space-between; }
+.war .l em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.bar { height: 6px; border-radius: 6px; background: #ece5d8; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; background: var(--sage); }
+.keycard { border-radius: 18px; padding: 14px 16px; background: linear-gradient(150deg, #2e3a33, #1b221e 60%, #3a2f1a); color: #f3ead4; display: flex; justify-content: space-between; align-items: center; }
+.keycard b { font: 700 17px/1.1 var(--serif); display: block; }
+.keycard small { font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #c3ccc5; }
+.keycard .chip { width: 34px; height: 25px; border-radius: 4px; background: linear-gradient(135deg, #f3dc9a, #c9a24a 50%, #a88234); }
+
+/* perfil */
+.me { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.me .av { width: 62px; height: 62px; border-radius: 50%; background: var(--sage); color: #fff; display: grid; place-items: center; font: 700 22px var(--serif); }
+.me b { font: 700 21px var(--serif); display: block; }
+.me small { font-size: 12.5px; color: #7a746a; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.style-tags span { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--sage-2); color: var(--sage); }
+.mrow { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13.5px; }
+.mrow:first-of-type { border-top: 0; }
+.mrow i { font-style: normal; font-size: 17px; }
+.mrow small { font: 500 11px var(--mono); color: #7a746a; }
+.mrow b { font-weight: 600; display: block; }
+.mrow span.s { font-size: 11.5px; color: #7a746a; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 82%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh .img { height: 150px; border-radius: 16px; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.facts div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.facts b { display: block; font: 700 16px/1.1 var(--serif); }
+.facts small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; }
+.steps { display: grid; gap: 4px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 12.5px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--sage-2); color: var(--sage); display: grid; place-items: center; font: 600 11px var(--mono); }
+
+/* tab bar */
+.tabs { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; border-radius: 26px; background: rgba(255,253,249,.74); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(43,42,38,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+.tabs button { border: 0; background: none; padding: 7px 0 6px; display: grid; justify-items: center; gap: 2px; font: 600 10.5px var(--sans); color: #7a746a; position: relative; z-index: 1; transition: color .3s; }
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-selected="true"] { color: var(--ink); }
+.tabs .ind { position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 21px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .55s cubic-bezier(.3,1.4,.5,1), width .55s; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 15px; height: 15px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9px/15px var(--mono); padding: 0 3px; }
+.toast { position: absolute; left: 50%; top: 48px; transform: translate(-50%, -260%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; z-index: 50; transition: transform .45s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translate(-50%, 0); }
+
+/* journey */
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .journey { grid-template-columns: 1fr; } }
+.jst { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c); }
+.jst .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--ink-2); display: flex; justify-content: space-between; }
+.jst .n span { color: var(--c); }
+.jst b { font: 700 20px/1.1 var(--serif); }
+.jst p.q { margin: 0; font: italic 400 14px/1.35 var(--serif); color: var(--ink-2); }
+.jst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.jst li { display: grid; grid-template-columns: 12px 1fr; gap: 6px; }
+.jst li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-top: 7px; }
+.jst .where { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 6px; }
+.loop { display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); border-radius: 4px; padding: 16px 18px; margin-top: 12px; }
+.loop i { font-style: normal; font-size: 26px; }
+.loop b { font: 700 18px var(--serif); display: block; }
+.loop span { font-size: 13.5px; color: #c7c2b8; }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.biz div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.biz b { font: 700 17px/1.2 var(--serif); }
+.biz p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+<style>
+.subtabs { display: flex; gap: 4px; }
+.subtabs button { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 7px 10px; font: 600 12.5px var(--sans); }
+.subtabs button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.feed { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+.sec { display: grid; gap: 10px; }
+.sec > h6 { margin: 0 2px; display: flex; justify-content: space-between; align-items: baseline; font: 700 17px var(--serif); }
+.sec > h6 small { font: 500 10.5px var(--mono); color: #7a746a; letter-spacing: .04em; }
+.hrow { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 2px 12px 4px; scroll-snap-type: x mandatory; }
+.hrow::-webkit-scrollbar { display: none; }
+.hrow > * { scroll-snap-align: start; flex: none; }
+.icard { width: 210px; border: 0; padding: 0; background: #fffdf9; border-radius: 20px; overflow: hidden; text-align: left; display: grid; }
+.icard canvas { width: 100%; height: 130px; display: block; }
+.icard span { padding: 9px 11px 11px; display: grid; gap: 2px; }
+.icard b { font: 700 15px/1.2 var(--serif); }
+.icard small { font-size: 11.5px; color: #7a746a; }
+.chipb { border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 8px 12px; font: 600 12.5px var(--sans); display: flex; gap: 6px; align-items: center; }
+.wcard { background: var(--ink); color: #fff; border-radius: 22px; padding: 16px; display: grid; gap: 8px; }
+.wcard b { font: 700 20px/1.1 var(--serif); }
+.wcard small { opacity: .75; font-size: 12.5px; }
+.wcard button { justify-self: start; border: 0; background: var(--brass); color: var(--ink); border-radius: 999px; padding: 8px 14px; font: 700 13px var(--sans); }
+.bacard { width: 250px; background: #fffdf9; border-radius: 20px; overflow: hidden; }
+.bacard .two { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.bacard canvas { width: 100%; height: 100px; display: block; }
+.bacard div.t { padding: 8px 11px 11px; font-size: 12px; color: #5e6259; }
+.bacard div.t b { display: block; font: 700 14px var(--serif); color: var(--ink); }
+.excard { width: 150px; background: #fffdf9; border-radius: 20px; padding: 12px; display: grid; justify-items: center; gap: 4px; text-align: center; }
+.excard i { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 16px var(--sans); font-style: normal; }
+.excard b { font-size: 13px; } .excard small { font-size: 11px; color: #7a746a; }
+.invite { border: 1.5px dashed #cfc8ba; border-radius: 20px; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; font-size: 12.5px; background: none; text-align: left; width: 100%; }
+.invite b { display: block; font: 700 15px var(--serif); }
+.invite .pal { display: flex; gap: 3px; } .invite .pal i { width: 14px; height: 30px; border-radius: 4px; display: block; }
+.glist { background: #fffdf9; border-radius: 20px; padding: 4px 12px; }
+.glist div { display: grid; grid-template-columns: 1fr auto; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13px; }
+.glist div:first-child { border-top: 0; }
+.glist em { font-style: normal; font: 500 10.5px var(--mono); color: #7a746a; }
+.from { justify-self: start; font: 600 9.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; background: var(--clay-2); color: var(--clay); border-radius: 999px; padding: 3px 8px; }
+.from.flash { animation: flash 1.4s 2; }
+@keyframes flash { 50% { background: var(--clay); color: #fff; } }
+.sgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sgrid button { border: 0; padding: 0; border-radius: 16px; overflow: hidden; background: #fffdf9; text-align: left; }
+.sgrid canvas { width: 100%; height: 84px; display: block; }
+.sgrid span { display: block; padding: 7px 10px; font: 600 12.5px var(--sans); }
+.blk { background: #fffdf9; border-radius: 22px; padding: 14px; display: grid; gap: 9px; }
+.blk h6 { margin: 0; font: 700 16px var(--serif); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.blk p { margin: 0; font-size: 12.5px; color: #5e6259; }
+.meters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 11.5px; }
+.meters div { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 4px; }
+.meters b { font: 700 14px var(--serif); }
+.dots { display: flex; gap: 3px; } .dots i { flex: 1; height: 5px; border-radius: 3px; background: #e2dacb; display: block; } .dots i.on { background: var(--clay); }
+.qa { display: grid; grid-template-columns: 44px 1fr auto; gap: 9px; align-items: center; font-size: 12.5px; }
+.qa canvas { width: 44px; height: 44px; border-radius: 10px; }
+.qa em { font-style: normal; font: 600 10.5px var(--mono); color: var(--sage); }
+.tl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.tl div { background: #f6f2ea; border-radius: 10px; padding: 7px 6px; font-size: 10.5px; display: grid; gap: 3px; min-height: 66px; align-content: start; }
+.tl b { font: 700 13px var(--serif); }
+.tl span { background: #fffdf9; border-radius: 6px; padding: 2px 4px; }
+.pal5 { display: flex; height: 40px; border-radius: 12px; overflow: hidden; } .pal5 i { flex: 1; display: block; }
+.rowkv { display: flex; justify-content: space-between; font-size: 13px; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.rowkv:first-of-type { border-top: 0; }
+.rowkv b { font: 600 12.5px var(--mono); }
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 92%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto auto 1fr auto; overflow: hidden; }
+.sheet.on { transform: none; }
+.sheet .hero2 { position: relative; height: 120px; }
+.sheet .hero2 canvas { width: 100%; height: 100%; display: block; }
+.sheet .hero2 h4 { position: absolute; left: 14px; bottom: 10px; margin: 0; color: #fff; font: 700 21px var(--serif); text-shadow: 0 2px 10px rgba(0,0,0,.5); }
+.sheet .hero2 .grab { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.8); }
+.itabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 10px 14px 6px; }
+.itabs::-webkit-scrollbar { display: none; }
+.itabs button { flex: none; border: 0; background: #ece5d8; border-radius: 999px; padding: 6px 11px; font: 600 12px var(--sans); }
+.itabs button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.sh { overflow-y: auto; padding: 6px 14px 14px; display: grid; gap: 12px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh p { margin: 0; font-size: 13px; color: #5e6259; }
+.shfoot { padding: 10px 14px 16px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; background: #f6f2ea; border-top: 1px solid #e7e0d3; }
+.sw6 { display: flex; gap: 6px; } .sw6 button { flex: 1; height: 38px; border-radius: 10px; border: 2px solid transparent; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.sw6 button[aria-pressed="true"] { border-color: var(--ink); }
+.layl { display: grid; gap: 3px; } .layl div { display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; align-items: center; font-size: 12.5px; padding: 6px 8px; background: #fffdf9; border-radius: 8px; }
+.layl i { width: 14px; height: 14px; border-radius: 3px; display: block; } .layl em { font-style: normal; font: 500 10.5px var(--mono); color: #7a746a; }
+/* page: board */
+.board-head { display: flex; justify-content: space-between; align-items: end; gap: 14px; flex-wrap: wrap; }
+.toggle { display: flex; background: #e2dccf; border-radius: 999px; padding: 4px; }
+.toggle button { border: 0; background: none; border-radius: 999px; padding: 8px 16px; font: 700 13px var(--sans); color: var(--ink-2); }
+.toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.col { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 6px; align-content: start; min-height: 120px; }
+.col h5 { margin: 0 0 4px; font: 700 15px var(--serif); display: flex; justify-content: space-between; }
+.col h5 span { font: 500 11px var(--mono); color: var(--ink-2); }
+.col .sub5 { font: 500 10px var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; margin: -4px 0 2px; }
+.chip { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 6px 8px; font: 600 12px/1.25 var(--sans); text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; cursor: pointer; will-change: transform; }
+.chip em { font-style: normal; font: 500 9.5px var(--mono); color: var(--ink-2); }
+.chip.p1 { border-left: 3px solid var(--sage); } .chip.p2 { border-left: 3px solid var(--brass); } .chip.p3 { border-left: 3px solid var(--clay); }
+.chip[aria-pressed="true"] { outline: 2px solid var(--ink); }
+.legend { display: flex; gap: 14px; font: 500 11px var(--mono); color: var(--ink-2); flex-wrap: wrap; margin-top: 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.why { margin-top: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; font-size: 14px; min-height: 64px; }
+.why b.h { display: block; font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--clay); margin-bottom: 3px; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; margin-top: 18px; }
+.rule { border-top: 3px solid var(--ink); padding-top: 10px; }
+.rule b { display: block; font: 700 17px/1.2 var(--serif); }
+.rule p { margin: 4px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.count { display: flex; gap: 22px; margin-top: 18px; flex-wrap: wrap; }
+.count div b { display: block; font: 700 38px/1 var(--serif); }
+.count div small { font: 500 11px var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+@media (max-width: 900px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .board { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><b>Inicio · redistribución</b> BuildI · app del cliente</div>
+      <h1>Menos pestañas, <em>cada cosa en su lugar</em></h1>
+      <p class="lede">En las tres partes de Inicio juntamos 12 subpestañas y 23 piezas. Eran buenas, pero todas en el mismo lugar. Aquí cada una se va a donde el cliente la buscaría.</p>
+      <div class="count"><div><b>12 → 3</b><small>subpestañas en Inicio</small></div><div><b>8</b><small>herramientas dentro de cada idea</small></div><div><b>6</b><small>piezas a otras pestañas</small></div></div>
+      <div class="rules">
+        <div class="rule"><b>Inicio es para descubrir</b><p>Solo tres subpestañas: Para ti, Explorar y Guardado. Lo demás va en secciones que se recorren con el dedo, con aire entre ellas.</p></div>
+        <div class="rule"><b>Las herramientas viven dentro de la idea</b><p>Foto, plano, luz, capas, pago: aparecen al abrir una idea, solo las que aplican. Una idea de pintura no muestra "cómo se construye".</p></div>
+        <div class="rule"><b>Lo que ya contrataste, a Mis obras</b><p>"Cómo se vive la obra" se vuelve el aviso semanal, y las revisiones con foto pasan al avance.</p></div>
+        <div class="rule"><b>Lo de largo plazo, a Mi hogar. Lo tuyo, a Perfil</b><p>El plan a 5 años y tu plano van en Mi hogar. Tu estilo y tu presupuesto van en Perfil, y se usan en todo.</p></div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="toast" id="toast"></div>
+        <div class="scroll" id="scroll"></div>
+        <div class="scrim" id="scrim"></div>
+        <div class="sheet" id="sheet"><div class="hero2"><canvas id="shc"></canvas><div class="grab"></div><h4>Cocina abierta con isla</h4></div><div class="itabs" id="itabs"></div><div class="sh" id="sh"></div>
+          <div class="shfoot"><button class="cta ghost" type="button" data-save="1">Guardar</button><button class="cta sage" type="button" data-doit="1">Hazlo con BuildI</button></div></div>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="App del cliente">
+          <div class="ind" id="ind"></div>
+          <button role="tab" aria-selected="true" type="button" data-tab="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9 1.3 5.8L12 16l-4.9 3 1.3-5.8L4 9.3l5.8-.7z"/></svg>Inicio</button>
+          <button role="tab" aria-selected="false" type="button" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/><path d="M2 21h20"/></svg>Mis obras</button>
+          <button role="tab" aria-selected="false" type="button" data-tab="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Mi hogar</button>
+          <button role="tab" aria-selected="false" type="button" data-tab="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="board-head">
+      <div><h2 style="margin:0">El mapa: de dónde sale y a dónde va cada pieza</h2>
+        <p class="sub" style="margin:6px 0 0">Cambia entre Antes y Después para ver cómo se mueven. Toca una pieza y el teléfono te lleva a su nuevo lugar.</p></div>
+      <div class="toggle" role="group" aria-label="Vista"><button type="button" data-mode="0" aria-pressed="false">Antes</button><button type="button" data-mode="1" aria-pressed="true">Después</button></div>
+    </div>
+    <div class="board" id="board">
+      <div class="col" data-col="inicio"><h5>Inicio <span id="n-inicio"></span></h5><div class="sub5" id="s-inicio"></div></div>
+      <div class="col" data-col="idea"><h5>Dentro de la idea <span id="n-idea"></span></h5><div class="sub5">aparece al abrir una idea</div></div>
+      <div class="col" data-col="obras"><h5>Mis obras <span id="n-obras"></span></h5><div class="sub5">al contratar</div></div>
+      <div class="col" data-col="hogar"><h5>Mi hogar <span id="n-hogar"></span></h5><div class="sub5">largo plazo</div></div>
+      <div class="col" data-col="perfil"><h5>Perfil <span id="n-perfil"></span></h5><div class="sub5">lo tuyo, se usa en todo</div></div>
+    </div>
+    <div class="legend"><span><i style="background:var(--sage)"></i>parte 1</span><span><i style="background:var(--brass)"></i>parte 2</span><span><i style="background:var(--clay)"></i>parte 3</span></div>
+    <div class="why" id="why"><b class="h">Toca una pieza</b>Aquí verás a dónde se fue y por qué.</div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const setup = c => { const w = c.clientWidth, h = c.clientHeight, d = devicePixelRatio || 1; c.width = w * d; c.height = h * d; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, w, h]; };
+  let toastT; const toast = s => { const t = $('toast'); t.textContent = s; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); };
+  const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+function room(c, kind) {
+    const [x, W, H] = setup(c);
+    const P = { cocina: ['#e9e2d4', '#c79a64', '#4f7d61'], sala: ['#efe8dc', '#b98b5a', '#9fb7a6'], terraza: ['#cfe3f3', '#a08a6c', '#6b8f5e'], bano: ['#e3e9ea', '#d9d4ca', '#3c6e9e'], home: ['#ece6dc', '#7a5a3c', '#b0561f'], recamara: ['#e3ebe0', '#b98b5a', '#c9a24a'], fachada: ['#bcd5ee', '#9aa1a4', '#4f7d61'], closet: ['#f1ece2', '#a0764f', '#2b2a26'], obra: ['#dcebf6', '#b9ad97', '#9aa1a4'] }[kind] || ['#efe8dc', '#b98b5a', '#4f7d61'];
+    x.fillStyle = P[0]; x.fillRect(0, 0, W, H); x.fillStyle = P[1]; x.fillRect(0, H * .72, W, H);
+    if (kind === 'cocina') { x.fillStyle = '#f5f2ec'; x.fillRect(W * .08, H * .45, W * .84, H * .27); x.fillStyle = P[2]; x.fillRect(W * .08, H * .5, W * .84, H * .22); x.fillStyle = '#3a3a3a'; x.fillRect(W * .06, H * .45, W * .88, 5); x.fillStyle = P[2]; x.fillRect(W * .1, H * .12, W * .45, H * .18); x.fillStyle = '#ffd9a0'; [.25, .5, .75].forEach(k => { x.beginPath(); x.arc(W * k, H * .3, 6, 0, 7); x.fill(); }); }
+    else if (kind === 'sala' || kind === 'recamara') { x.fillStyle = '#9fc4e6'; x.fillRect(W * .3, H * .1, W * .4, H * .4); x.strokeStyle = '#2b2a26'; x.lineWidth = 3; x.strokeRect(W * .3, H * .1, W * .4, H * .4); x.fillStyle = P[2]; if (kind === 'sala') { x.fillRect(W * .15, H * .55, W * .7, H * .14); x.fillRect(W * .13, H * .62, W * .74, H * .14); } else { x.fillStyle = '#fff'; x.fillRect(W * .2, H * .58, W * .6, H * .18); x.fillStyle = P[2]; x.fillRect(W * .2, H * .64, W * .6, H * .14); } x.fillStyle = '#6b8f5e'; x.beginPath(); x.arc(W * .1, H * .6, W * .06, 0, 7); x.fill(); }
+    else if (kind === 'terraza') { x.fillStyle = '#7a5a3c'; for (let i = 0; i < 6; i++) x.fillRect(W * (.1 + i * .16), H * .1, W * .03, H * .62); x.fillRect(W * .05, H * .1, W * .9, H * .05); x.fillStyle = '#f3ead4'; x.fillRect(W * .25, H * .55, W * .5, H * .12); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .85, H * .5, W * .09, 0, 7); x.fill(); }
+    else if (kind === 'bano') { x.fillStyle = '#fff'; x.fillRect(W * .55, H * .2, W * .3, H * .52); x.strokeStyle = 'rgba(0,0,0,.08)'; for (let i = 0; i < W; i += 14) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H * .72); x.stroke(); } x.fillStyle = P[2]; x.fillRect(W * .12, H * .48, W * .3, H * .24); x.fillStyle = '#e8e8e8'; x.beginPath(); x.ellipse(W * .27, H * .48, W * .12, H * .05, 0, 0, 7); x.fill(); }
+    else if (kind === 'home') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .5, W * .8, H * .06); x.fillRect(W * .15, H * .56, W * .04, H * .16); x.fillRect(W * .8, H * .56, W * .04, H * .16); x.fillStyle = '#2b2a26'; x.fillRect(W * .35, H * .3, W * .28, H * .18); x.fillStyle = '#9fc4e6'; x.fillRect(W * .37, H * .32, W * .24, H * .14); x.fillStyle = P[2]; x.fillRect(W * .7, H * .15, W * .2, H * .3); }
+    else if (kind === 'fachada') { x.fillStyle = '#f3ede2'; x.fillRect(W * .15, H * .25, W * .7, H * .47); x.fillStyle = '#2b2a26'; x.beginPath(); x.moveTo(W * .1, H * .27); x.lineTo(W * .5, H * .05); x.lineTo(W * .9, H * .27); x.fill(); x.fillStyle = '#9fc4e6'; x.fillRect(W * .25, H * .35, W * .18, H * .15); x.fillRect(W * .57, H * .35, W * .18, H * .15); x.fillStyle = '#7a5a3c'; x.fillRect(W * .44, H * .52, W * .12, H * .2); x.fillStyle = P[2]; x.beginPath(); x.arc(W * .08, H * .66, W * .07, 0, 7); x.fill(); }
+    else if (kind === 'closet') { x.fillStyle = P[1]; x.fillRect(W * .1, H * .08, W * .8, H * .64); x.fillStyle = '#f1ece2'; for (let i = 0; i < 3; i++) x.fillRect(W * (.13 + i * .26), H * .12, W * .22, H * .56); x.fillStyle = '#b0561f'; x.fillRect(W * .15, H * .2, W * .18, H * .1); x.fillStyle = '#4f7d61'; x.fillRect(W * .42, H * .18, W * .18, H * .3); }
+    else if (kind === 'obra') { x.fillStyle = '#9aa1a4'; for (let f = 0; f < 3; f++) { x.fillRect(W * .2, H * (.62 - f * .18), W * .6, 6); for (let k = 0; k <= 4; k++) x.fillRect(W * (.2 + k * .15) - 2, H * (.62 - f * .18) + 6, 4, H * .12); } x.strokeStyle = '#ff5f0f'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .88, H * .72); x.lineTo(W * .88, H * .05); x.lineTo(W * .4, H * .05); x.stroke(); }
+  }
+
+  
+
+  /* -------- pieces: [id, label, part, col, path, why, nav] -------- */
+  const P = [
+    ['asis', 'Asistente de 4 preguntas', 1, 'inicio', 'Inicio › Para ti, arriba', 'Es la puerta de entrada para quien no sabe qué hacer. Se queda arriba en Para ti y desaparece cuando ya tienes ideas guardadas.', { tab: 0, sub: 0, at: 'wiz' }],
+    ['caben', 'Ideas que caben', 1, 'inicio', 'Inicio › Para ti, sección deslizable', 'Es el corazón del feed. Ahora es una fila que se desliza con el dedo, no una pestaña.', { tab: 0, sub: 0, at: 'caben' }],
+    ['nec', 'Por necesidad', 2, 'inicio', 'Inicio › Para ti (atajos) y Explorar (filtro)', 'No es un lugar aparte: es otra forma de buscar. Aparece como atajos en Para ti y como filtro en Explorar.', { tab: 0, sub: 0, at: 'nec' }],
+    ['ba', 'Antes y después', 1, 'inicio', 'Inicio › Para ti, sección deslizable', 'Inspira más mezclado entre las ideas que encerrado en su propia pestaña.', { tab: 0, sub: 0, at: 'ba' }],
+    ['exp', 'Expertos', 2, 'inicio', 'Inicio › Para ti, y dentro de la idea', 'En el feed se descubren. Dentro de la idea aparece el experto que mejor encaja con ella.', { tab: 0, sub: 0, at: 'exp' }],
+    ['guias', 'Guías y tu colonia', 2, 'inicio', 'Inicio › Para ti, al final', 'Se lee después de inspirarse. Va al final del feed.', { tab: 0, sub: 0, at: 'guias' }],
+    ['explorar', 'Explorar espacios', 1, 'inicio', 'Inicio › Explorar', 'Se queda como subpestaña: es la búsqueda libre.', { tab: 0, sub: 1 }],
+    ['tab', 'Mis tableros', 1, 'inicio', 'Inicio › Guardado', 'Todo lo guardado en un lugar.', { tab: 0, sub: 2 }],
+    ['cmp', 'Comparar ideas', 2, 'inicio', 'Inicio › Guardado', 'Solo comparas lo que ya guardaste, así que vive junto a tus tableros.', { tab: 0, sub: 2, at: 'cmp' }],
+    ['casa', 'En tu casa (foto)', 2, 'idea', 'Idea › En tu casa', 'Es la primera pestaña de cada idea: verla en tu espacio antes que nada.', { tab: 0, idea: 0 }],
+    ['plano', 'En tu plano', 2, 'idea', 'Idea › En tu plano', 'Solo en ideas que cambian el espacio.', { tab: 0, idea: 1 }],
+    ['luz', 'Luz y color', 3, 'idea', 'Idea › Luz y color · también en Mi hogar', 'Aparece en ideas de pintura e interiorismo. También se puede usar desde Mi hogar para tus colores actuales.', { tab: 0, idea: 2 }],
+    ['capas', 'Cómo se construye', 3, 'idea', 'Idea › Cómo se construye', 'Solo en ideas constructivas. Explica por qué cuesta lo que cuesta.', { tab: 0, idea: 3 }],
+    ['acab', 'Nivel de acabados', 1, 'idea', 'Idea › Pagarlo', 'El precio cambia con el nivel. Vive junto al pago.', { tab: 0, idea: 5 }],
+    ['pago', 'Pagarlo a meses', 2, 'idea', 'Idea › Pagarlo → Mis obras › Dinero', 'Antes de decidir es una simulación. Al contratar, pasa a Mis obras como plan de pagos.', { tab: 0, idea: 5 }],
+    ['quien', 'Quién lo hace', 2, 'idea', 'Idea › Quién lo hace', 'El equipo propuesto para esa idea.', { tab: 0, idea: 6 }],
+    ['look', 'Compra el look', 1, 'idea', 'Idea › Quién lo hace', 'Para quien solo quiere los muebles, sin obra.', { tab: 0, idea: 6 }],
+    ['vive', 'Cómo se vive la obra', 2, 'obras', 'Idea › Cómo se vive → Mis obras › Esta semana en casa', 'Antes de decidir es una promesa ("2 semanas sin cocina"). Ya en obra, se vuelve el aviso semanal de ruido y polvo.', { tab: 1, at: 'vive' }],
+    ['qa', 'Revisiones con foto', 3, 'obras', 'Mis obras › Avance', 'Lo que "revisa BuildI" se cumple durante la obra, con foto de cada prueba.', { tab: 1, at: 'qa' }],
+    ['plan5', 'Plan a 5 años', 3, 'hogar', 'Mi hogar › Plan', 'Es sobre tu casa a largo plazo: va junto al valor y al mantenimiento, no en la inspiración.', { tab: 2, at: 'plan5' }],
+    ['mueb', 'Muebles en tu plano', 3, 'hogar', 'Mi hogar › Tu plano · también en ideas de muebles', 'Tu plano vive en Mi hogar y sirve aunque no remodeles. En ideas de muebles se abre ya con el mueble puesto.', { tab: 2, at: 'mueb' }],
+    ['estilo', 'Tu estilo', 2, 'perfil', 'Perfil › Mi estilo', 'Es tuyo, no de una idea. Se juega una vez y se edita en Perfil. En Inicio solo aparece como invitación si falta.', { tab: 3, at: 'estilo' }],
+    ['ppto', 'Presupuesto anual', 3, 'perfil', 'Perfil › Preferencias', 'Lo usan el plan a 5 años, las ideas que caben en tu bolsillo y el financiamiento.', { tab: 3, at: 'ppto' }]
+  ];
+  const board = $('board'), cols = {}; board.querySelectorAll('.col').forEach(c => cols[c.dataset.col] = c);
+  const chips = {};
+  P.forEach(p => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip p' + p[2]; b.dataset.id = p[0]; b.setAttribute('aria-pressed', 'false'); b.innerHTML = `<span>${p[1]}</span><em>P${p[2]}</em>`; chips[p[0]] = b; });
+  let mode = 1;
+  function place(animate) {
+    const first = {}; if (animate) for (const k in chips) first[k] = chips[k].getBoundingClientRect();
+    P.forEach(p => cols[mode ? p[3] : 'inicio'].appendChild(chips[p[0]]));
+    ['inicio', 'idea', 'obras', 'hogar', 'perfil'].forEach(c => $('n-' + c).textContent = cols[c].querySelectorAll('.chip').length);
+    $('s-inicio').textContent = mode ? 'Para ti · Explorar · Guardado' : '12 subpestañas en 3 partes';
+    if (!animate || reduce) return;
+    for (const k in chips) { const l = chips[k].getBoundingClientRect(), f = first[k], dx = f.left - l.left, dy = f.top - l.top; if (!dx && !dy) continue;
+      const el = chips[k]; el.style.transition = 'none'; el.style.transform = `translate(${dx}px,${dy}px)`; el.getBoundingClientRect();
+      el.style.transition = `transform .7s cubic-bezier(.3,1.15,.4,1) ${Math.random() * .15}s`; el.style.transform = ''; }
+  }
+  document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { mode = +b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); place(true); });
+  board.addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; const p = P.find(p => p[0] === c.dataset.id);
+    Object.values(chips).forEach(x => x.setAttribute('aria-pressed', x === c));
+    $('why').innerHTML = `<b class="h">${p[1]} → ${p[4]}</b>${p[5]}`; go(p[6]); });
+  place(false);
+
+  /* -------- phone -------- */
+  const S = { tab: 0, sub: 0, created: false, paint: 0, months: 24 };
+  const NEEDS = [['🌑', 'Casa oscura'], ['🌡', 'Mucho calor'], ['👶', 'Viene un bebé'], ['💻', 'Home office'], ['🔇', 'Mucho ruido'], ['👵', 'Papás en casa']];
+  const IDEAS = [['cocina', 'Cocina abierta con isla', 'Caben en tus 12.4 m² · desde $220k'], ['sala', 'Tragaluz en el pasillo', 'Para tu casa oscura · $28k'], ['closet', 'Clóset a medida', 'Pared de 3.1 m · $34k'], ['terraza', 'Pérgola en terraza', '18 m² · $85k']];
+  const from = (k, label) => `<span class="from" data-from="${k}">de Inicio · ${label}</span>`;
+  function inicio() {
+    const sub = `<div class="subtabs">${['Para ti', 'Explorar', 'Guardado'].map((s, i) => `<button type="button" data-sub="${i}" aria-pressed="${i === S.sub}">${s}</button>`).join('')}</div>`;
+    let body;
+    if (S.sub === 0) body = `<div class="feed">
+      <div class="wcard" data-at="wiz"><b>¿No sabes por dónde empezar?</b><small>4 preguntas y una foto. En 2 minutos tienes 3 opciones con precio.</small><button type="button" data-t="Abriría el asistente de la parte 1">Empezar</button></div>
+      <div class="sec" data-at="nec"><h6>¿Qué te preocupa? <small>ATAJOS</small></h6><div class="hrow">${NEEDS.map(n => `<button type="button" class="chipb" data-need="1">${n[0]} ${n[1]}</button>`).join('')}</div></div>
+      <div class="sec" data-at="caben"><h6>Caben en tu casa <small>PARA TU ESTILO</small></h6><div class="hrow">${IDEAS.map((d, i) => `<button type="button" class="icard" data-open="${i}"><canvas data-room="${d[0]}"></canvas><span><b>${d[1]}</b><small>${d[2]}</small></span></button>`).join('')}</div></div>
+      <button type="button" class="invite" data-go-perfil="1"><span><b>Ya conocemos tu estilo</b>Cálido natural · edítalo en Perfil</span><span class="pal">${['#efe8dc', '#b98b5a', '#4f7d61', '#9fb7a6', '#c9a24a'].map(c => `<i style="background:${c}"></i>`).join('')}</span></button>
+      <div class="sec" data-at="ba"><h6>Antes y después <small>OBRAS REALES</small></h6><div class="hrow">${[['cocina', 'Cocina en Chapalita', '6 semanas · $264k'], ['bano', 'Baño en Providencia', '3 semanas · $118k']].map(c => `<div class="bacard"><div class="two"><canvas data-before="1"></canvas><canvas data-room="${c[0]}"></canvas></div><div class="t"><b>${c[1]}</b>${c[2]}</div></div>`).join('')}</div></div>
+      <div class="sec" data-at="exp"><h6>Expertos cerca de ti <small>VIDEOLLAMADA 30 MIN</small></h6><div class="hrow">${[['LR', '#4f7d61', 'Lucía Ramos', 'Cocinas · ★4.9'], ['DM', '#b0561f', 'Daniel Morales', 'Fachadas · ★4.8'], ['SC', '#3c6e9e', 'Sofía Castillo', 'Muebles · ★5.0']].map(e => `<div class="excard"><i style="background:${e[1]}">${e[0]}</i><b>${e[2]}</b><small>${e[3]}</small></div>`).join('')}</div></div>
+      <div class="sec" data-at="guias"><h6>Antes de decidir <small>GUÍAS</small></h6><div class="glist"><div><span>¿Necesito permiso para remodelar?</span><em>3 min</em></div><div><span>¿Puedo vivir en casa durante la obra?</span><em>3 min</em></div><div><span>12 obras de BuildI en tu colonia</span><em>mapa</em></div></div></div>
+    </div>`;
+    if (S.sub === 1) body = `<div class="hrow">${['Todo', ...NEEDS.map(n => n[0] + ' ' + n[1])].map((n, i) => `<button type="button" class="chipb" style="${i === 0 ? 'background:var(--ink);color:#fff' : ''}">${n}</button>`).join('')}</div>
+      <div class="sgrid">${[['cocina', 'Cocina'], ['sala', 'Sala'], ['recamara', 'Recámara'], ['bano', 'Baño'], ['terraza', 'Terraza'], ['fachada', 'Fachada'], ['closet', 'Clósets'], ['home', 'Home office']].map(s => `<button type="button" data-t="Ideas de ${s[1].toLowerCase()}"><canvas data-room="${s[0]}"></canvas><span>${s[1]}</span></button>`).join('')}</div>`;
+    if (S.sub === 2) body = `<div class="blk"><h6>Cocina 2027 <small style="font:500 11px var(--mono);color:#7a746a">4 ideas · $236k–$372k</small></h6><div class="sgrid">${['cocina', 'sala', 'closet', 'home'].map(r => `<button type="button" data-open="0"><canvas data-room="${r}"></canvas></button>`).join('')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="cta ghost" type="button" data-t="Enlace copiado">Compartir</button><button class="cta" type="button" data-t="Proyecto creado">Convertir en proyecto</button></div></div>
+      <div class="blk" data-at="cmp"><h6>Comparar</h6><p>Marca dos ideas guardadas y velas lado a lado: costo, tiempo, días sin usar el espacio y cuánto sube el valor.</p><button class="cta sage" type="button" data-t="Abriría la comparación de la parte 2">Comparar Tragaluz vs. Ventana</button></div>`;
+    return `<div class="greet"><small><span>Inicio</span><span>Casa Providencia</span></small><h3>¿Qué quieres hacer <em>con tu espacio?</em></h3></div>${sub}${body}`;
+  }
+  function obras() {
+    return `<div class="greet"><small><span>Mis obras</span><span>${S.created ? '2 proyectos' : '1 proyecto'}</span></small><h3>Depto 6B · <em>semana 6</em></h3></div>
+      ${S.created ? '<div class="blk" style="background:var(--sage-2)"><h6>Cocina abierta con isla <span class="from">nuevo · de Inicio</span></h6><p>Visita técnica el jueves 10:00. Ya trae tus fotos, tu plano, tu estilo y la simulación de pago.</p></div>' : ''}
+      <div class="blk" data-at="vive"><h6>Esta semana en casa ${from('vive', 'cómo se vive')}</h6><div class="meters">${[['Ruido', 4, 'lun a mié'], ['Polvo', 2, 'sellado'], ['Sin cocina', 3, 'hasta vie']].map(m => `<div><span>${m[0]}</span><b>${m[1]} de 5</b><span class="dots">${[0, 1, 2, 3, 4].map(k => `<i class="${k < m[1] ? 'on' : ''}"></i>`).join('')}</span><small style="color:#7a746a">${m[2]}</small></div>`).join('')}</div><p>La cocineta provisional sigue en el comedor. El viernes vuelve el agua a la tarja.</p></div>
+      <div class="blk" data-at="qa"><h6>Revisiones de BuildI ${from('qa', 'cómo se construye')}</h6>${[['obra', 'Prueba de inundación 24 h', 'OK'], ['bano', 'Nivel de piso con láser', 'OK'], ['cocina', 'Prueba de presión de agua', 'mañana']].map(q => `<div class="qa"><canvas data-room="${q[0]}"></canvas><span>${q[1]}</span><em style="${q[2] === 'OK' ? '' : 'color:#8a6400'}">${q[2] === 'OK' ? '✓ con foto' : q[2]}</em></div>`).join('')}</div>
+      <div class="blk"><h6>Dinero ${from('pago', 'pagarlo')}</h6><div class="rowkv"><span>Plan de pago</span><b>24 meses</b></div><div class="rowkv"><span>Mensualidad</span><b>${money(9448)}</b></div><div class="rowkv"><span>Próximo pago por avance</span><b>15 oct</b></div></div>`;
+  }
+  function hogar() {
+    return `<div class="greet"><small><span>Mi hogar</span><span>Casa Providencia</span></small><h3>Tu casa, <em>a largo plazo</em></h3></div>
+      <div class="blk" data-at="plan5"><h6>Plan a 5 años ${from('plan5', 'plan')}</h6><div class="tl">${[['27', ['Imperm.']], ['28', ['Solar']], ['29', ['Minisplit']], ['30', ['—']], ['31', ['Cocina']]].map(y => `<div><b>'${y[0]}</b>${y[1].map(i => `<span>${i}</span>`).join('')}</div>`).join('')}</div><p>Valor estimado: $4.9M → $6.2M. Impermeabilizar va primero porque vienen las lluvias.</p></div>
+      <div class="blk" data-at="mueb"><h6>Tu plano ${from('mueb', 'muebles')}</h6><svg viewBox="-.2 -.2 5.6 4.4" style="width:100%;height:auto;background:#f6f2ea;border-radius:12px"><rect x="0" y="0" width="5.2" height="4" fill="none" stroke="#2b2a26" stroke-width=".08"/><rect x=".8" y=".15" width="2.2" height=".9" rx=".06" fill="#9fb7a6"/><rect x=".9" y=".9" width="2" height="1.4" rx=".06" fill="#e8d9c0" opacity=".7"/><rect x="1.4" y="1.3" width="1" height=".6" rx=".06" fill="#b98b5a"/><rect x="3.2" y="2.6" width="1.8" height=".9" rx=".06" fill="#8a5a3c"/><line x1="2.6" y1="0" x2="4.4" y2="0" stroke="#9cc3df" stroke-width=".12"/></svg><button class="cta ghost" type="button" data-t="Abriría el acomodador de muebles de la parte 3">Acomodar muebles</button></div>
+      <div class="blk"><h6>Tus colores ${from('luz', 'luz y color')}</h6><div class="pal5">${['#9fb7a6', '#efe8dc', '#c9825a', '#f8f8f4'].map(c => `<i style="background:${c}"></i>`).join('')}</div><p>Sala: Salvia BLD-4521 · Recámaras: Hueso BLD-1102. Pruébalos con la luz de cualquier hora.</p></div>`;
+  }
+  function perfil() {
+    return `<div class="greet"><small><span>Perfil</span><span>Ana G.</span></small><h3>Lo tuyo, <em>en todo BuildI</em></h3></div>
+      <div class="blk" data-at="estilo"><h6>Mi estilo ${from('estilo', 'tu estilo')}</h6><div class="pal5">${['#efe8dc', '#b98b5a', '#4f7d61', '#9fb7a6', '#c9a24a'].map(c => `<i style="background:${c}"></i>`).join('')}</div><p><b style="color:var(--ink)">Cálido natural 80%</b> · Mexicano 20%. Ordena tus ideas y lo ve tu arquitecto.</p><button class="cta ghost" type="button" data-t="Abriría las tarjetas deslizables">Volver a jugar</button></div>
+      <div class="blk" data-at="ppto"><h6>Preferencias ${from('ppto', 'presupuesto')}</h6><div class="rowkv"><span>Puedo apartar al año</span><b>${money(150000)}</b></div><div class="rowkv"><span>Me importa más</span><b>que valga más</b></div><div class="rowkv"><span>Ideas nuevas</span><b>1 vez por semana</b></div></div>
+      <div class="blk"><h6>Expertos guardados</h6><div class="rowkv"><span>Arq. Lucía Ramos</span><b>★ 4.9</b></div><div class="rowkv"><span>Sofía Castillo</span><b>★ 5.0</b></div></div>`;
+  }
+  const scroll = $('scroll');
+  function render(keep) {
+    const st = scroll.scrollTop;
+    scroll.innerHTML = `<div class="view">${[inicio, obras, hogar, perfil][S.tab]()}</div>`;
+    if (keep) { scroll.scrollTop = st; scroll.querySelector('.view').style.animation = 'none'; } else scroll.scrollTop = 0;
+    scroll.querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room));
+    scroll.querySelectorAll('canvas[data-before]').forEach(before);
+    const tb = [...$('tabs').querySelectorAll('[data-tab]')]; tb.forEach((b, i) => b.setAttribute('aria-selected', i === S.tab));
+    const b = tb[S.tab]; $('ind').style.width = b.offsetWidth + 'px'; $('ind').style.transform = `translateX(${b.offsetLeft - 5}px)`;
+  }
+  function before(c) { const [x, w, h] = setup(c); x.fillStyle = '#cfc8ba'; x.fillRect(0, 0, w, h); x.fillStyle = '#8f8a80'; x.fillRect(0, h * .7, w, h); x.fillStyle = '#7a6f5c'; x.fillRect(w * .08, h * .15, w * .84, h * .2); x.fillStyle = '#a69a85'; x.fillRect(w * .08, h * .48, w * .84, h * .22); x.fillStyle = 'rgba(0,0,0,.2)'; x.fillRect(0, 0, w, h); }
+
+  /* -------- idea sheet -------- */
+  const ITABS = ['En tu casa', 'En tu plano', 'Luz y color', 'Cómo se construye', 'Cómo se vive', 'Pagarlo', 'Quién lo hace'];
+  let itab = 0;
+  const PAINT = ['#9fb7a6', '#efe8dc', '#c9825a', '#3f4e66', '#d4a64a'];
+  function sheet() {
+    $('itabs').innerHTML = ITABS.map((t, i) => `<button type="button" data-itab="${i}" aria-pressed="${i === itab}">${t}</button>`).join('');
+    let h = '';
+    if (itab === 0) h = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:14px;overflow:hidden"><canvas data-before="1" style="width:100%;height:130px"></canvas><canvas data-room="cocina" style="width:100%;height:130px"></canvas></div><p>Sobre la foto de tu cocina. En la app completa: divisor deslizable y 3 estilos.</p>`;
+    if (itab === 1) h = `<svg viewBox="0 0 300 160" style="width:100%;background:#fffdf9;border-radius:14px"><rect x="10" y="10" width="280" height="140" fill="none" stroke="#2b2a26" stroke-width="3"/><line x1="150" y1="10" x2="150" y2="150" stroke="#b0561f" stroke-width="3" stroke-dasharray="6 5"/><rect x="40" y="70" width="90" height="30" fill="#3a3a3a"/><text x="85" y="89" text-anchor="middle" font-family="Archivo" font-size="9" fill="#fff">isla 2.4 × 0.9</text><text x="156" y="28" font-family="IBM Plex Mono" font-size="8" fill="#b0561f">muro que se abre</text></svg><p>✓ Cabe la isla con 1.1 m de paso · ! El muro puede ser de carga.</p>`;
+    if (itab === 2) h = `<div style="height:130px;border-radius:14px;background:linear-gradient(180deg,${PAINT[S.paint]} 0 64%, #b98b5a 64%);position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,200,120,.45),transparent 55%)"></div><span style="position:absolute;left:8px;top:8px;font:500 10px var(--mono);background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:4px">18:00 · poniente</span></div><div class="sw6">${PAINT.map((c, i) => `<button type="button" data-paint="${i}" aria-pressed="${i === S.paint}" style="background:${c}"></button>`).join('')}</div><p>Solo aparece en ideas con pintura o interiorismo. La herramienta completa con la hora del día está en la parte 3.</p>`;
+    if (itab === 3) h = `<div class="layl">${[['#d8cbb3', 'Cubierta de cuarzo', '$4,200/ml'], ['#4f7d61', 'Gabinetes laca', '$9,800/ml'], ['#9aa1a4', 'Viga IPR (si es de carga)', '$28k'], ['#a9a59c', 'Muro existente', 'se abre']].map(l => `<div><i style="background:${l[0]}"></i><span>${l[1]}</span><em>${l[2]}</em></div>`).join('')}</div><p>Solo en ideas constructivas. Cada capa con material, precio y oficio.</p>`;
+    if (itab === 4) h = `<div class="meters">${[['Ruido', 4], ['Polvo', 3], ['Molestia', 3]].map(m => `<div><span>${m[0]}</span><b>${m[1]} de 5</b><span class="dots">${[0, 1, 2, 3, 4].map(k => `<i class="${k < m[1] ? 'on' : ''}"></i>`).join('')}</span></div>`).join('')}</div><p>2 semanas sin cocina, con cocineta provisional. Al contratar, esto se vuelve el aviso semanal en Mis obras.</p>`;
+    if (itab === 5) { const mens = 280000 * .7 * .012 / (1 - Math.pow(1.012, -S.months));
+      h = `<div class="blk"><div class="rowkv"><span>Acabados</span><b>Medio</b></div><div class="rowkv"><span>Total estimado</span><b>${money(280000)}</b></div><div class="rowkv"><span>Plazo</span><b><input type="range" id="mon" min="6" max="48" step="6" value="${S.months}" style="width:110px;vertical-align:middle;accent-color:var(--sage)" aria-label="Meses"> <span id="monO">${S.months} m</span></b></div><div class="rowkv"><span>Mensualidad</span><b id="mens" style="color:var(--sage)">${money(mens)}</b></div></div><p>Al contratar, este plan pasa a Mis obras › Dinero.</p>`; }
+    if (itab === 6) h = `<div class="blk"><div class="rowkv"><span>Diseño</span><b>Arq. Lucía Ramos</b></div><div class="rowkv"><span>Obra</span><b>Constructora Torres</b></div><div class="rowkv"><span>Gabinetes</span><b>Carpintería Castillo</b></div></div><button class="cta ghost" type="button" data-t="Carrito con los muebles y accesorios">Solo comprar el look · $46k</button>`;
+    $('sh').innerHTML = h; $('sh').scrollTop = 0;
+    $('sh').querySelectorAll('canvas[data-room]').forEach(c => room(c, c.dataset.room)); $('sh').querySelectorAll('canvas[data-before]').forEach(before);
+  }
+  const openSheet = () => { sheet(); $('sheet').classList.add('on'); $('scrim').classList.add('on'); requestAnimationFrame(() => room($('shc'), 'cocina')); };
+  const closeSheet = () => { $('sheet').classList.remove('on'); $('scrim').classList.remove('on'); };
+  $('scrim').onclick = closeSheet;
+  $('sheet').addEventListener('click', e => { let b;
+    if (b = e.target.closest('[data-itab]')) { itab = +b.dataset.itab; sheet(); b = $('itabs').children[itab]; b.scrollIntoView({ inline: 'nearest', block: 'nearest' }); return; }
+    if (b = e.target.closest('[data-paint]')) { S.paint = +b.dataset.paint; sheet(); return; }
+    if (b = e.target.closest('[data-t]')) { toast(b.dataset.t); return; }
+    if (e.target.closest('[data-save]')) { toast('Guardada en Cocina 2027'); return; }
+    if (e.target.closest('[data-doit]')) { closeSheet(); S.created = true; S.tab = 1; render(); toast('Proyecto creado · ya está en Mis obras'); }
+  });
+  $('sheet').addEventListener('input', e => { if (e.target.id === 'mon') { S.months = +e.target.value; $('monO').textContent = S.months + ' m'; $('mens').textContent = money(280000 * .7 * .012 / (1 - Math.pow(1.012, -S.months))); } });
+
+  scroll.addEventListener('click', e => { let b;
+    if (b = e.target.closest('[data-sub]')) { S.sub = +b.dataset.sub; render(); return; }
+    if (b = e.target.closest('[data-open]')) { itab = 0; openSheet(); return; }
+    if (e.target.closest('[data-go-perfil]')) { S.tab = 3; render(); return; }
+    if (e.target.closest('[data-need]')) { S.sub = 1; render(); toast('Explorar filtrado por esa necesidad'); return; }
+    if (b = e.target.closest('[data-t]')) { toast(b.dataset.t); return; }
+  });
+  $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return; S.tab = +b.dataset.tab; closeSheet(); render(); });
+
+  function go(nav) {
+    closeSheet(); S.tab = nav.tab; if (nav.sub != null) S.sub = nav.sub; else if (nav.tab === 0) S.sub = 0; render();
+    if (nav.idea != null) { itab = nav.idea; setTimeout(openSheet, 250); return; }
+    if (nav.at) { const el = scroll.querySelector(`[data-at="${nav.at}"]`); if (el) { setTimeout(() => { scroll.scrollTo({ top: el.offsetTop - 60, behavior: reduce ? 'auto' : 'smooth' }); const f = el.querySelector('.from'); if (f) { f.classList.remove('flash'); void f.offsetWidth; f.classList.add('flash'); } el.animate && el.animate([{ boxShadow: '0 0 0 3px #b0561f' }, { boxShadow: '0 0 0 0 transparent' }], { duration: 1600 }); }, 120); } }
+  }
+  render();
+  addEventListener('resize', () => render(true));
+})();
+</script>

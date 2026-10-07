@@ -33,6 +33,14 @@ export default function ChiefOfLaborTabLayout() {
         }}
       />
       <Tabs.Screen
+        name="fronts"
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="construct-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="crew-manager"
         options={{
           tabBarIcon: ({ color, size }) => (

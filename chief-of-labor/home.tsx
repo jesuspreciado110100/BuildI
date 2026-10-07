@@ -1,31 +1,83 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { ActivityItem, ChiefOfLaborService, Contractor, formatAgo } from '@/app/services/ChiefOfLaborService';
+import { LaborDataGate, useLaborData } from '@/app/components/LaborDataState';
+
+// Inicio del contratista de mano de obra: sus números de hoy y lo último
+// que pasó en sus obras (entradas que registró el residente, avance,
+// inscripciones y constancias). Todo sale de Supabase.
+
+interface HomeData {
+  contractor: Contractor;
+  activeCrews: number;
+  sites: number;
+  present: number;
+  workers: number;
+  blocked: number;
+  activity: ActivityItem[];
+}
+
+async function loadHome(): Promise<HomeData> {
+  const [contractor, sites, crews, blocked, activity] = await Promise.all([
+    ChiefOfLaborService.getContractor(),
+    ChiefOfLaborService.getSites(),
+    ChiefOfLaborService.getCrews(),
+    ChiefOfLaborService.countBlockedFronts(),
+    ChiefOfLaborService.getRecentActivity(),
+  ]);
+  if (!contractor) throw new Error('No hay contratista.');
+  const workers = await ChiefOfLaborService.getWorkers(sites);
+  return {
+    contractor,
+    activeCrews: crews.filter(c => c.status === 'active').length,
+    sites: sites.filter(s => s.active).length,
+    present: workers.filter(w => w.attendance === 'present' || w.attendance === 'late').length,
+    workers: workers.length,
+    blocked,
+    activity,
+  };
+}
+
+const ACTIVITY_COLORS: Record<ActivityItem['type'], string> = { success: '#10B981', info: '#3B82F6', warning: '#F59E0B' };
 
 export default function ChiefOfLaborHome() {
+  const { state, reload } = useLaborData(loadHome);
+  return (
+    <LaborDataGate title="Inicio" state={state} reload={reload}>
+      {data => <HomeScreen data={data} reload={reload} />}
+    </LaborDataGate>
+  );
+}
+
+function HomeScreen({ data, reload }: { data: HomeData; reload: (silent?: boolean) => Promise<void> }) {
+  const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+
   const stats = [
-    { title: 'Active Crews', value: '12', icon: 'people', color: '#3B82F6' },
-    { title: 'Projects', value: '8', icon: 'construct', color: '#10B981' },
-    { title: 'Efficiency', value: '94%', icon: 'trending-up', color: '#F59E0B' },
-    { title: 'Safety Score', value: '98%', icon: 'shield-checkmark', color: '#EF4444' },
+    { title: 'Cuadrillas activas', value: String(data.activeCrews), icon: 'people', color: '#3B82F6' },
+    { title: 'Obras', value: String(data.sites), icon: 'construct', color: '#10B981' },
+    { title: 'Llegaron hoy', value: `${data.present} de ${data.workers}`, icon: 'checkmark-circle', color: '#F59E0B' },
+    { title: 'Frentes detenidos', value: String(data.blocked), icon: 'alert-circle', color: '#EF4444' },
   ];
 
-  const recentActivities = [
-    { title: 'Crew A completed foundation work', time: '2 hours ago', type: 'success' },
-    { title: 'New worker assigned to Site B', time: '4 hours ago', type: 'info' },
-    { title: 'Safety inspection scheduled', time: '6 hours ago', type: 'warning' },
-  ];
+  const refresh = async () => {
+    setRefreshing(true);
+    await reload(true);
+    setRefreshing(false);
+  };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       <View style={styles.header}>
-        <Text style={styles.title}>Chief of Labor Dashboard</Text>
-        <Text style={styles.subtitle}>Manage your workforce efficiently</Text>
+        <Text style={styles.title}>Hola, {data.contractor.display_name.split(' ')[0]}</Text>
+        <Text style={styles.subtitle}>{data.contractor.business_name}</Text>
       </View>
 
       <View style={styles.statsGrid}>
-        {stats.map((stat, index) => (
-          <View key={index} style={[styles.statCard, { borderLeftColor: stat.color }]}>
+        {stats.map(stat => (
+          <View key={stat.title} style={[styles.statCard, { borderLeftColor: stat.color }]}>
             <View style={styles.statHeader}>
               <Ionicons name={stat.icon as any} size={24} color={stat.color} />
               <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
@@ -36,20 +88,28 @@ export default function ChiefOfLaborHome() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recent Activities</Text>
-        {recentActivities.map((activity, index) => (
-          <View key={index} style={styles.activityCard}>
-            <View style={styles.activityContent}>
-              <Text style={styles.activityTitle}>{activity.title}</Text>
-              <Text style={styles.activityTime}>{activity.time}</Text>
-            </View>
+        <Text style={styles.sectionTitle}>Actividad reciente</Text>
+        {data.activity.length === 0 ? (
+          <View style={styles.activityCard}>
+            <Text style={styles.activityTime}>
+              Aquí verás las entradas que registra el residente, el avance de tus frentes y los cursos de tu gente.
+            </Text>
           </View>
-        ))}
+        ) : (
+          data.activity.map(activity => (
+            <View key={activity.id} style={[styles.activityCard, { borderLeftWidth: 3, borderLeftColor: ACTIVITY_COLORS[activity.type] }]}>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>{activity.title}</Text>
+                <Text style={styles.activityTime}>{formatAgo(activity.at, activity.timezone)}</Text>
+              </View>
+            </View>
+          ))
+        )}
       </View>
 
-      <TouchableOpacity style={styles.actionButton}>
-        <Ionicons name="add-circle" size={24} color="#FFFFFF" />
-        <Text style={styles.actionButtonText}>Quick Actions</Text>
+      <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/chief-of-labor/crew-manager')}>
+        <Ionicons name="checkbox" size={24} color="#FFFFFF" />
+        <Text style={styles.actionButtonText}>Pasar lista</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -131,6 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
   activityTitle: {
     fontSize: 16,

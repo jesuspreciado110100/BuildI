@@ -1,0 +1,682 @@
+<title>BuildI Inicio a Medida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --plaster: #e4e8e1;
+  --paper: #fbfaf6;
+  --ink: #2b2a26;
+  --ink-2: #5e6259;
+  --line: rgba(43,42,38,.13);
+  --sage: #4f7d61;
+  --sage-2: #dfe9e2;
+  --clay: #b0561f;
+  --clay-2: #f6e3d6;
+  --brass: #c9a24a;
+  --blue: #3c6e9e;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--plaster); color: var(--ink); font: 15px/1.55 var(--sans); padding-inline: 20px; padding-block: 36px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 56px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow b { background: var(--sage); color: #fff; padding: 3px 7px; font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 74px)/.98 var(--serif); letter-spacing: -.025em; margin: 14px 0 16px; text-wrap: balance; max-width: 16ch; }
+h1 em { font-style: italic; font-weight: 400; color: var(--sage); }
+h2 { font: 700 clamp(30px, 4vw, 46px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+.lede { font-size: 18px; max-width: 58ch; margin: 0 0 14px; }
+.sub { color: var(--ink-2); max-width: 62ch; margin: 0 0 20px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.tabsx { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; }
+.tx { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tx button { border: 1px solid var(--ink); background: var(--paper); padding: 7px 10px; font: 600 13px var(--sans); text-align: left; border-radius: 10px; display: flex; gap: 8px; align-items: center; }
+.tx button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tx b { font: 700 17px/1.2 var(--serif); display: block; margin-bottom: 2px; }
+.tx p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* phone */
+.phone { width: 384px; max-width: 100%; border-radius: 50px; background: #121412; padding: 11px; box-shadow: 0 40px 80px rgba(43,42,38,.3), inset 0 0 0 2px #3a3d38; justify-self: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.screen { border-radius: 40px; overflow: hidden; overflow: clip; position: relative; background: #f6f2ea; height: 790px; }
+.island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #000; border-radius: 20px; z-index: 40; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 12px 100px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: vin .4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes vin { from { opacity: 0; transform: translateY(8px); } }
+.greet small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; display: flex; justify-content: space-between; }
+.greet h3 { font: 700 27px/1.05 var(--serif); letter-spacing: -.015em; margin: 4px 0 0; }
+.greet h3 em { font-style: italic; font-weight: 400; color: var(--sage); }
+.pc { background: #fffdf9; border-radius: 22px; padding: 12px; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #7a746a; margin-bottom: 8px; }
+.hd b { color: var(--ink); font-weight: 500; }
+.hd button { border: 0; background: none; font: 600 11.5px var(--sans); color: var(--sage); text-transform: none; letter-spacing: 0; padding: 0; }
+.hscroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* inicio */
+.intent { flex: none; border: 0; background: #fffdf9; border-radius: 18px; padding: 10px 12px; width: 118px; text-align: left; display: grid; gap: 4px; }
+.intent .ic { font-size: 22px; }
+.intent b { font-size: 12.5px; line-height: 1.2; }
+.intent small { font: 500 10px var(--mono); color: #7a746a; }
+.intent[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.intent[aria-pressed="true"] small { color: #c7c2b8; }
+.ideas { columns: 2; column-gap: 8px; }
+.idea { break-inside: avoid; margin-bottom: 8px; background: #fffdf9; border-radius: 18px; overflow: hidden; border: 0; padding: 0; width: 100%; text-align: left; display: block; position: relative; }
+.idea .img { display: block; width: 100%; }
+.idea .t { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.idea .t b { font: 600 13.5px/1.2 var(--serif); }
+.idea .t small { font: 500 10px var(--mono); color: #7a746a; }
+.idea .save { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,253,249,.9); display: grid; place-items: center; font-size: 13px; border: 0; }
+.idea .save.on { background: var(--clay); color: #fff; }
+.tagx { position: absolute; top: 8px; left: 8px; font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: rgba(43,42,38,.75); color: #fff; padding: 3px 6px; border-radius: 6px; }
+.ba { position: relative; height: 170px; border-radius: 14px; overflow: hidden; touch-action: none; cursor: ew-resize; user-select: none; }
+.ba canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .top { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 3px solid #fff; }
+.ba .top canvas { width: var(--w); }
+.ba .lb { position: absolute; top: 8px; font: 500 9.5px var(--mono); background: rgba(0,0,0,.6); color: #fff; padding: 2px 6px; border-radius: 4px; z-index: 2; }
+.est { display: grid; gap: 8px; }
+.est .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 12.5px; }
+.seg { display: flex; background: #ece5d8; border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 4px; border-radius: 8px; font: 600 11.5px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+input[type=range] { accent-color: var(--sage); width: 100%; }
+.est .res { background: var(--sage-2); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.est .res b { font: 700 22px var(--serif); color: var(--sage); }
+.est .res small { font-size: 11.5px; color: var(--ink-2); display: block; }
+.cta { border: 0; background: var(--ink); color: #fff; border-radius: 14px; padding: 12px; font: 700 14px var(--sans); width: 100%; }
+.cta.sage { background: var(--sage); }
+.cta.ghost { background: none; color: var(--ink); border: 1px solid var(--ink); }
+
+/* obras */
+.proj { background: #fffdf9; border-radius: 22px; padding: 0; overflow: hidden; border: 0; width: 100%; text-align: left; display: grid; }
+.proj .img { height: 92px; position: relative; }
+.proj .img span { position: absolute; left: 10px; bottom: 8px; font: 500 9.5px var(--mono); background: rgba(255,253,249,.92); padding: 3px 7px; border-radius: 6px; }
+.proj .t { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.proj b { font: 700 17px/1.15 var(--serif); }
+.proj small { font-size: 12px; color: #7a746a; }
+.stg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.stg i { height: 6px; border-radius: 4px; background: #ece5d8; display: block; }
+.stg i.d { background: var(--sage); } .stg i.n { background: var(--clay); }
+.stg-l { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; font: 500 8.5px var(--mono); color: #9a958b; text-transform: uppercase; }
+.stg-l span.n { color: var(--clay); }
+.next { display: flex; justify-content: space-between; align-items: center; background: var(--clay-2); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; }
+.next b { font: 600 12.5px var(--sans); }
+.next em { font-style: normal; font: 500 11px var(--mono); color: var(--clay); }
+.newp { border: 1.5px dashed #b9b2a4; background: none; border-radius: 22px; padding: 14px; display: grid; gap: 2px; text-align: left; }
+.newp b { font: 700 15px var(--serif); }
+.newp small { font-size: 12px; color: #7a746a; }
+.back { border: 0; background: none; font: 600 13px var(--sans); color: var(--sage); padding: 0; justify-self: start; }
+.kpi2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpi2 div { background: #fffdf9; border-radius: 16px; padding: 9px 10px; }
+.kpi2 b { display: block; font: 700 21px/1 var(--serif); }
+.kpi2 small { font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #7a746a; }
+.appr { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #efe8dc; position: relative; }
+.appr:first-of-type { border-top: 0; }
+.appr .sw { width: 44px; height: 44px; border-radius: 10px; }
+.appr b { font-size: 13px; display: block; }
+.appr small { font-size: 11.5px; color: #7a746a; }
+.appr .acts { grid-column: 2; display: flex; gap: 6px; }
+.appr .acts button { border: 1px solid var(--ink); background: none; border-radius: 999px; padding: 4px 10px; font: 600 11.5px var(--sans); }
+.appr .acts button.ok { background: var(--sage); border-color: var(--sage); color: #fff; }
+.appr .done { grid-column: 2; font: 500 11px var(--mono); color: var(--sage); }
+.dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dg { background: #f6f2ea; border-radius: 12px; padding: 8px; display: grid; gap: 2px; font-size: 11.5px; border: 0; text-align: left; }
+.dg i { font-style: normal; font-size: 17px; }
+.dg b { font-size: 12px; }
+.dg small { font: 500 9.5px var(--mono); color: #7a746a; }
+.feed { display: grid; gap: 8px; }
+.fi { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+.fi .ph { width: 54px; height: 44px; border-radius: 8px; }
+.fi b { font-size: 13px; display: block; }
+.fi small { font-size: 11px; color: #7a746a; }
+
+/* hogar */
+.props { display: flex; gap: 6px; }
+.prop { flex: 1; border: 1px solid var(--line); background: #fffdf9; border-radius: 14px; padding: 8px 10px; text-align: left; display: grid; gap: 1px; }
+.prop b { font-size: 12.5px; }
+.prop small { font: 500 9.5px var(--mono); color: #7a746a; }
+.prop[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.health { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
+.ring { position: relative; width: 104px; height: 104px; }
+.ring svg { width: 104px; height: 104px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .v { stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,1.3,.5,1); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; text-align: center; }
+.ring .in b { font: 700 30px/1 var(--serif); }
+.ring .in small { font: 500 8.5px var(--mono); color: #7a746a; }
+.hl { display: grid; gap: 5px; font-size: 12.5px; }
+.hl div { display: flex; justify-content: space-between; gap: 6px; }
+.hl b { font-family: var(--mono); font-weight: 500; font-size: 12px; }
+.task { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #efe8dc; }
+.task:first-of-type { border-top: 0; }
+.task .d { width: 40px; height: 44px; border-radius: 10px; background: #f6f2ea; display: grid; place-items: center; align-content: center; text-align: center; }
+.task .d b { font: 700 16px/1 var(--serif); }
+.task .d small { font: 500 8px var(--mono); text-transform: uppercase; color: #7a746a; }
+.task b.t { font-size: 13px; display: block; }
+.task small.s { font-size: 11.5px; color: #7a746a; }
+.task button { border: 0; background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 11px; font: 600 11.5px var(--sans); white-space: nowrap; }
+.task button.done { background: var(--sage-2); color: var(--sage); }
+.task.urgent .d { background: var(--clay-2); }
+.task.urgent .d b { color: var(--clay); }
+.use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.use div { background: #f6f2ea; border-radius: 14px; padding: 8px 9px; display: grid; gap: 2px; }
+.use b { font: 700 17px/1 var(--serif); }
+.use small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; letter-spacing: .05em; }
+.use svg { width: 100%; height: 26px; }
+.use em { font-style: normal; font: 500 10px var(--mono); }
+.alertx { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; background: var(--clay-2); border-radius: 16px; padding: 10px 12px; font-size: 12.5px; }
+.alertx i { font-style: normal; font-size: 20px; }
+.alertx b { display: block; font-size: 13px; }
+.svc { flex: none; width: 112px; border: 0; background: #fffdf9; border-radius: 16px; padding: 10px; display: grid; gap: 3px; text-align: left; }
+.svc i { font-style: normal; font-size: 20px; }
+.svc b { font-size: 12.5px; line-height: 1.2; }
+.svc small { font: 500 10px var(--mono); color: var(--sage); }
+.war { display: grid; gap: 7px; }
+.war div { display: grid; gap: 3px; font-size: 12.5px; }
+.war .l { display: flex; justify-content: space-between; }
+.war .l em { font-style: normal; font: 500 11px var(--mono); color: #7a746a; }
+.bar { height: 6px; border-radius: 6px; background: #ece5d8; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; background: var(--sage); }
+.keycard { border-radius: 18px; padding: 14px 16px; background: linear-gradient(150deg, #2e3a33, #1b221e 60%, #3a2f1a); color: #f3ead4; display: flex; justify-content: space-between; align-items: center; }
+.keycard b { font: 700 17px/1.1 var(--serif); display: block; }
+.keycard small { font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #c3ccc5; }
+.keycard .chip { width: 34px; height: 25px; border-radius: 4px; background: linear-gradient(135deg, #f3dc9a, #c9a24a 50%, #a88234); }
+
+/* perfil */
+.me { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.me .av { width: 62px; height: 62px; border-radius: 50%; background: var(--sage); color: #fff; display: grid; place-items: center; font: 700 22px var(--serif); }
+.me b { font: 700 21px var(--serif); display: block; }
+.me small { font-size: 12.5px; color: #7a746a; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.style-tags span { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--sage-2); color: var(--sage); }
+.mrow { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #efe8dc; font-size: 13.5px; }
+.mrow:first-of-type { border-top: 0; }
+.mrow i { font-style: normal; font-size: 17px; }
+.mrow small { font: 500 11px var(--mono); color: #7a746a; }
+.mrow b { font-weight: 600; display: block; }
+.mrow span.s { font-size: 11.5px; color: #7a746a; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 25; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 82%; background: #f6f2ea; border-radius: 26px 26px 0 0; transform: translateY(105%); transition: transform .5s cubic-bezier(.3,1.2,.4,1); z-index: 30; display: grid; grid-template-rows: auto 1fr; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #cfc8ba; margin: 8px auto 2px; }
+.sh { overflow-y: auto; padding: 8px 14px 22px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; min-height: 0; }
+.sh .img { height: 150px; border-radius: 16px; }
+.sh h4 { margin: 0; font: 700 22px/1.1 var(--serif); }
+.sh p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.facts div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.facts b { display: block; font: 700 16px/1.1 var(--serif); }
+.facts small { font: 500 9px var(--mono); text-transform: uppercase; color: #7a746a; }
+.steps { display: grid; gap: 4px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 12.5px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--sage-2); color: var(--sage); display: grid; place-items: center; font: 600 11px var(--mono); }
+
+/* tab bar */
+.tabs { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; border-radius: 26px; background: rgba(255,253,249,.74); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(43,42,38,.18), inset 0 1px 0 rgba(255,255,255,.9); }
+.tabs button { border: 0; background: none; padding: 7px 0 6px; display: grid; justify-items: center; gap: 2px; font: 600 10.5px var(--sans); color: #7a746a; position: relative; z-index: 1; transition: color .3s; }
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-selected="true"] { color: var(--ink); }
+.tabs .ind { position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 21px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .55s cubic-bezier(.3,1.4,.5,1), width .55s; }
+.tabs .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 15px; height: 15px; border-radius: 8px; background: var(--clay); color: #fff; font: 600 9px/15px var(--mono); padding: 0 3px; }
+.toast { position: absolute; left: 50%; top: 48px; transform: translate(-50%, -260%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; z-index: 50; transition: transform .45s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translate(-50%, 0); }
+
+/* journey */
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .journey { grid-template-columns: 1fr; } }
+.jst { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--c); }
+.jst .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--ink-2); display: flex; justify-content: space-between; }
+.jst .n span { color: var(--c); }
+.jst b { font: 700 20px/1.1 var(--serif); }
+.jst p.q { margin: 0; font: italic 400 14px/1.35 var(--serif); color: var(--ink-2); }
+.jst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.jst li { display: grid; grid-template-columns: 12px 1fr; gap: 6px; }
+.jst li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-top: 7px; }
+.jst .where { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 6px; }
+.loop { display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); border-radius: 4px; padding: 16px 18px; margin-top: 12px; }
+.loop i { font-style: normal; font-size: 26px; }
+.loop b { font: 700 18px var(--serif); display: block; }
+.loop span { font-size: 13.5px; color: #c7c2b8; }
+.biz { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.biz div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.biz b { font: 700 17px/1.2 var(--serif); }
+.biz p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+<style>
+.subtabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.subtabs::-webkit-scrollbar { display: none; }
+.subtabs button { flex: none; border: 1px solid var(--line); background: #fffdf9; border-radius: 999px; padding: 6px 12px; font: 600 12.5px var(--sans); }
+.subtabs button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.lead { font-size: 12.5px; color: var(--ink-2); margin: 0 2px; }
+/* furniture */
+.fplan { background: #fffdf9; border-radius: 18px; padding: 8px; }
+.fplan svg { width: 100%; height: auto; display: block; touch-action: none; user-select: none; }
+.fplan .pc-r { cursor: grab; }
+.cat { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+.cat::-webkit-scrollbar { display: none; }
+.cat button { flex: none; width: 104px; border: 0; background: #fffdf9; border-radius: 14px; padding: 8px; text-align: left; display: grid; gap: 4px; }
+.cat button i { display: block; height: 30px; border-radius: 6px; }
+.cat b { font-size: 12px; line-height: 1.15; }
+.cat small { font: 500 10.5px var(--mono); color: #7a746a; }
+.seltool { display: flex; gap: 6px; align-items: center; background: var(--ink); color: #fff; border-radius: 14px; padding: 7px 8px 7px 12px; font-size: 12.5px; }
+.seltool span { flex: 1; }
+.seltool button { border: 0; border-radius: 999px; padding: 5px 11px; font: 600 12px var(--sans); background: #fff; color: var(--ink); }
+.seltool button.x { background: var(--clay); color: #fff; }
+.checks { display: grid; gap: 4px; font-size: 12.5px; }
+.checks div { display: grid; grid-template-columns: 18px 1fr; gap: 6px; }
+.checks .ok { color: var(--sage); } .checks .bad { color: var(--clay); } .checks .warn { color: #8a6400; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.kpis div { background: #fffdf9; border-radius: 12px; padding: 8px; }
+.kpis b { display: block; font: 700 18px var(--serif); }
+.kpis small { font: 500 9.5px var(--mono); text-transform: uppercase; color: #7a746a; }
+/* light */
+.lroom { position: relative; border-radius: 18px; overflow: hidden; height: 230px; }
+.lroom canvas { width: 100%; height: 100%; display: block; }
+.lroom .clock { position: absolute; left: 10px; top: 10px; background: rgba(0,0,0,.55); color: #fff; font: 500 11px var(--mono); padding: 3px 8px; border-radius: 6px; }
+.timebar { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font: 500 11px var(--mono); color: #7a746a; }
+.timebar input { width: 100%; accent-color: var(--clay); }
+.paints { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.paints button { border: 2px solid transparent; border-radius: 12px; height: 44px; padding: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.paints button[aria-pressed="true"] { border-color: var(--ink); }
+.seg { display: flex; background: #ece5d8; border-radius: 999px; padding: 3px; }
+.seg button { flex: 1; border: 0; background: none; border-radius: 999px; padding: 6px 4px; font: 600 12px var(--sans); }
+.seg button[aria-pressed="true"] { background: #fffdf9; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.optrow { display: grid; grid-template-columns: 62px 1fr; gap: 8px; align-items: center; font: 500 10.5px var(--mono); color: #7a746a; text-transform: uppercase; }
+.hint { background: var(--clay-2); color: #6d3412; border-radius: 14px; padding: 9px 11px; font-size: 12.5px; }
+.hint.good { background: var(--sage-2); color: #2e5a3f; }
+/* layers */
+.lay { background: #fffdf9; border-radius: 18px; padding: 6px; }
+.lay svg { width: 100%; height: auto; display: block; }
+.lay g[data-l] { cursor: pointer; }
+.ldet { background: #fffdf9; border-radius: 16px; padding: 11px 12px; display: grid; gap: 5px; animation: vin .35s both; }
+.ldet b { font: 700 16px var(--serif); }
+.ldet .m { display: flex; gap: 6px; flex-wrap: wrap; }
+.ldet .m span { font: 500 10.5px var(--mono); background: #f6f2ea; border-radius: 6px; padding: 3px 6px; }
+.ldet p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.bsteps { display: grid; }
+.bsteps div { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 7px 0; border-top: 1px solid #efe8dc; font-size: 12.5px; }
+.bsteps div:first-of-type { border-top: 0; }
+.bsteps em { font-style: normal; font: 500 10.5px var(--mono); color: var(--clay); }
+.bsteps small { display: block; color: #7a746a; font-size: 11.5px; }
+/* plan 5 años */
+.years { display: grid; gap: 8px; }
+.yr { display: grid; grid-template-columns: 46px 1fr; gap: 8px; }
+.yr > b { font: 700 15px var(--serif); padding-top: 6px; }
+.yr .its { display: grid; gap: 5px; border-left: 2px solid #e2dacb; padding-left: 9px; min-height: 30px; }
+.it { background: #fffdf9; border-radius: 12px; padding: 7px 9px; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; font-size: 12.5px; animation: vin .35s both; }
+.it b { font-size: 13px; }
+.it em { font-style: normal; font: 600 11.5px var(--mono); text-align: right; }
+.it small { grid-column: 1 / -1; color: #7a746a; font-size: 11px; }
+.it.urg { box-shadow: inset 3px 0 0 var(--clay); }
+.save { font-size: 11.5px; color: #7a746a; font-style: italic; padding: 2px 0; }
+.vchart svg { width: 100%; height: auto; display: block; }
+.pri { display: flex; gap: 4px; }
+.pri button { flex: 1; border: 1.5px solid var(--line); background: #fffdf9; border-radius: 12px; padding: 7px 4px; font: 600 12px var(--sans); }
+.pri button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
+.brow { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; font-size: 12.5px; }
+.brow input { grid-column: 1 / -1; width: 100%; accent-color: var(--sage); }
+.brow output { font: 600 13px var(--mono); }
+/* page */
+.princ { display: grid; gap: 0; border-top: 3px solid var(--ink); max-width: 580px; margin-top: 18px; }
+.princ div { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.princ i { font: 700 18px/1 var(--serif); color: var(--sage); font-style: normal; }
+.princ b { display: block; font: 700 16px/1.2 var(--serif); }
+.princ p { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.try { margin-top: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; font-size: 13.5px; max-width: 580px; }
+.try b.h { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); display: block; margin-bottom: 4px; }
+.mapgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.mg { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+.mg .n { font: 500 11px var(--mono); color: var(--clay); letter-spacing: .08em; }
+.mg b { font: 700 18px/1.2 var(--serif); }
+.mg p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.mg .tech { font: 500 11px var(--mono); color: var(--sage); }
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><b>Inicio · parte 3</b> BuildI · app del cliente</div>
+      <h1>Inicio, con <em>tus medidas, tu luz y tu tiempo</em></h1>
+      <p class="lede">Las partes 1 y 2 inspiran y ayudan a decidir. Esta convierte la inspiración en algo que el cliente puede tocar: sus muebles en su plano, su pintura con su luz, la idea por dentro y un plan realista para los próximos años.</p>
+      <p class="sub">Cuatro herramientas nuevas dentro de Inicio. Medidas, precios y fechas son de ejemplo.</p>
+      <div class="princ">
+        <div><i>1</i><div><b>Acomodar muebles en tu plano</b><p>El plano real de la sala-comedor, a escala. Agregas muebles del catálogo y los arrastras. Avisa si chocan, si tapan la puerta o si el paso queda menor a 60 cm. Abajo sale el total y se compra todo junto.</p></div></div>
+        <div><i>2</i><div><b>Luz y color a cualquier hora</b><p>Tu sala con la pintura, el piso y el tipo de foco que elijas. Mueves la hora del día y ves cómo entra el sol según la orientación de tu casa. Te avisa cuándo un color no te va a funcionar y calcula cuánta pintura necesitas.</p></div></div>
+        <div><i>3</i><div><b>Cómo se construye, capa por capa</b><p>La idea "abierta" en vista explotada: cada capa con su material, grosor, para qué sirve y cuánto cuesta por m². Luego los pasos de obra día por día y qué revisa BuildI. Así el cliente entiende lo que paga.</p></div></div>
+        <div><i>4</i><div><b>Tu casa en 5 años</b><p>Todas las ideas guardadas, acomodadas por año según lo que puedes apartar y lo que te importa más: ahorrar, que suba el valor o vivir más cómodo. Lo urgente va primero y la gráfica muestra cómo sube el valor de tu casa.</p></div></div>
+      </div>
+      <div class="try"><b class="h">Prueba esto</b>En <b>Muebles</b> agrega el comedor y arrástralo hasta que choque con el sofá o tape la puerta. En <b>Luz y color</b> elige Azul noche y mueve la hora de 8:00 a 19:00. En <b>Cómo se construye</b> mueve la vista explotada y toca una capa. En <b>Plan 5 años</b> cambia el presupuesto y la prioridad.</div>
+    </div>
+
+    <div class="phone">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="toast" id="toast"></div>
+        <div class="scroll" id="scroll"></div>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="App del cliente">
+          <div class="ind" id="ind"></div>
+          <button role="tab" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9 1.3 5.8L12 16l-4.9 3 1.3-5.8L4 9.3l5.8-.7z"/></svg>Inicio</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/><path d="M2 21h20"/></svg>Mis obras</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Mi hogar</button>
+          <button role="tab" aria-selected="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Qué hace falta para construirlo en BuildI</h2>
+    <p class="sub">Cada herramienta se apoya en datos que la app ya junta en otras partes: el plano de la visita técnica, la orientación de la casa, el catálogo de proveedores y los tableros del cliente.</p>
+    <div class="mapgrid">
+      <div class="mg"><span class="n">MUEBLES</span><b>Plano a escala + catálogo con medidas</b><p>El plano sale de la visita técnica o de "Mi hogar › Expediente". Cada mueble del proveedor trae ancho y fondo.</p><span class="tech">react-native-svg + gesture-handler · choque por rectángulos</span></div>
+      <div class="mg"><span class="n">LUZ Y COLOR</span><b>Orientación + hora + pintura</b><p>La orientación se toma con la brújula del teléfono en la visita. La pintura viene del proveedor, con código para pedir muestra.</p><span class="tech">Skia · capas de luz sobre la foto del cuarto</span></div>
+      <div class="mg"><span class="n">CÓMO SE CONSTRUYE</span><b>Ficha técnica por idea</b><p>Cada idea constructiva trae sus capas, precio por m², oficios y pasos. Son los mismos datos con que el constructor cotiza.</p><span class="tech">SVG isométrico · Reanimated para separar capas</span></div>
+      <div class="mg"><span class="n">PLAN 5 AÑOS</span><b>Tableros + presupuesto anual</b><p>Toma las ideas guardadas. Lo urgente viene de "Mi hogar" (impermeabilizar antes de lluvias). Cada año se puede convertir en un proyecto.</p><span class="tech">acomodo por prioridad · gráfica de valor</span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const setup = c => { const w = c.clientWidth, h = c.clientHeight, d = devicePixelRatio || 1; c.width = w * d; c.height = h * d; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, w, h]; };
+  let toastT; const toast = s => { const t = $('toast'); t.textContent = s; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); };
+  const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+  const S = { sub: 0 };
+
+  /* =============== 1 · MUEBLES =============== */
+  const RW = 5.2, RH = 4.0, DOOR = [0.2, 3.1, 0.9, 0.9];
+  const CAT = [
+    { k: 'sofa', n: 'Sofá 3 plazas', w: 2.2, d: 0.9, p: 18900, c: '#9fb7a6' },
+    { k: 'sillon', n: 'Sillón', w: 0.8, d: 0.8, p: 7400, c: '#d4b25e' },
+    { k: 'centro', n: 'Mesa de centro', w: 1.0, d: 0.6, p: 4200, c: '#b98b5a' },
+    { k: 'tapete', n: 'Tapete 2×1.4', w: 2.0, d: 1.4, p: 3600, c: '#e8d9c0', floor: true },
+    { k: 'comedor', n: 'Comedor 6 personas', w: 1.8, d: 0.9, p: 14500, c: '#8a5a3c' },
+    { k: 'librero', n: 'Librero', w: 1.2, d: 0.35, p: 6800, c: '#7d8284' }
+  ];
+  let pieces = [{ id: 1, k: 'tapete', x: 0.9, y: 0.9, r: 0 }, { id: 2, k: 'sofa', x: 0.8, y: 0.15, r: 0 }, { id: 3, k: 'centro', x: 1.4, y: 1.3, r: 0 }];
+  let nextId = 4, sel = null;
+  const dims = p => { const c = CAT.find(c => c.k === p.k); return p.r ? [c.d, c.w] : [c.w, c.d]; };
+  const cat = p => CAT.find(c => c.k === p.k);
+  const gap = (a, b) => { const [aw, ad] = dims(a), [bw, bd] = dims(b);
+    const dx = Math.max(0, a.x - (b.x + bw), b.x - (a.x + aw)), dy = Math.max(0, a.y - (b.y + bd), b.y - (a.y + ad));
+    return dx > 0 && dy > 0 ? Math.hypot(dx, dy) : Math.max(dx, dy); };
+  const overlap = (a, b) => { const [aw, ad] = dims(a), [bw, bd] = dims(b); return a.x < b.x + bw - .01 && b.x < a.x + aw - .01 && a.y < b.y + bd - .01 && b.y < a.y + ad - .01; };
+  function status(p) {
+    if (cat(p).floor) return 'ok';
+    const solid = pieces.filter(q => q !== p && !cat(q).floor);
+    if (solid.some(q => overlap(p, q))) return 'clash';
+    const [w, d] = dims(p); if (p.x < DOOR[0] + DOOR[2] && p.x + w > DOOR[0] && p.y + d > DOOR[1]) return 'door';
+    if (p.k !== 'centro' && solid.some(q => { const g = gap(p, q); return q.k !== 'centro' && g > 0 && g < 0.6; })) return 'tight';
+    return 'ok';
+  }
+  const COL = { ok: '#2b2a26', clash: '#c0392b', door: '#c0392b', tight: '#c99a17' };
+  function planSVG() {
+    const order = [...pieces].sort((a, b) => (cat(b).floor ? 1 : 0) - (cat(a).floor ? 1 : 0));
+    let g = '';
+    for (const p of order) { const [w, d] = dims(p), st = status(p), c = cat(p);
+      g += `<g class="pc-r" data-pid="${p.id}"><rect x="${p.x}" y="${p.y}" width="${w}" height="${d}" rx=".06" fill="${c.c}" fill-opacity="${c.floor ? .7 : .95}" stroke="${p.id === sel ? '#3c6e9e' : COL[st]}" stroke-width="${p.id === sel ? .06 : st === 'ok' ? .02 : .05}" ${st !== 'ok' && !c.floor ? 'stroke-dasharray=".12 .07"' : ''}/>
+        <text x="${p.x + w / 2}" y="${p.y + d / 2 + .06}" text-anchor="middle" font-family="Archivo" font-size=".17" fill="#2b2a26" pointer-events="none">${c.n.split(' ')[0]}</text></g>`; }
+    return g;
+  }
+  function planChecks() {
+    const out = [], solid = pieces.filter(p => !cat(p).floor);
+    const cl = solid.filter(p => status(p) === 'clash'), dr = solid.filter(p => status(p) === 'door'), ti = solid.filter(p => status(p) === 'tight');
+    if (cl.length) out.push(['bad', '✕', `${cl.map(p => cat(p).n).join(' y ')}: chocan`]);
+    if (dr.length) out.push(['bad', '✕', `${dr.map(p => cat(p).n).join(', ')} tapa la puerta`]);
+    if (ti.length) out.push(['warn', '!', `Paso de menos de 60 cm junto a ${ti.map(p => cat(p).n.toLowerCase()).join(' y ')}`]);
+    if (!out.length) out.push(['ok', '✓', 'Todo cabe, la puerta abre y se puede pasar cómodo']);
+    out.push(['ok', '✓', 'La ventana queda libre: entra la luz de la tarde']);
+    return out;
+  }
+  function planStats() {
+    const area = pieces.filter(p => !cat(p).floor).reduce((s, p) => { const [w, d] = dims(p); return s + w * d; }, 0);
+    return { free: Math.round((1 - area / (RW * RH)) * 100), total: pieces.reduce((s, p) => s + cat(p).p, 0), n: pieces.length };
+  }
+  function muebles() {
+    const st = planStats(), sp = pieces.find(p => p.id === sel);
+    return `<p class="lead">Tu sala-comedor de <b>5.2 × 4.0 m</b>, del plano de la visita técnica. Arrastra los muebles; toca uno para girarlo o quitarlo.</p>
+      <div class="fplan"><svg id="fsvg" viewBox="-0.25 -0.3 5.7 4.75">
+        <rect x="0" y="0" width="${RW}" height="${RH}" fill="#f6f2ea"/>
+        ${Array.from({ length: 5 }, (_, i) => `<line x1="${i + 1}" y1="0" x2="${i + 1}" y2="${RH}" stroke="#e7e0d3" stroke-width=".01"/>`).join('')}${Array.from({ length: 3 }, (_, i) => `<line x1="0" y1="${i + 1}" x2="${RW}" y2="${i + 1}" stroke="#e7e0d3" stroke-width=".01"/>`).join('')}
+        <path d="M${DOOR[0]} ${RH} A ${DOOR[2]} ${DOOR[2]} 0 0 1 ${DOOR[0] + DOOR[2]} ${RH - DOOR[2]}" fill="none" stroke="#b0561f" stroke-width=".02" stroke-dasharray=".06 .05"/><line x1="${DOOR[0] + DOOR[2]}" y1="${RH}" x2="${DOOR[0] + DOOR[2]}" y2="${RH - DOOR[2]}" stroke="#b0561f" stroke-width=".03"/>
+        <rect x="0" y="0" width="${RW}" height="${RH}" fill="none" stroke="#2b2a26" stroke-width=".1"/>
+        <line x1="2.6" y1="0" x2="4.4" y2="0" stroke="#9cc3df" stroke-width=".12"/><text x="3.5" y="-.12" text-anchor="middle" font-family="IBM Plex Mono" font-size=".14" fill="#3c6e9e">ventana</text>
+        <line x1="${DOOR[0]}" y1="${RH}" x2="${DOOR[0] + DOOR[2]}" y2="${RH}" stroke="#f6f2ea" stroke-width=".12"/><text x="${DOOR[0] + .45}" y="${RH + .22}" text-anchor="middle" font-family="IBM Plex Mono" font-size=".14" fill="#b0561f">puerta</text>
+        <text x="${RW / 2}" y="${RH + .22}" text-anchor="middle" font-family="IBM Plex Mono" font-size=".13" fill="#7a746a">5.20 m</text>
+        <g id="fp">${planSVG()}</g></svg></div>
+      ${sp ? `<div class="seltool"><span>${cat(sp).n} · ${dims(sp).map(v => v.toFixed(2)).join(' × ')} m</span><button type="button" data-rot="1">Girar</button><button type="button" class="x" data-del="1">Quitar</button></div>` : ''}
+      <div class="pc checks" id="fchk">${planChecks().map(c => `<div class="${c[0]}"><span>${c[1]}</span><span>${c[2]}</span></div>`).join('')}</div>
+      <div class="hd" style="margin:2px 2px -4px"><span>Catálogo · caben en tu sala</span><b>toca para agregar</b></div>
+      <div class="cat">${CAT.map(c => `<button type="button" data-add="${c.k}"><i style="background:${c.c}"></i><b>${c.n}</b><small>${c.w}×${c.d} m · ${money(c.p)}</small></button>`).join('')}</div>
+      <div class="kpis" id="fk"><div><small>Piezas</small><b>${st.n}</b></div><div><small>Piso libre</small><b>${st.free}%</b></div><div><small>Total</small><b>${money(st.total / 1000)}k</b></div></div>
+      <button class="cta sage" type="button" data-buy="1">Comprar todo · entrega e instalación ${money(st.total)}</button>`;
+  }
+  function refreshPlan() { $('fp').innerHTML = planSVG(); $('fchk').innerHTML = planChecks().map(c => `<div class="${c[0]}"><span>${c[1]}</span><span>${c[2]}</span></div>`).join(''); const st = planStats(); $('fk').innerHTML = `<div><small>Piezas</small><b>${st.n}</b></div><div><small>Piso libre</small><b>${st.free}%</b></div><div><small>Total</small><b>${money(st.total / 1000)}k</b></div>`; }
+  function bindPlan() {
+    const svg = $('fsvg'); if (!svg) return; let drag = null;
+    const pt = e => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); };
+    svg.onpointerdown = e => { const g = e.target.closest('[data-pid]'); if (!g) { if (sel !== null) { sel = null; render(true); } return; }
+      const p = pieces.find(q => q.id === +g.dataset.pid), m = pt(e); drag = { p, ox: m.x - p.x, oy: m.y - p.y, moved: false }; svg.setPointerCapture(e.pointerId); };
+    svg.onpointermove = e => { if (!drag) return; const m = pt(e), [w, d] = dims(drag.p);
+      const nx = Math.round(Math.max(0, Math.min(RW - w, m.x - drag.ox)) * 10) / 10, ny = Math.round(Math.max(0, Math.min(RH - d, m.y - drag.oy)) * 10) / 10;
+      if (nx !== drag.p.x || ny !== drag.p.y) { drag.p.x = nx; drag.p.y = ny; drag.moved = true; refreshPlan(); } };
+    svg.onpointerup = () => { if (!drag) return; const p = drag.p, mv = drag.moved; drag = null;
+      if (!mv) { sel = sel === p.id ? null : p.id; render(true); } else { const s = status(p); if (s === 'clash') toast('Choca con otro mueble'); else if (s === 'door') toast('Así no abre la puerta'); try { navigator.vibrate && s !== 'ok' && navigator.vibrate(20); } catch (_) {} } };
+  }
+
+  /* =============== 2 · LUZ Y COLOR =============== */
+  const PAINTS = [['Salvia', '#9fb7a6', 'BLD-4521'], ['Hueso', '#efe8dc', 'BLD-1102'], ['Terracota', '#c9825a', 'BLD-3307'], ['Azul noche', '#3f4e66', 'BLD-6610'], ['Ocre', '#d4a64a', 'BLD-2214'], ['Blanco puro', '#f8f8f4', 'BLD-0001']];
+  const FLOORS = [['Roble', '#b98b5a'], ['Concreto', '#a9a59c'], ['Barro', '#b8673f']];
+  const L = { paint: 0, floor: 0, t: 17, temp: 0 };
+  const lum = h => { const n = parseInt(h.slice(1), 16), r = n >> 16, g = n >> 8 & 255, b = n & 255; return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; };
+  function drawLight(c) {
+    const [x, W, H] = setup(c), wall = PAINTS[L.paint][1], fl = FLOORS[L.floor][1], t = L.t;
+    const bx0 = W * .2, bx1 = W * .8, by0 = H * .12, by1 = H * .64;
+    const poly = (pts, f) => { x.beginPath(); pts.forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.closePath(); x.fillStyle = f; x.fill(); };
+    poly([[0, 0], [W, 0], [bx1, by0], [bx0, by0]], '#f2efe8');
+    poly([[bx0, by0], [bx1, by0], [bx1, by1], [bx0, by1]], wall);
+    poly([[0, 0], [bx0, by0], [bx0, by1], [0, H]], wall); poly([[0, 0], [bx0, by0], [bx0, by1], [0, H]], 'rgba(0,0,0,.08)');
+    poly([[W, 0], [bx1, by0], [bx1, by1], [W, H]], wall); poly([[W, 0], [bx1, by0], [bx1, by1], [W, H]], 'rgba(0,0,0,.14)');
+    poly([[0, H], [bx0, by1], [bx1, by1], [W, H]], fl);
+    x.strokeStyle = 'rgba(0,0,0,.12)'; x.lineWidth = 1;
+    if (L.floor === 0) for (let i = 1; i < 9; i++) { const k = i / 9; x.beginPath(); x.moveTo(bx0 + (bx1 - bx0) * k, by1); x.lineTo(W * k, H); x.stroke(); }
+    if (L.floor === 2) { for (let i = 1; i < 6; i++) { const k = i / 6; x.beginPath(); x.moveTo(bx0 + (bx1 - bx0) * k, by1); x.lineTo(W * k, H); x.stroke(); } for (let j = 1; j < 4; j++) { const k = j / 4, yy = by1 + (H - by1) * k * k, xl = bx0 * (1 - k * k), xr = bx1 + (W - bx1) * k * k; x.beginPath(); x.moveTo(xl, yy); x.lineTo(xr, yy); x.stroke(); } }
+    // window on left wall (west)
+    const wq = [[W * .04, H * .2], [W * .14, H * .25], [W * .14, H * .55], [W * .04, H * .62]];
+    const day = Math.max(0, Math.min(1, Math.sin(Math.PI * (t - 6.5) / 13.5)));
+    poly(wq, `rgb(${120 + 120 * day},${150 + 90 * day},${190 + 50 * day})`);
+    x.strokeStyle = '#fff'; x.lineWidth = 3; x.beginPath(); wq.forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.closePath(); x.stroke();
+    // sun patch: west sun from 13h to 19h
+    if (t >= 13 && t <= 19.2) { const k = (t - 13) / 6.2, len = .25 + k * .55, a = Math.sin(Math.PI * Math.min(1, (19.2 - t) / 6.2 + .1)) * .5;
+      const gold = t > 17 ? (t - 17) / 2.2 : 0;
+      x.fillStyle = `rgba(255,${235 - 60 * gold},${180 - 100 * gold},${.18 + .3 * a})`;
+      poly([[W * .14, H * .62], [W * .14, H * .95], [W * (.14 + len), H * (.95 - len * .1)], [W * (.14 + len * .8), H * .66]], x.fillStyle);
+      x.fillStyle = `rgba(255,${225 - 50 * gold},${170 - 90 * gold},${.12 + .14 * a})`; poly([[bx0, by0 + (by1 - by0) * .3], [bx0 + W * len * .5, by0 + (by1 - by0) * (.2 + k * .2)], [bx0 + W * len * .5, by1], [bx0, by1]], x.fillStyle); }
+    // sofa
+    x.fillStyle = 'rgba(43,42,38,.85)'; x.fillRect(W * .32, H * .5, W * .36, H * .14); x.fillStyle = 'rgba(43,42,38,.7)'; x.fillRect(W * .3, H * .6, W * .4, H * .12);
+    // lamp
+    x.strokeStyle = '#2b2a26'; x.lineWidth = 2; x.beginPath(); x.moveTo(W * .75, H * .76); x.lineTo(W * .75, H * .36); x.stroke(); x.fillStyle = '#efe2cf'; poly([[W * .72, H * .36], [W * .78, H * .36], [W * .8, H * .28], [W * .7, H * .28]], '#efe2cf');
+    // ambient
+    const dark = 1 - day;
+    x.fillStyle = `rgba(16,22,44,${dark * .62})`; x.fillRect(0, 0, W, H);
+    if (t >= 17 && t < 19.5) { x.fillStyle = `rgba(255,140,40,${.12 * (1 - Math.abs(t - 18.2))})`; x.fillRect(0, 0, W, H); }
+    if (t < 9) { x.fillStyle = `rgba(120,150,200,${.12 * (9 - t) / 2.5})`; x.fillRect(0, 0, W, H); }
+    if (day < .45) { const lc = L.temp ? '255,246,228' : '255,200,130', gr = x.createRadialGradient(W * .75, H * .32, 4, W * .75, H * .45, W * .55);
+      const on = (0.45 - day) / .45; gr.addColorStop(0, `rgba(${lc},${.85 * on})`); gr.addColorStop(.4, `rgba(${lc},${.32 * on})`); gr.addColorStop(1, `rgba(${lc},0)`);
+      x.globalCompositeOperation = 'lighter'; x.fillStyle = gr; x.fillRect(0, 0, W, H); x.globalCompositeOperation = 'source-over'; }
+  }
+  const hhmm = t => `${Math.floor(t)}:${String(Math.round((t % 1) * 60)).padStart(2, '0')}`;
+  function lightHint() {
+    const p = PAINTS[L.paint], l = lum(p[1]);
+    if (l < .32) return ['', `${p[0]} en una sala que solo recibe sol por la tarde se verá casi negro en la mañana y la noche. Úsalo en un solo muro, el que recibe el sol.`];
+    if (L.paint === 2 || L.paint === 4) return ['', `Entre 17:00 y 19:00 el sol del poniente pone más naranja la ${p[0].toLowerCase()}. Con focos neutros de 4000K se ve más fiel en la noche.`];
+    if (L.paint === 5 && L.temp === 1) return ['', 'Blanco puro con luz fría de 4000K se siente de oficina. Con 2700K se ve cálido y acogedor.'];
+    return ['good', `${p[0]} se ve parejo a lo largo del día en tu sala orientada al poniente. Buena elección.`];
+  }
+  function luz() {
+    const h = lightHint();
+    return `<p class="lead">Tu sala orientada al <b>poniente</b>, según la brújula de la visita técnica. Mueve la hora y elige pintura, piso y focos.</p>
+      <div class="lroom"><canvas id="lc"></canvas><span class="clock" id="lclock">${hhmm(L.t)} · ${PAINTS[L.paint][0]}</span></div>
+      <div class="timebar"><span>7:00</span><input type="range" id="lt" min="7" max="22" step=".25" value="${L.t}" aria-label="Hora del día"><span>22:00</span></div>
+      <div class="pc" style="display:grid;gap:9px">
+        <div class="optrow"><span>Pintura</span><div class="paints">${PAINTS.map((p, i) => `<button type="button" data-paint="${i}" aria-pressed="${i === L.paint}" style="background:${p[1]}" aria-label="${p[0]}"></button>`).join('')}</div></div>
+        <div class="optrow"><span>Piso</span><div class="seg">${FLOORS.map((f, i) => `<button type="button" data-floor="${i}" aria-pressed="${i === L.floor}">${f[0]}</button>`).join('')}</div></div>
+        <div class="optrow"><span>Focos</span><div class="seg"><button type="button" data-temp="0" aria-pressed="${L.temp === 0}">Cálida 2700K</button><button type="button" data-temp="1" aria-pressed="${L.temp === 1}">Neutra 4000K</button></div></div>
+      </div>
+      <div class="hint ${h[0]}" id="lhint">${h[1]}</div>
+      <div class="pc"><div class="hd"><span>${PAINTS[L.paint][0]} · ${PAINTS[L.paint][2]}</span><b>18 m² de muro</b></div><div style="font-size:12.5px;color:#5e6259">2 manos · 3.6 L → <b>1 galón ${money(890)}</b> · o pintado por BuildI en 1 día, ${money(4200)}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="cta ghost" type="button" data-sample="1">Muestra a casa · gratis</button><button class="cta sage" type="button" data-paintit="1">Que lo pinten</button></div>`;
+  }
+
+  /* =============== 3 · CÓMO SE CONSTRUYE =============== */
+  const SYS = [
+    { n: 'Azotea verde', price: 1450, layers: [
+      ['Losa existente', '10 cm de concreto', 'Lo que ya tienes. Antes se revisa que aguante el peso extra: 120 kg/m² mojado.', 0, 'Ingeniero', '#a9a59c', 14],
+      ['Impermeabilizante', 'membrana de 4 mm', 'Lo más importante. Se prueba 24 h con agua encharcada antes de seguir.', 260, 'Impermeabilizador', '#3f4e66', 6],
+      ['Barrera antiraíz', 'polietileno 0.5 mm', 'Evita que las raíces rompan el impermeabilizante.', 60, 'Jardinero', '#6b6f70', 4],
+      ['Capa de drenaje', 'nódulos de 3 cm', 'El agua que sobra corre a la bajada pluvial y no se encharca.', 180, 'Jardinero', '#2b2a26', 8],
+      ['Tela filtrante', 'geotextil', 'Deja pasar el agua pero no la tierra.', 40, 'Jardinero', '#e8e2d4', 3],
+      ['Sustrato ligero', '12 cm', 'Tierra ligera: pesa la mitad que la normal.', 320, 'Jardinero', '#7a5236', 16],
+      ['Plantas', 'sedum y pastos', 'Casi no necesitan riego. Bajan hasta 4 °C la planta alta.', 410, 'Jardinero', '#4f7d61', 10]],
+      steps: [['Día 1', 'Revisión de la losa y prueba de carga', 'Ingeniero'], ['Día 2–3', 'Impermeabilizante', 'Impermeabilizador'], ['Día 4', 'Prueba de inundación 24 h', 'Residente BuildI'], ['Día 5–6', 'Capas, sustrato y plantas', 'Jardinero'], ['Día 7', 'Riego por goteo y entrega', 'Jardinero']],
+      qa: ['Prueba de inundación 24 h con foto', 'Peso revisado por un ingeniero', 'Garantía de 5 años del impermeabilizante'] },
+    { n: 'Piso nuevo', price: 980, layers: [
+      ['Firme existente', 'concreto', 'Se revisa que esté plano y sin humedad.', 0, 'Albañil', '#a9a59c', 14],
+      ['Autonivelante', '5 mm', 'Deja el piso perfectamente plano. Sin esto, las piezas grandes se despegan o suenan huecas.', 190, 'Pisero', '#cfc8ba', 6],
+      ['Adhesivo', 'cemento flexible', 'Pega las piezas grandes sin que truenen con los cambios de temperatura.', 110, 'Pisero', '#e8e2d4', 4],
+      ['Porcelanato', '60×120 cm', 'La pieza que ves. Grande, con pocas juntas.', 620, 'Pisero', '#d8cbb3', 10],
+      ['Junta y sellador', '2 mm', 'Junta delgada del color de la pieza. Se sella para que no se manche.', 60, 'Pisero', '#8a7f6c', 3]],
+      steps: [['Día 1', 'Retirar el piso anterior', 'Albañil'], ['Día 2', 'Autonivelante (seca 24 h)', 'Pisero'], ['Día 3–5', 'Colocación de piezas', 'Pisero'], ['Día 6', 'Junta, sellado y limpieza', 'Pisero']],
+      qa: ['Nivel con láser antes de colocar', 'Prueba de "golpe": ninguna pieza suena hueca', 'Piezas extra guardadas para reparaciones'] },
+    { n: 'Muro acústico', price: 1150, layers: [
+      ['Bastidor metálico', 'canal de 6.35 cm', 'La estructura. Se separa del muro existente para que el ruido no pase.', 180, 'Tablaroquero', '#9aa1a4', 10],
+      ['Lana mineral', '5 cm', 'Absorbe el ruido dentro del muro.', 210, 'Tablaroquero', '#e8b04a', 12],
+      ['Tablaroca 1', '12.7 mm', 'Primera capa de placa.', 160, 'Tablaroquero', '#e8e2d4', 5],
+      ['Tablaroca 2', '12.7 mm, juntas cruzadas', 'La segunda capa con juntas cruzadas es la que más ruido corta.', 160, 'Tablaroquero', '#ddd6c8', 5],
+      ['Pasta y pintura', 'acabado liso', 'Queda igual que los otros muros.', 140, 'Pintor', '#9fb7a6', 3]],
+      steps: [['Día 1', 'Bastidor y lana mineral', 'Tablaroquero'], ['Día 2', 'Dos capas de tablaroca', 'Tablaroquero'], ['Día 3', 'Pasta y lija', 'Tablaroquero'], ['Día 4', 'Pintura', 'Pintor']],
+      qa: ['Medición de ruido antes y después', 'Sellado acústico en los bordes', 'Se revisan contactos e instalaciones dentro'] }
+  ];
+  const C = { sys: 0, ex: .6, l: 1 };
+  function layersSVG() {
+    const s = SYS[C.sys], n = s.layers.length, ys = []; let cy = 0, g = '';
+    s.layers.forEach(L => { ys.push(cy); cy -= L[6] + 4 + 26 * C.ex; });
+    const ly = [...ys]; for (let i = n - 2; i >= 0; i--) ly[i] = Math.max(ys[i], ly[i + 1] + 15);
+    s.layers.forEach((L, i) => { const t = L[6], yy = ys[i], on = i === C.l;
+      const top = `${30},${yy - 34} ${150},${yy - 34} ${190},${yy} ${70},${yy}`, front = `${70},${yy} ${190},${yy} ${190},${yy + t} ${70},${yy + t}`, side = `${150},${yy - 34} ${190},${yy} ${190},${yy + t} ${150},${yy - 34 + t}`;
+      g += `<g data-l="${i}"><polygon points="${side}" fill="${L[5]}" opacity=".75"/><polygon points="${front}" fill="${L[5]}"/><polygon points="${front}" fill="rgba(0,0,0,.12)"/><polygon points="${top}" fill="${L[5]}" stroke="${on ? '#b0561f' : 'rgba(0,0,0,.15)'}" stroke-width="${on ? 2.5 : 1}"/>
+        <polyline points="192,${yy} 204,${yy} 212,${ly[i]}" fill="none" stroke="${on ? '#b0561f' : '#cfc8ba'}"/><rect x="210" y="${ly[i] - 9}" width="120" height="15" fill="transparent"/><text x="216" y="${ly[i] + 4}" font-family="Archivo" font-size="11" font-weight="${on ? 700 : 500}" fill="${on ? '#b0561f' : '#2b2a26'}">${L[0]}</text></g>`; });
+    const minY = ys[n - 1] - 44, maxY = Math.max(ys[0] + s.layers[0][6], ly[0]) + 12;
+    return `<svg viewBox="0 ${minY} 330 ${maxY - minY}">${g}</svg>`;
+  }
+  function detail() { const L = SYS[C.sys].layers[C.l]; return `<div class="ldet" id="ldet"><b>${C.l + 1}. ${L[0]}</b><div class="m"><span>${L[1]}</span><span>${L[3] ? money(L[3]) + '/m²' : 'ya existe'}</span><span>${L[4]}</span></div><p>${L[2]}</p></div>`; }
+  function construye() {
+    const s = SYS[C.sys];
+    return `<div class="seg">${SYS.map((x, i) => `<button type="button" data-sys="${i}" aria-pressed="${i === C.sys}">${x.n}</button>`).join('')}</div>
+      <div class="lay" id="lay">${layersSVG()}</div>
+      <div class="timebar"><span>junto</span><input type="range" id="lex" min="0" max="1" step=".02" value="${C.ex}" aria-label="Separar capas"><span>separado</span></div>
+      ${detail()}
+      <div class="kpis"><div><small>Capas</small><b>${s.layers.length}</b></div><div><small>Por m²</small><b>${money(s.price)}</b></div><div><small>Días</small><b>${s.steps[s.steps.length - 1][0].replace(/\D+/g, ' ').trim().split(' ').pop()}</b></div></div>
+      <div class="pc bsteps"><div class="hd" style="border:0;display:flex"><span>Paso a paso</span></div>${s.steps.map(r => `<div><em>${r[0]}</em><span>${r[1]}<small>${r[2]}</small></span></div>`).join('')}</div>
+      <div class="pc checks"><div class="hd" style="display:flex"><span>Lo que revisa BuildI</span><b>con foto en Mis obras</b></div>${s.qa.map(q => `<div class="ok"><span>✓</span><span style="color:var(--ink)">${q}</span></div>`).join('')}</div>`;
+  }
+
+  /* =============== 4 · PLAN 5 AÑOS =============== */
+  const IDEAS = [
+    { n: 'Impermeabilizar azotea', c: 38000, v: 20000, cf: 2, sv: 0, urg: 'Antes de lluvias · aviso de Mi hogar' },
+    { n: 'Minisplits inverter', c: 48000, v: 30000, cf: 4, sv: 6000 },
+    { n: 'Paneles solares', c: 95000, v: 120000, cf: 1, sv: 18000 },
+    { n: 'Cocina abierta', c: 280000, v: 420000, cf: 5, sv: 0 },
+    { n: 'Baño principal', c: 140000, v: 190000, cf: 4, sv: 0 },
+    { n: 'Terraza con pérgola', c: 85000, v: 110000, cf: 4, sv: 0 },
+    { n: 'Piso de madera', c: 120000, v: 130000, cf: 3, sv: 0 }
+  ];
+  const P = { budget: 150000, pri: 1 };
+  function schedule() {
+    const metric = [i => i.sv / i.c, i => i.v / i.c, i => i.cf][P.pri];
+    const q = [...IDEAS].sort((a, b) => (b.urg ? 1 : 0) - (a.urg ? 1 : 0) || metric(b) - metric(a));
+    const years = [2027, 2028, 2029, 2030, 2031].map(y => ({ y, its: [] }));
+    let bank = 0;
+    for (const yr of years) { bank += P.budget; while (q.length && q[0].c <= bank) { const it = q.shift(); bank -= it.c; yr.its.push(it); } if (!yr.its.length) yr.note = `Sin obra: juntas ${money(bank / 1000)}k para ${q[0] ? q[0].n.toLowerCase() : 'lo que sigue'}`; }
+    const left = q;
+    return { years, left };
+  }
+  function plan() {
+    return `<p class="lead">Tus <b>7 ideas guardadas</b>, acomodadas por año según lo que puedes apartar y lo que te importa más.</p>
+      <div class="pc" style="display:grid;gap:10px">
+        <div class="brow"><span>Puedo apartar al año</span><output id="pbO">${money(P.budget)}</output><input type="range" id="pb" min="60000" max="400000" step="10000" value="${P.budget}" aria-label="Presupuesto anual"></div>
+        <div class="pri">${['Ahorrar', 'Que valga más', 'Vivir cómodo'].map((t, i) => `<button type="button" data-pri="${i}" aria-pressed="${i === P.pri}">${t}</button>`).join('')}</div>
+      </div><div id="pout" style="display:grid;gap:12px">${planOut()}</div>`;
+  }
+  function planOut() {
+    const { years, left } = schedule();
+    let base = 4900000, val = base, sav = 0; const pts = [[0, base]];
+    years.forEach((y, i) => { val += y.its.reduce((s, it) => s + it.v, 0) + val * .04; sav += y.its.reduce((s, it) => s + it.sv, 0); pts.push([i + 1, val]); });
+    const max = Math.max(...pts.map(p => p[1])), min = base * .95, X = i => 22 + i * 53, Y = v => 90 - (v - min) / (max - min) * 75;
+    const inv = years.reduce((s, y) => s + y.its.reduce((a, b) => a + b.c, 0), 0);
+    return `<div class="years">${years.map(y => `<div class="yr"><b>${y.y}</b><div class="its">${y.its.map(it => `<div class="it ${it.urg ? 'urg' : ''}"><b>${it.n}</b><em>${money(it.c / 1000)}k</em><small>${it.urg ? it.urg : it.sv ? `ahorra ${money(it.sv)} al año` : `+${money(it.v / 1000)}k de valor`}</small></div>`).join('') || `<div class="save">${y.note || 'Sin obra este año'}</div>`}</div></div>`).join('')}</div>
+      ${left.length ? `<div class="hint">No alcanza en 5 años: ${left.map(l => l.n.toLowerCase()).join(', ')}. Sube lo que apartas o junta ideas en una sola obra.</div>` : '<div class="hint good">Todo cabe en 5 años. Las ideas del mismo año se hacen en una sola obra y ahorras alrededor del 10%.</div>'}
+      <div class="pc vchart"><div class="hd"><span>Valor de tu casa</span><b>${money(base)} → ${money(val)}</b></div>
+        <svg viewBox="0 0 300 110"><polyline points="${pts.map(p => X(p[0]) + ',' + Y(p[1])).join(' ')}" fill="none" stroke="#4f7d61" stroke-width="2.5"/><polygon points="${X(0)},100 ${pts.map(p => X(p[0]) + ',' + Y(p[1])).join(' ')} ${X(5)},100" fill="#4f7d61" opacity=".12"/>
+        ${pts.map(p => `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3" fill="#4f7d61"/><text x="${X(p[0])}" y="108" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#7a746a">${p[0] ? 2026 + p[0] : 'hoy'}</text>`).join('')}</svg>
+        <small style="font-size:11px;color:#7a746a">Incluye una plusvalía estimada de 4% al año en tu colonia.</small></div>
+      <div class="kpis"><div><small>Inviertes</small><b>${money(inv / 1000)}k</b></div><div><small>Ganas valor</small><b style="color:var(--sage)">+$${((val - base) / 1e6).toFixed(1)}M</b></div><div><small>Ahorro/año</small><b>${money(sav / 1000)}k</b></div></div>
+      <button class="cta sage" type="button" data-start="1">Empezar ${years.find(y => y.its.length)?.y || ''}: crear proyecto</button>`;
+  }
+
+  /* =============== render =============== */
+  const SUBS = ['Muebles', 'Luz y color', 'Cómo se construye', 'Plan 5 años'];
+  const scroll = $('scroll');
+  function render(keep) {
+    const st = scroll.scrollTop;
+    scroll.innerHTML = `<div class="view"><div class="greet"><small><span>Inicio</span><span>Casa Providencia</span></small><h3>Pruébalo <em>en tu casa</em></h3></div>
+      <div class="subtabs">${SUBS.map((s, i) => `<button type="button" data-sub="${i}" aria-pressed="${i === S.sub}">${s}</button>`).join('')}</div>${[muebles, luz, construye, plan][S.sub]()}</div>`;
+    if (keep) { scroll.scrollTop = st; scroll.querySelector('.view').style.animation = 'none'; } else scroll.scrollTop = 0;
+    if (S.sub === 0) bindPlan();
+    if (S.sub === 1) drawLight($('lc'));
+  }
+  scroll.addEventListener('click', e => {
+    const d = k => e.target.closest(`[data-${k}]`);
+    let b;
+    if (b = d('sub')) { S.sub = +b.dataset.sub; sel = null; render(); return; }
+    if (b = d('add')) { const c = CAT.find(c => c.k === b.dataset.add); const p = { id: nextId++, k: c.k, x: Math.max(0, (RW - c.w) / 2), y: Math.max(0, (RH - c.d) / 2), r: 0 }; pieces.push(p); sel = p.id; render(true); toast(`${c.n} agregado · arrástralo`); return; }
+    if (d('rot')) { const p = pieces.find(q => q.id === sel); p.r = 1 - p.r; const [w, dd] = dims(p); p.x = Math.min(p.x, RW - w); p.y = Math.min(p.y, RH - dd); render(true); return; }
+    if (d('del')) { pieces = pieces.filter(q => q.id !== sel); sel = null; render(true); return; }
+    if (d('buy')) { const bad = pieces.filter(p => !cat(p).floor && ['clash', 'door'].includes(status(p))); toast(bad.length ? 'Primero acomoda lo que choca' : 'Carrito listo · entrega en 6 días'); return; }
+    if (b = d('paint')) { L.paint = +b.dataset.paint; render(true); return; }
+    if (b = d('floor')) { L.floor = +b.dataset.floor; render(true); return; }
+    if (b = d('temp')) { L.temp = +b.dataset.temp; render(true); return; }
+    if (d('sample')) { toast(`Muestra ${PAINTS[L.paint][2]} llega el viernes`); return; }
+    if (d('paintit')) { toast('Pintor disponible el martes · 1 día'); return; }
+    if (b = d('sys')) { C.sys = +b.dataset.sys; C.l = 1; render(true); return; }
+    if (b = e.target.closest('g[data-l]')) { C.l = +b.dataset.l; $('lay').innerHTML = layersSVG(); $('ldet').outerHTML = detail(); return; }
+    if (b = d('pri')) { P.pri = +b.dataset.pri; render(true); return; }
+    if (d('start')) { toast('Proyecto creado en Mis obras con las ideas del primer año'); return; }
+  });
+  scroll.addEventListener('input', e => {
+    if (e.target.id === 'lt') { L.t = +e.target.value; drawLight($('lc')); $('lclock').textContent = `${hhmm(L.t)} · ${PAINTS[L.paint][0]}`; }
+    if (e.target.id === 'lex') { C.ex = +e.target.value; $('lay').innerHTML = layersSVG(); }
+    if (e.target.id === 'pb') { P.budget = +e.target.value; $('pbO').textContent = money(P.budget); $('pout').innerHTML = planOut(); }
+  });
+  const tb = [...$('tabs').querySelectorAll('button')]; requestAnimationFrame(() => { const b = tb[0]; $('ind').style.width = b.offsetWidth + 'px'; $('ind').style.transform = `translateX(${b.offsetLeft - 5}px)`; });
+  tb.forEach((t, i) => { if (i !== 0) t.onclick = () => toast('Esa sección tiene su propio prototipo'); });
+  render();
+  addEventListener('resize', () => render(true));
+})();
+</script>
